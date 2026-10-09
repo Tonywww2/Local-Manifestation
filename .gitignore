@@ -1,0 +1,35 @@
+# Local caches, build output and player/server data
+/.cache/
+/bin/
+/data/
+/internal/native/generated.go
+
+# Executables, test output and diagnostics
+*.exe
+*.dll
+*.test
+*.out
+*.prof
+*.pprof
+*.log
+coverage*.txt
+coverage*.html
+
+# Editor and operating-system files
+/.idea/
+/.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tmp
+*.temp
+*.bak
+*~
+__pycache__/
+*.pyc
+
+# Local environment settings
+.env
+.env.*
+!.env.example
+!.env.sample

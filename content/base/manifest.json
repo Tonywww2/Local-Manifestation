@@ -1,0 +1,16 @@
+{
+  "_comment": "Batch 01 content; base tuning values are development values.",
+  "id": "base",
+  "version": "0.7.0",
+  "sdk": 6,
+  "definitions": "definitions.json",
+  "adventure": "adventure.json",
+  "assets": {
+    "floor:default": "assets/concrete-floor.png",
+    "ui:main-background": "assets/workshop-menu.png",
+    "player:base:bulwark": "assets/warrior.png"
+  },
+  "scripts": [
+    "behavior.js"
+  ]
+}

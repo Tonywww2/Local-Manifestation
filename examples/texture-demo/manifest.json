@@ -1,0 +1,4 @@
+{
+  "id":"texture-demo","version":"1.0.0","sdk":6,"type":"texture",
+  "assets":{"ui:theme":"theme.json"}
+}

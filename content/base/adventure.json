@@ -1,0 +1,3447 @@
+{
+  "_comment": "Batch 01. Authored first-floor encounters; later floors reuse templates with DEVELOPMENT scaling. Ordinary battle final rewards: two 50% accessory rolls (mean 1), development tier weights 70:25:5. No set bonuses.",
+  "format": 3,
+  "floors": [
+    {
+      "id": "base:floor-1",
+      "map": "base:branch-map",
+      "personal_ap": 4,
+      "shared_ap": 3,
+      "enhanced_room": "base:guardian-enhanced"
+    },
+    {
+      "id": "base:floor-2",
+      "map": "base:branch-map",
+      "personal_ap": 4,
+      "shared_ap": 3,
+      "enhanced_room": "base:guardian-enhanced"
+    },
+    {
+      "id": "base:floor-3",
+      "map": "base:branch-map",
+      "personal_ap": 4,
+      "shared_ap": 3,
+      "enhanced_room": "base:guardian-enhanced"
+    },
+    {
+      "id": "base:floor-4",
+      "map": "base:branch-map",
+      "personal_ap": 4,
+      "shared_ap": 3,
+      "enhanced_room": "base:guardian-enhanced"
+    },
+    {
+      "id": "base:floor-5",
+      "map": "base:branch-map",
+      "personal_ap": 4,
+      "shared_ap": 3,
+      "enhanced_room": "base:guardian-enhanced"
+    }
+  ],
+  "maps": [
+    {
+      "id": "base:branch-map",
+      "start": "start",
+      "boss": "boss",
+      "nodes": [
+        {
+          "id": "start",
+          "definition": "base:start",
+          "q": 0,
+          "r": 0,
+          "edges": [
+            "passage-a-start",
+            "passage-b-start"
+          ]
+        },
+        {
+          "id": "a",
+          "definition": "base:combat-a",
+          "q": 2,
+          "r": 0,
+          "edges": [
+            "passage-a-start",
+            "passage-a-c",
+            "passage-a-shrine"
+          ]
+        },
+        {
+          "id": "b",
+          "definition": "base:combat-b",
+          "q": 0,
+          "r": 2,
+          "edges": [
+            "passage-b-start",
+            "passage-b-c",
+            "passage-b-shop"
+          ]
+        },
+        {
+          "id": "c",
+          "definition": "base:combat-c",
+          "q": 2,
+          "r": 2,
+          "edges": [
+            "passage-a-c",
+            "passage-b-c",
+            "passage-c-shop",
+            "passage-boss-c"
+          ]
+        },
+        {
+          "id": "shrine",
+          "definition": "base:shrine",
+          "q": 4,
+          "r": -2,
+          "edges": [
+            "passage-a-shrine"
+          ]
+        },
+        {
+          "id": "shop",
+          "definition": "base:forge",
+          "q": 0,
+          "r": 4,
+          "edges": [
+            "passage-b-shop",
+            "passage-c-shop"
+          ]
+        },
+        {
+          "id": "boss",
+          "definition": "base:boss",
+          "q": 4,
+          "r": 2,
+          "edges": [
+            "passage-boss-c"
+          ]
+        },
+        {
+          "id": "passage-a-c",
+          "definition": "base:passage",
+          "q": 2,
+          "r": 1,
+          "edges": [
+            "a",
+            "c"
+          ]
+        },
+        {
+          "id": "passage-a-shrine",
+          "definition": "base:passage",
+          "q": 3,
+          "r": -1,
+          "edges": [
+            "a",
+            "shrine"
+          ]
+        },
+        {
+          "id": "passage-a-start",
+          "definition": "base:passage",
+          "q": 1,
+          "r": 0,
+          "edges": [
+            "a",
+            "start"
+          ]
+        },
+        {
+          "id": "passage-b-c",
+          "definition": "base:passage",
+          "q": 1,
+          "r": 2,
+          "edges": [
+            "b",
+            "c"
+          ]
+        },
+        {
+          "id": "passage-b-shop",
+          "definition": "base:passage",
+          "q": 0,
+          "r": 3,
+          "edges": [
+            "b",
+            "shop"
+          ]
+        },
+        {
+          "id": "passage-b-start",
+          "definition": "base:passage",
+          "q": 0,
+          "r": 1,
+          "edges": [
+            "b",
+            "start"
+          ]
+        },
+        {
+          "id": "passage-boss-c",
+          "definition": "base:passage",
+          "q": 3,
+          "r": 2,
+          "edges": [
+            "boss",
+            "c"
+          ]
+        },
+        {
+          "id": "passage-c-shop",
+          "definition": "base:passage",
+          "q": 1,
+          "r": 3,
+          "edges": [
+            "c",
+            "shop"
+          ]
+        }
+      ],
+      "terrain": [
+        {
+          "q": -1,
+          "r": 0,
+          "name": "Mountain wall",
+          "name_key": "terrain.mountain"
+        },
+        {
+          "q": -1,
+          "r": 1,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": -1,
+          "r": 2,
+          "name": "Mountain wall",
+          "name_key": "terrain.mountain"
+        },
+        {
+          "q": -1,
+          "r": 3,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": -1,
+          "r": 4,
+          "name": "Mountain wall",
+          "name_key": "terrain.mountain"
+        },
+        {
+          "q": -1,
+          "r": 5,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 0,
+          "r": -1,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 0,
+          "r": 5,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 1,
+          "r": -1,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 1,
+          "r": 1,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 1,
+          "r": 4,
+          "name": "Mountain wall",
+          "name_key": "terrain.mountain"
+        },
+        {
+          "q": 2,
+          "r": -1,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 2,
+          "r": 3,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 3,
+          "r": -2,
+          "name": "Mountain wall",
+          "name_key": "terrain.mountain"
+        },
+        {
+          "q": 3,
+          "r": 0,
+          "name": "Mountain wall",
+          "name_key": "terrain.mountain"
+        },
+        {
+          "q": 3,
+          "r": 1,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 3,
+          "r": 3,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 4,
+          "r": -3,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 4,
+          "r": -1,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 4,
+          "r": 1,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 4,
+          "r": 3,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 5,
+          "r": -3,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 5,
+          "r": -2,
+          "name": "Mountain wall",
+          "name_key": "terrain.mountain"
+        },
+        {
+          "q": 5,
+          "r": 1,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 5,
+          "r": 2,
+          "name": "Mountain wall",
+          "name_key": "terrain.mountain"
+        }
+      ],
+      "generator": {
+        "count": {
+          "base": 8,
+          "per_player": 2,
+          "per_floor": 1
+        },
+        "pool": [
+          "base:combat-a",
+          "base:combat-b",
+          "base:combat-c",
+          "base:leak-node",
+          "base:ranged-node",
+          "base:grouped-node",
+          "base:forge",
+          "base:shrine",
+          "base:revival",
+          "base:cleanse-node"
+        ],
+        "extra_edge_chance": 0
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "id": "base:start",
+      "kind": "start",
+      "name": "Start",
+      "name_key": "node.start",
+      "hint": "",
+      "hint_key": "",
+      "payment": "none",
+      "cost": 0,
+      "handler": "engine:noop"
+    },
+    {
+      "id": "base:combat-a",
+      "kind": "combat",
+      "name": "Dragging Traces",
+      "name_key": "content.base:combat-a.name",
+      "hint": "Continuous drag marks cross the ground.",
+      "hint_key": "content.base:combat-a.hint",
+      "payment": "personal",
+      "cost": 1,
+      "room": "base:skirmish",
+      "handler": "engine:noop"
+    },
+    {
+      "id": "base:combat-b",
+      "kind": "combat",
+      "name": "Behind Cover",
+      "name_key": "content.base:combat-b.name",
+      "hint": "Something keeps flying out from behind cover.",
+      "hint_key": "content.base:combat-b.hint",
+      "payment": "personal",
+      "cost": 1,
+      "room": "base:behind-cover",
+      "handler": "engine:noop"
+    },
+    {
+      "id": "base:combat-c",
+      "kind": "combat",
+      "name": "Heavy Pile",
+      "name_key": "content.base:combat-c.name",
+      "hint": "The silhouettes ahead look unusually heavy.",
+      "hint_key": "content.base:combat-c.hint",
+      "payment": "personal",
+      "cost": 1,
+      "room": "base:heavy-pile",
+      "handler": "engine:noop"
+    },
+    {
+      "id": "base:shrine",
+      "kind": "shrine",
+      "name": "Shrine",
+      "name_key": "node.shrine",
+      "hint": "A calming light calls to you.",
+      "hint_key": "hint.shrine",
+      "payment": "shared",
+      "cost": 1,
+      "handler": "base:rest",
+      "parameters": {
+        "penalty_removal": 1
+      }
+    },
+    {
+      "id": "base:forge",
+      "kind": "shop",
+      "name": "Weapon forge",
+      "name_key": "node.shop",
+      "hint": "Weapon forge: upgrades for coins.",
+      "hint_key": "hint.forge",
+      "payment": "shared",
+      "cost": 1,
+      "handler": "base:forge",
+      "parameters": {
+        "cost_per_level": 10,
+        "damage_per_upgrade": 3
+      },
+      "shop": [
+        {
+          "item": "base:sword-item",
+          "price": 50
+        },
+        {
+          "item": "base:pry-bar-item",
+          "price": 50
+        },
+        {
+          "item": "base:wave-sword-item",
+          "price": 50
+        },
+        {
+          "item": "base:carbine-item",
+          "price": 50
+        },
+        {
+          "item": "base:model-700-item",
+          "price": 50
+        },
+        {
+          "item": "base:injector-item",
+          "price": 50
+        },
+        {
+          "item": "base:focus-item",
+          "price": 50
+        },
+        {
+          "item": "base:thermal-emitter-item",
+          "price": 50
+        },
+        {
+          "item": "base:condensing-projector-item",
+          "price": 50
+        },
+        {
+          "item": "base:seeker-item",
+          "price": 50
+        },
+        {
+          "item": "base:dual-focus-item",
+          "price": 50
+        },
+        {
+          "item": "base:armor-head",
+          "price": 35
+        },
+        {
+          "item": "base:armor-body",
+          "price": 35
+        },
+        {
+          "item": "base:armor-legs",
+          "price": 35
+        },
+        {
+          "item": "base:armor-feet",
+          "price": 35
+        },
+        {
+          "item": "base:light-goggles",
+          "price": 35
+        },
+        {
+          "item": "base:light-jacket",
+          "price": 35
+        },
+        {
+          "item": "base:stretch-trousers",
+          "price": 35
+        },
+        {
+          "item": "base:soft-shoes",
+          "price": 35
+        },
+        {
+          "item": "base:filter-mask",
+          "price": 35
+        },
+        {
+          "item": "base:isolation-coat",
+          "price": 35
+        },
+        {
+          "item": "base:insulated-guards",
+          "price": 35
+        },
+        {
+          "item": "base:shielded-boots",
+          "price": 35
+        },
+        {
+          "item": "base:grip-ring",
+          "price": 55
+        },
+        {
+          "item": "base:balance-weight",
+          "price": 55
+        },
+        {
+          "item": "base:support-liner",
+          "price": 55
+        },
+        {
+          "item": "base:note-clip",
+          "price": 55
+        },
+        {
+          "item": "base:range-tag",
+          "price": 55
+        },
+        {
+          "item": "base:spare-capacitor",
+          "price": 55
+        },
+        {
+          "item": "base:buffer-pad",
+          "price": 55
+        },
+        {
+          "item": "base:reinforcement-plate",
+          "price": 55
+        },
+        {
+          "item": "base:metronome",
+          "price": 55
+        },
+        {
+          "item": "base:light-foot-clip",
+          "price": 55
+        },
+        {
+          "item": "base:etched-weight",
+          "price": 55
+        },
+        {
+          "item": "base:coupling-contact",
+          "price": 55
+        },
+        {
+          "item": "base:hot-contact",
+          "price": 55
+        },
+        {
+          "item": "base:cold-contact",
+          "price": 55
+        },
+        {
+          "item": "base:grounding-braid",
+          "price": 55
+        },
+        {
+          "item": "base:filter-sample",
+          "price": 55
+        },
+        {
+          "item": "base:weighted-sleeve",
+          "price": 55
+        },
+        {
+          "item": "base:bidirectional-coupler",
+          "price": 55
+        },
+        {
+          "item": "base:heat-sink",
+          "price": 55
+        },
+        {
+          "item": "base:calibration-pendant",
+          "price": 55
+        },
+        {
+          "item": "base:first-aid-kit",
+          "price": 55
+        },
+        {
+          "item": "base:fiber-bundle",
+          "price": 55
+        },
+        {
+          "item": "base:healing-potion",
+          "price": 20
+        },
+        {
+          "item": "base:recovery-patch",
+          "price": 20
+        },
+        {
+          "item": "base:barrier-potion",
+          "price": 20
+        },
+        {
+          "item": "base:support",
+          "price": 20
+        }
+      ]
+    },
+    {
+      "id": "base:boss",
+      "kind": "boss",
+      "name": "Boss",
+      "name_key": "node.boss",
+      "hint": "A burden blocks the exit.",
+      "hint_key": "hint.boss",
+      "payment": "shared",
+      "cost": 1,
+      "room": "base:guardian",
+      "handler": "engine:noop"
+    },
+    {
+      "id": "base:passage",
+      "kind": "passage",
+      "name": "Passage",
+      "name_key": "node.passage",
+      "hint": "A free route between rooms.",
+      "hint_key": "hint.passage",
+      "payment": "none",
+      "cost": 0,
+      "handler": "engine:noop"
+    },
+    {
+      "id": "base:revival",
+      "kind": "revival",
+      "name": "Revival facility",
+      "name_key": "node.revival",
+      "hint": "A faint warmth remains here.",
+      "hint_key": "hint.revival",
+      "payment": "personal",
+      "cost": 1,
+      "handler": "engine:noop",
+      "facility": "revive",
+      "facility_cost": 30
+    },
+    {
+      "id": "base:ranged-node",
+      "kind": "combat",
+      "name": "Distant Reflections",
+      "name_key": "content.base:ranged-node.name",
+      "hint": "The distant reflections keep facing this way.",
+      "hint_key": "content.base:ranged-node.hint",
+      "payment": "personal",
+      "cost": 1,
+      "room": "base:ranged-room",
+      "handler": "engine:noop"
+    },
+    {
+      "id": "base:survival-node",
+      "kind": "combat",
+      "name": "Holdout",
+      "name_key": "node.survival",
+      "hint": "An uneasy silence surrounds this place.",
+      "hint_key": "hint.survival",
+      "payment": "personal",
+      "cost": 1,
+      "room": "base:survival-room",
+      "handler": "engine:noop"
+    },
+    {
+      "id": "base:cleanse-node",
+      "kind": "event",
+      "name": "A quiet refuge",
+      "name_key": "node.cleanse",
+      "hint": "A mysterious warmth seems to soothe the air.",
+      "hint_key": "hint.cleanse",
+      "payment": "personal",
+      "cost": 1,
+      "handler": "base:cleanse-node"
+    },
+    {
+      "id": "base:leak-node",
+      "kind": "combat",
+      "name": "Leak Zone",
+      "name_key": "content.base:leak-node.name",
+      "hint": "A smell like cleaning fluid lingers in the air.",
+      "hint_key": "content.base:leak-node.hint",
+      "payment": "personal",
+      "cost": 1,
+      "room": "base:leak-zone",
+      "handler": "engine:noop"
+    },
+    {
+      "id": "base:grouped-node",
+      "kind": "combat",
+      "name": "Grouped Forms",
+      "name_key": "content.base:grouped-node.name",
+      "hint": "Several silhouettes move in the same rhythm.",
+      "hint_key": "content.base:grouped-node.hint",
+      "payment": "personal",
+      "cost": 1,
+      "room": "base:grouped-forms",
+      "handler": "engine:noop"
+    }
+  ],
+  "rooms": [
+    {
+      "id": "base:skirmish",
+      "width": 2000,
+      "height": 1250,
+      "objective": "clear",
+      "join": "between_waves",
+      "initial_delay": 1.5,
+      "spawn_radius": {
+        "x": 750,
+        "y": 450
+      },
+      "scaling": {
+        "hp_factor": 1,
+        "hp_variation": 0.03,
+        "hp_per_floor": 0.45,
+        "hp_per_extra_player": 0.25,
+        "damage_per_floor": 0.2
+      },
+      "waves": [
+        {
+          "enemies": [
+            {
+              "enemy": "base:dragger",
+              "count": {
+                "base": 2,
+                "per_player": 1,
+                "per_floor": 0
+              }
+            },
+            {
+              "enemy": "base:bagbound",
+              "count": {
+                "base": 1,
+                "per_player": 1,
+                "per_floor": 0
+              }
+            }
+          ],
+          "break_seconds": 4,
+          "reward": {
+            "xp": {
+              "base": 18,
+              "per_player": 0,
+              "per_floor": 2
+            },
+            "coins": {
+              "base": 10,
+              "per_player": 0,
+              "per_floor": 2
+            }
+          }
+        },
+        {
+          "enemies": [
+            {
+              "enemy": "base:dragger",
+              "count": {
+                "base": 2,
+                "per_player": 1,
+                "per_floor": 0
+              }
+            },
+            {
+              "enemy": "base:bagbound",
+              "count": {
+                "base": 2,
+                "per_player": 1,
+                "per_floor": 0
+              }
+            }
+          ],
+          "break_seconds": 4,
+          "reward": {
+            "xp": {
+              "base": 18,
+              "per_player": 0,
+              "per_floor": 2
+            },
+            "coins": {
+              "base": 10,
+              "per_player": 0,
+              "per_floor": 2
+            },
+            "draws": [
+              {
+                "rolls": 2,
+                "chance": 0.5,
+                "items": [
+                  {
+                    "item": "base:grip-ring",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:balance-weight",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:support-liner",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:note-clip",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:range-tag",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:spare-capacitor",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:buffer-pad",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:reinforcement-plate",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:metronome",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:light-foot-clip",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:etched-weight",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:coupling-contact",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:hot-contact",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:cold-contact",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:grounding-braid",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:filter-sample",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:weighted-sleeve",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:bidirectional-coupler",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:heat-sink",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:calibration-pendant",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:first-aid-kit",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:fiber-bundle",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:stress-bypass",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:fixed-focus-lens",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:feedback-clip",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:residual-heat-tag",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:isolation-box",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:backup-barrier-unit",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:timing-relay",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:parallel-reserve",
+                    "weight": 0.625
+                  }
+                ]
+              },
+              {
+                "rolls": 1,
+                "chance": 0.35,
+                "items": [
+                  {
+                    "item": "base:sword-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:pry-bar-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:wave-sword-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:carbine-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:model-700-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:injector-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:focus-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:thermal-emitter-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:condensing-projector-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:seeker-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:dual-focus-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-head",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-body",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-legs",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-feet",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:light-goggles",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:light-jacket",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:stretch-trousers",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:soft-shoes",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:filter-mask",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:isolation-coat",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:insulated-guards",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:shielded-boots",
+                    "weight": 1
+                  }
+                ]
+              },
+              {
+                "rolls": 1,
+                "chance": 0.3,
+                "items": [
+                  {
+                    "item": "base:healing-potion",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:recovery-patch",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:barrier-potion",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:support",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "base:guardian",
+      "width": 2000,
+      "height": 1250,
+      "objective": "clear",
+      "join": "never",
+      "initial_delay": 1.5,
+      "spawn_radius": {
+        "x": 750,
+        "y": 450
+      },
+      "scaling": {
+        "hp_factor": 1,
+        "hp_variation": 0.03,
+        "hp_per_floor": 0.45,
+        "hp_per_extra_player": 0.25,
+        "damage_per_floor": 0.2
+      },
+      "waves": [
+        {
+          "enemies": [
+            {
+              "enemy": "base:carrier",
+              "count": {
+                "base": 1,
+                "per_player": 0,
+                "per_floor": 0
+              }
+            },
+            {
+              "enemy": "base:dragger",
+              "count": {
+                "base": 1,
+                "per_player": 1,
+                "per_floor": 0
+              }
+            },
+            {
+              "enemy": "base:bagbound",
+              "count": {
+                "base": 1,
+                "per_player": 0,
+                "per_floor": 0
+              }
+            }
+          ],
+          "break_seconds": 0,
+          "reward": {
+            "xp": {
+              "base": 80,
+              "per_player": 0,
+              "per_floor": 2
+            },
+            "coins": {
+              "base": 45,
+              "per_player": 0,
+              "per_floor": 2
+            },
+            "draws": [
+              {
+                "rolls": 2,
+                "chance": 0.5,
+                "items": [
+                  {
+                    "item": "base:grip-ring",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:balance-weight",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:support-liner",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:note-clip",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:range-tag",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:spare-capacitor",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:buffer-pad",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:reinforcement-plate",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:metronome",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:light-foot-clip",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:etched-weight",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:coupling-contact",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:hot-contact",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:cold-contact",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:grounding-braid",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:filter-sample",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:weighted-sleeve",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:bidirectional-coupler",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:heat-sink",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:calibration-pendant",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:first-aid-kit",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:fiber-bundle",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:stress-bypass",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:fixed-focus-lens",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:feedback-clip",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:residual-heat-tag",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:isolation-box",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:backup-barrier-unit",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:timing-relay",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:parallel-reserve",
+                    "weight": 0.625
+                  }
+                ]
+              },
+              {
+                "rolls": 1,
+                "chance": 0.35,
+                "items": [
+                  {
+                    "item": "base:sword-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:pry-bar-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:wave-sword-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:carbine-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:model-700-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:injector-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:focus-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:thermal-emitter-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:condensing-projector-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:seeker-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:dual-focus-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-head",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-body",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-legs",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-feet",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:light-goggles",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:light-jacket",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:stretch-trousers",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:soft-shoes",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:filter-mask",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:isolation-coat",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:insulated-guards",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:shielded-boots",
+                    "weight": 1
+                  }
+                ]
+              },
+              {
+                "rolls": 1,
+                "chance": 0.3,
+                "items": [
+                  {
+                    "item": "base:healing-potion",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:recovery-patch",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:barrier-potion",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:support",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "base:guardian-enhanced",
+      "width": 2000,
+      "height": 1250,
+      "objective": "clear",
+      "join": "never",
+      "initial_delay": 1.5,
+      "spawn_radius": {
+        "x": 750,
+        "y": 450
+      },
+      "scaling": {
+        "hp_factor": 1.45,
+        "hp_variation": 0.03,
+        "hp_per_floor": 0.45,
+        "hp_per_extra_player": 0.25,
+        "damage_per_floor": 0.2
+      },
+      "waves": [
+        {
+          "enemies": [
+            {
+              "enemy": "base:carrier-enhanced",
+              "count": {
+                "base": 1,
+                "per_player": 0,
+                "per_floor": 0
+              }
+            },
+            {
+              "enemy": "base:dragger",
+              "count": {
+                "base": 1,
+                "per_player": 1,
+                "per_floor": 0
+              }
+            },
+            {
+              "enemy": "base:lens-array",
+              "count": {
+                "base": 1,
+                "per_player": 0,
+                "per_floor": 0
+              }
+            }
+          ],
+          "break_seconds": 0,
+          "reward": {
+            "xp": {
+              "base": 80,
+              "per_player": 0,
+              "per_floor": 2
+            },
+            "coins": {
+              "base": 45,
+              "per_player": 0,
+              "per_floor": 2
+            },
+            "draws": [
+              {
+                "rolls": 2,
+                "chance": 0.5,
+                "items": [
+                  {
+                    "item": "base:grip-ring",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:balance-weight",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:support-liner",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:note-clip",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:range-tag",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:spare-capacitor",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:buffer-pad",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:reinforcement-plate",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:metronome",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:light-foot-clip",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:etched-weight",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:coupling-contact",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:hot-contact",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:cold-contact",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:grounding-braid",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:filter-sample",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:weighted-sleeve",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:bidirectional-coupler",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:heat-sink",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:calibration-pendant",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:first-aid-kit",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:fiber-bundle",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:stress-bypass",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:fixed-focus-lens",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:feedback-clip",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:residual-heat-tag",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:isolation-box",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:backup-barrier-unit",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:timing-relay",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:parallel-reserve",
+                    "weight": 0.625
+                  }
+                ]
+              },
+              {
+                "rolls": 1,
+                "chance": 0.35,
+                "items": [
+                  {
+                    "item": "base:sword-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:pry-bar-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:wave-sword-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:carbine-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:model-700-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:injector-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:focus-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:thermal-emitter-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:condensing-projector-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:seeker-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:dual-focus-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-head",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-body",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-legs",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-feet",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:light-goggles",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:light-jacket",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:stretch-trousers",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:soft-shoes",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:filter-mask",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:isolation-coat",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:insulated-guards",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:shielded-boots",
+                    "weight": 1
+                  }
+                ]
+              },
+              {
+                "rolls": 1,
+                "chance": 0.3,
+                "items": [
+                  {
+                    "item": "base:healing-potion",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:recovery-patch",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:barrier-potion",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:support",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "base:ranged-room",
+      "width": 2000,
+      "height": 1250,
+      "objective": "clear",
+      "join": "between_waves",
+      "initial_delay": 1.5,
+      "spawn_radius": {
+        "x": 750,
+        "y": 450
+      },
+      "scaling": {
+        "hp_factor": 1,
+        "hp_variation": 0.03,
+        "hp_per_floor": 0.45,
+        "hp_per_extra_player": 0.25,
+        "damage_per_floor": 0.2
+      },
+      "waves": [
+        {
+          "enemies": [
+            {
+              "enemy": "base:lensform",
+              "count": {
+                "base": 1,
+                "per_player": 1,
+                "per_floor": 0
+              }
+            },
+            {
+              "enemy": "base:dragger",
+              "count": {
+                "base": 2,
+                "per_player": 1,
+                "per_floor": 0
+              }
+            }
+          ],
+          "break_seconds": 4,
+          "reward": {
+            "xp": {
+              "base": 18,
+              "per_player": 0,
+              "per_floor": 2
+            },
+            "coins": {
+              "base": 10,
+              "per_player": 0,
+              "per_floor": 2
+            }
+          }
+        },
+        {
+          "enemies": [
+            {
+              "enemy": "base:lensform",
+              "count": {
+                "base": 2,
+                "per_player": 1,
+                "per_floor": 0
+              }
+            },
+            {
+              "enemy": "base:dragger",
+              "count": {
+                "base": 2,
+                "per_player": 1,
+                "per_floor": 0
+              }
+            }
+          ],
+          "break_seconds": 4,
+          "reward": {
+            "xp": {
+              "base": 18,
+              "per_player": 0,
+              "per_floor": 2
+            },
+            "coins": {
+              "base": 10,
+              "per_player": 0,
+              "per_floor": 2
+            },
+            "draws": [
+              {
+                "rolls": 2,
+                "chance": 0.5,
+                "items": [
+                  {
+                    "item": "base:grip-ring",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:balance-weight",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:support-liner",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:note-clip",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:range-tag",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:spare-capacitor",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:buffer-pad",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:reinforcement-plate",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:metronome",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:light-foot-clip",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:etched-weight",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:coupling-contact",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:hot-contact",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:cold-contact",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:grounding-braid",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:filter-sample",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:weighted-sleeve",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:bidirectional-coupler",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:heat-sink",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:calibration-pendant",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:first-aid-kit",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:fiber-bundle",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:stress-bypass",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:fixed-focus-lens",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:feedback-clip",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:residual-heat-tag",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:isolation-box",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:backup-barrier-unit",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:timing-relay",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:parallel-reserve",
+                    "weight": 0.625
+                  }
+                ]
+              },
+              {
+                "rolls": 1,
+                "chance": 0.35,
+                "items": [
+                  {
+                    "item": "base:sword-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:pry-bar-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:wave-sword-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:carbine-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:model-700-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:injector-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:focus-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:thermal-emitter-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:condensing-projector-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:seeker-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:dual-focus-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-head",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-body",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-legs",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-feet",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:light-goggles",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:light-jacket",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:stretch-trousers",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:soft-shoes",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:filter-mask",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:isolation-coat",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:insulated-guards",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:shielded-boots",
+                    "weight": 1
+                  }
+                ]
+              },
+              {
+                "rolls": 1,
+                "chance": 0.3,
+                "items": [
+                  {
+                    "item": "base:healing-potion",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:recovery-patch",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:barrier-potion",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:support",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "base:survival-room",
+      "width": 2000.0,
+      "height": 1250.0,
+      "objective": "survive",
+      "join": "between_waves",
+      "initial_delay": 1,
+      "spawn_radius": {
+        "x": 750.0,
+        "y": 450.0
+      },
+      "scaling": {
+        "hp_factor": 1,
+        "hp_per_floor": 0.25,
+        "hp_per_extra_player": 0.35,
+        "damage_per_floor": 0.2,
+        "hp_variation": 0.03
+      },
+      "waves": [
+        {
+          "enemies": [
+            {
+              "enemy": "base:stalker",
+              "count": {
+                "base": 2,
+                "per_player": 1,
+                "per_floor": 1
+              }
+            }
+          ],
+          "break_seconds": 2,
+          "reward": {
+            "xp": {
+              "base": 0,
+              "per_player": 0,
+              "per_floor": 10
+            },
+            "coins": {
+              "base": 0,
+              "per_player": 0,
+              "per_floor": 5
+            },
+            "items": [
+              {
+                "item": "base:ember-charm",
+                "chance": 1
+              }
+            ],
+            "xp_policy": "total"
+          }
+        }
+      ],
+      "objective_seconds": 20
+    },
+    {
+      "id": "base:behind-cover",
+      "width": 2000,
+      "height": 1250,
+      "objective": "clear",
+      "join": "between_waves",
+      "initial_delay": 1.5,
+      "spawn_radius": {
+        "x": 750,
+        "y": 450
+      },
+      "scaling": {
+        "hp_factor": 1,
+        "hp_variation": 0.03,
+        "hp_per_floor": 0.45,
+        "hp_per_extra_player": 0.25,
+        "damage_per_floor": 0.2
+      },
+      "waves": [
+        {
+          "enemies": [
+            {
+              "enemy": "base:shard-spitter",
+              "count": {
+                "base": 1,
+                "per_player": 1,
+                "per_floor": 0
+              }
+            },
+            {
+              "enemy": "base:dragger",
+              "count": {
+                "base": 2,
+                "per_player": 1,
+                "per_floor": 0
+              }
+            }
+          ],
+          "break_seconds": 4,
+          "reward": {
+            "xp": {
+              "base": 18,
+              "per_player": 0,
+              "per_floor": 2
+            },
+            "coins": {
+              "base": 10,
+              "per_player": 0,
+              "per_floor": 2
+            }
+          }
+        },
+        {
+          "enemies": [
+            {
+              "enemy": "base:shard-spitter",
+              "count": {
+                "base": 2,
+                "per_player": 1,
+                "per_floor": 0
+              }
+            },
+            {
+              "enemy": "base:dragger",
+              "count": {
+                "base": 2,
+                "per_player": 1,
+                "per_floor": 0
+              }
+            }
+          ],
+          "break_seconds": 4,
+          "reward": {
+            "xp": {
+              "base": 18,
+              "per_player": 0,
+              "per_floor": 2
+            },
+            "coins": {
+              "base": 10,
+              "per_player": 0,
+              "per_floor": 2
+            },
+            "draws": [
+              {
+                "rolls": 2,
+                "chance": 0.5,
+                "items": [
+                  {
+                    "item": "base:grip-ring",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:balance-weight",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:support-liner",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:note-clip",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:range-tag",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:spare-capacitor",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:buffer-pad",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:reinforcement-plate",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:metronome",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:light-foot-clip",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:etched-weight",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:coupling-contact",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:hot-contact",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:cold-contact",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:grounding-braid",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:filter-sample",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:weighted-sleeve",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:bidirectional-coupler",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:heat-sink",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:calibration-pendant",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:first-aid-kit",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:fiber-bundle",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:stress-bypass",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:fixed-focus-lens",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:feedback-clip",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:residual-heat-tag",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:isolation-box",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:backup-barrier-unit",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:timing-relay",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:parallel-reserve",
+                    "weight": 0.625
+                  }
+                ]
+              },
+              {
+                "rolls": 1,
+                "chance": 0.35,
+                "items": [
+                  {
+                    "item": "base:sword-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:pry-bar-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:wave-sword-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:carbine-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:model-700-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:injector-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:focus-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:thermal-emitter-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:condensing-projector-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:seeker-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:dual-focus-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-head",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-body",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-legs",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-feet",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:light-goggles",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:light-jacket",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:stretch-trousers",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:soft-shoes",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:filter-mask",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:isolation-coat",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:insulated-guards",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:shielded-boots",
+                    "weight": 1
+                  }
+                ]
+              },
+              {
+                "rolls": 1,
+                "chance": 0.3,
+                "items": [
+                  {
+                    "item": "base:healing-potion",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:recovery-patch",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:barrier-potion",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:support",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "obstacles": [
+        {
+          "position": {
+            "x": 800,
+            "y": 550
+          },
+          "radius": 95
+        },
+        {
+          "position": {
+            "x": 1250,
+            "y": 720
+          },
+          "radius": 95
+        }
+      ]
+    },
+    {
+      "id": "base:heavy-pile",
+      "width": 2000,
+      "height": 1250,
+      "objective": "clear",
+      "join": "between_waves",
+      "initial_delay": 1.5,
+      "spawn_radius": {
+        "x": 750,
+        "y": 450
+      },
+      "scaling": {
+        "hp_factor": 1,
+        "hp_variation": 0.03,
+        "hp_per_floor": 0.45,
+        "hp_per_extra_player": 0.25,
+        "damage_per_floor": 0.2
+      },
+      "waves": [
+        {
+          "enemies": [
+            {
+              "enemy": "base:burdened",
+              "count": {
+                "base": 1,
+                "per_player": 1,
+                "per_floor": 0
+              }
+            },
+            {
+              "enemy": "base:dragger",
+              "count": {
+                "base": 2,
+                "per_player": 1,
+                "per_floor": 0
+              }
+            }
+          ],
+          "break_seconds": 4,
+          "reward": {
+            "xp": {
+              "base": 18,
+              "per_player": 0,
+              "per_floor": 2
+            },
+            "coins": {
+              "base": 10,
+              "per_player": 0,
+              "per_floor": 2
+            }
+          }
+        },
+        {
+          "enemies": [
+            {
+              "enemy": "base:burdened",
+              "count": {
+                "base": 2,
+                "per_player": 0,
+                "per_floor": 0
+              }
+            },
+            {
+              "enemy": "base:dragger",
+              "count": {
+                "base": 2,
+                "per_player": 1,
+                "per_floor": 0
+              }
+            }
+          ],
+          "break_seconds": 4,
+          "reward": {
+            "xp": {
+              "base": 18,
+              "per_player": 0,
+              "per_floor": 2
+            },
+            "coins": {
+              "base": 10,
+              "per_player": 0,
+              "per_floor": 2
+            },
+            "draws": [
+              {
+                "rolls": 2,
+                "chance": 0.5,
+                "items": [
+                  {
+                    "item": "base:grip-ring",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:balance-weight",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:support-liner",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:note-clip",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:range-tag",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:spare-capacitor",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:buffer-pad",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:reinforcement-plate",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:metronome",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:light-foot-clip",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:etched-weight",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:coupling-contact",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:hot-contact",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:cold-contact",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:grounding-braid",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:filter-sample",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:weighted-sleeve",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:bidirectional-coupler",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:heat-sink",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:calibration-pendant",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:first-aid-kit",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:fiber-bundle",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:stress-bypass",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:fixed-focus-lens",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:feedback-clip",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:residual-heat-tag",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:isolation-box",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:backup-barrier-unit",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:timing-relay",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:parallel-reserve",
+                    "weight": 0.625
+                  }
+                ]
+              },
+              {
+                "rolls": 1,
+                "chance": 0.35,
+                "items": [
+                  {
+                    "item": "base:sword-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:pry-bar-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:wave-sword-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:carbine-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:model-700-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:injector-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:focus-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:thermal-emitter-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:condensing-projector-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:seeker-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:dual-focus-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-head",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-body",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-legs",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-feet",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:light-goggles",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:light-jacket",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:stretch-trousers",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:soft-shoes",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:filter-mask",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:isolation-coat",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:insulated-guards",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:shielded-boots",
+                    "weight": 1
+                  }
+                ]
+              },
+              {
+                "rolls": 1,
+                "chance": 0.3,
+                "items": [
+                  {
+                    "item": "base:healing-potion",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:recovery-patch",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:barrier-potion",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:support",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "base:leak-zone",
+      "width": 2000,
+      "height": 1250,
+      "objective": "clear",
+      "join": "between_waves",
+      "initial_delay": 1.5,
+      "spawn_radius": {
+        "x": 750,
+        "y": 450
+      },
+      "scaling": {
+        "hp_factor": 1,
+        "hp_variation": 0.03,
+        "hp_per_floor": 0.45,
+        "hp_per_extra_player": 0.25,
+        "damage_per_floor": 0.2
+      },
+      "waves": [
+        {
+          "enemies": [
+            {
+              "enemy": "base:leaker",
+              "count": {
+                "base": 1,
+                "per_player": 1,
+                "per_floor": 0
+              }
+            },
+            {
+              "enemy": "base:bagbound",
+              "count": {
+                "base": 2,
+                "per_player": 1,
+                "per_floor": 0
+              }
+            }
+          ],
+          "break_seconds": 4,
+          "reward": {
+            "xp": {
+              "base": 18,
+              "per_player": 0,
+              "per_floor": 2
+            },
+            "coins": {
+              "base": 10,
+              "per_player": 0,
+              "per_floor": 2
+            }
+          }
+        },
+        {
+          "enemies": [
+            {
+              "enemy": "base:leaker",
+              "count": {
+                "base": 2,
+                "per_player": 1,
+                "per_floor": 0
+              }
+            },
+            {
+              "enemy": "base:bagbound",
+              "count": {
+                "base": 2,
+                "per_player": 1,
+                "per_floor": 0
+              }
+            }
+          ],
+          "break_seconds": 4,
+          "reward": {
+            "xp": {
+              "base": 18,
+              "per_player": 0,
+              "per_floor": 2
+            },
+            "coins": {
+              "base": 10,
+              "per_player": 0,
+              "per_floor": 2
+            },
+            "draws": [
+              {
+                "rolls": 2,
+                "chance": 0.5,
+                "items": [
+                  {
+                    "item": "base:grip-ring",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:balance-weight",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:support-liner",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:note-clip",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:range-tag",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:spare-capacitor",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:buffer-pad",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:reinforcement-plate",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:metronome",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:light-foot-clip",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:etched-weight",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:coupling-contact",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:hot-contact",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:cold-contact",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:grounding-braid",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:filter-sample",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:weighted-sleeve",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:bidirectional-coupler",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:heat-sink",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:calibration-pendant",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:first-aid-kit",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:fiber-bundle",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:stress-bypass",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:fixed-focus-lens",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:feedback-clip",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:residual-heat-tag",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:isolation-box",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:backup-barrier-unit",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:timing-relay",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:parallel-reserve",
+                    "weight": 0.625
+                  }
+                ]
+              },
+              {
+                "rolls": 1,
+                "chance": 0.35,
+                "items": [
+                  {
+                    "item": "base:sword-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:pry-bar-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:wave-sword-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:carbine-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:model-700-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:injector-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:focus-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:thermal-emitter-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:condensing-projector-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:seeker-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:dual-focus-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-head",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-body",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-legs",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-feet",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:light-goggles",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:light-jacket",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:stretch-trousers",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:soft-shoes",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:filter-mask",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:isolation-coat",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:insulated-guards",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:shielded-boots",
+                    "weight": 1
+                  }
+                ]
+              },
+              {
+                "rolls": 1,
+                "chance": 0.3,
+                "items": [
+                  {
+                    "item": "base:healing-potion",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:recovery-patch",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:barrier-potion",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:support",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "base:grouped-forms",
+      "width": 2000,
+      "height": 1250,
+      "objective": "clear",
+      "join": "between_waves",
+      "initial_delay": 1.5,
+      "spawn_radius": {
+        "x": 750,
+        "y": 450
+      },
+      "scaling": {
+        "hp_factor": 1,
+        "hp_variation": 0.03,
+        "hp_per_floor": 0.45,
+        "hp_per_extra_player": 0.25,
+        "damage_per_floor": 0.2
+      },
+      "waves": [
+        {
+          "enemies": [
+            {
+              "enemy": "base:encased",
+              "count": {
+                "base": 1,
+                "per_player": 0,
+                "per_floor": 0
+              }
+            },
+            {
+              "enemy": "base:dragger",
+              "count": {
+                "base": 2,
+                "per_player": 1,
+                "per_floor": 0
+              }
+            }
+          ],
+          "break_seconds": 4,
+          "reward": {
+            "xp": {
+              "base": 24,
+              "per_player": 0,
+              "per_floor": 2
+            },
+            "coins": {
+              "base": 15,
+              "per_player": 0,
+              "per_floor": 2
+            }
+          }
+        },
+        {
+          "enemies": [
+            {
+              "enemy": "base:lens-array",
+              "count": {
+                "base": 1,
+                "per_player": 0,
+                "per_floor": 0
+              }
+            },
+            {
+              "enemy": "base:bagbound",
+              "count": {
+                "base": 2,
+                "per_player": 1,
+                "per_floor": 0
+              }
+            }
+          ],
+          "break_seconds": 4,
+          "reward": {
+            "xp": {
+              "base": 24,
+              "per_player": 0,
+              "per_floor": 2
+            },
+            "coins": {
+              "base": 15,
+              "per_player": 0,
+              "per_floor": 2
+            },
+            "draws": [
+              {
+                "rolls": 2,
+                "chance": 0.5,
+                "items": [
+                  {
+                    "item": "base:grip-ring",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:balance-weight",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:support-liner",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:note-clip",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:range-tag",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:spare-capacitor",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:buffer-pad",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:reinforcement-plate",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:metronome",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:light-foot-clip",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:etched-weight",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:coupling-contact",
+                    "weight": 5.833333333333333
+                  },
+                  {
+                    "item": "base:hot-contact",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:cold-contact",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:grounding-braid",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:filter-sample",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:weighted-sleeve",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:bidirectional-coupler",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:heat-sink",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:calibration-pendant",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:first-aid-kit",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:fiber-bundle",
+                    "weight": 2.5
+                  },
+                  {
+                    "item": "base:stress-bypass",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:fixed-focus-lens",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:feedback-clip",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:residual-heat-tag",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:isolation-box",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:backup-barrier-unit",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:timing-relay",
+                    "weight": 0.625
+                  },
+                  {
+                    "item": "base:parallel-reserve",
+                    "weight": 0.625
+                  }
+                ]
+              },
+              {
+                "rolls": 1,
+                "chance": 0.35,
+                "items": [
+                  {
+                    "item": "base:sword-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:pry-bar-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:wave-sword-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:carbine-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:model-700-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:injector-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:focus-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:thermal-emitter-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:condensing-projector-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:seeker-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:dual-focus-item",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-head",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-body",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-legs",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:armor-feet",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:light-goggles",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:light-jacket",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:stretch-trousers",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:soft-shoes",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:filter-mask",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:isolation-coat",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:insulated-guards",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:shielded-boots",
+                    "weight": 1
+                  }
+                ]
+              },
+              {
+                "rolls": 1,
+                "chance": 0.3,
+                "items": [
+                  {
+                    "item": "base:healing-potion",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:recovery-patch",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:barrier-potion",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:support",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

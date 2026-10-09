@@ -1,0 +1,1952 @@
+{
+  "_comment": "Batch 01 playable content. All base values, timers, thresholds, prices, loot weights and later-floor scaling are replaceable DEVELOPMENT tuning; not final balance. No set bonuses.",
+  "run": {
+    "floors": [
+      "base:floor-1",
+      "base:floor-2",
+      "base:floor-3",
+      "base:floor-4",
+      "base:floor-5"
+    ],
+    "vote_ratio": 0.7
+  },
+  "weapons": [
+    {
+      "id": "base:carbine",
+      "name": "Colt M4 Carbine",
+      "type": "physical",
+      "base": 7,
+      "scaling": {
+        "agility": 0.8,
+        "strength": 0.25
+      },
+      "cooldown": 0.24,
+      "projectile_speed": 1100,
+      "range": 1050
+    },
+    {
+      "id": "base:focus",
+      "name": "Handheld Coupler",
+      "type": "magic",
+      "base": 10,
+      "scaling": {
+        "intelligence": 0.5,
+        "mana": 0.5
+      },
+      "cooldown": 0.48,
+      "projectile_speed": 520,
+      "range": 1000
+    },
+    {
+      "id": "base:sword",
+      "name": "Utility Blade",
+      "type": "physical",
+      "base": 4,
+      "scaling": {
+        "agility": 1,
+        "strength": 0.25
+      },
+      "cooldown": 0.42,
+      "projectile_speed": 0,
+      "mode": "melee",
+      "windup": 0.1,
+      "recovery": 0.32,
+      "range": 105,
+      "active_duration": 0.09
+    },
+    {
+      "id": "base:wave-sword",
+      "name": "Oscillating Blade",
+      "type": "physical",
+      "base": 7,
+      "scaling": {
+        "strength": 0.9,
+        "sense": 0.3
+      },
+      "cooldown": 0.66,
+      "projectile_speed": 460,
+      "pierce": 3,
+      "range": 430,
+      "windup": 0.15,
+      "recovery": 0.51
+    },
+    {
+      "id": "base:seeker",
+      "name": "Tracking Marker",
+      "type": "electromagnetic",
+      "base": 8,
+      "scaling": {
+        "sense": 0.8,
+        "agility": 0.4
+      },
+      "cooldown": 0.5,
+      "projectile_speed": 400,
+      "range": 900,
+      "tracking": 3
+    },
+    {
+      "id": "base:dual-focus",
+      "name": "Dual-Channel Coupler",
+      "type": "magic",
+      "base": 8,
+      "scaling": {
+        "intelligence": 0.5,
+        "mana": 0.4
+      },
+      "cooldown": 0.7,
+      "projectile_speed": 460,
+      "range": 1000,
+      "additional_damage": [
+        {
+          "id": "fire",
+          "type": "fire",
+          "base": 6,
+          "scaling": {
+            "mana": 0.3
+          },
+          "modifiers": []
+        }
+      ]
+    },
+    {
+      "id": "base:root-bolt",
+      "name": "Development rooting bolt",
+      "type": "magic",
+      "base": 12,
+      "scaling": {
+        "intelligence": 0.5,
+        "mana": 0.5
+      },
+      "flat": 0,
+      "modifiers": [],
+      "final_flat": 0,
+      "cooldown": 0.48,
+      "projectile_speed": 420,
+      "on_hit_statuses": [
+        "base:root"
+      ]
+    },
+    {
+      "id": "base:pry-bar",
+      "name": "Weighted Pry Bar",
+      "type": "physical",
+      "base": 14,
+      "scaling": {
+        "strength": 1.2,
+        "constitution": 0.25
+      },
+      "cooldown": 0.95,
+      "projectile_speed": 0,
+      "mode": "melee",
+      "windup": 0.27,
+      "recovery": 0.68,
+      "range": 135,
+      "active_duration": 0.13
+    },
+    {
+      "id": "base:model-700",
+      "name": "Remington Model 700",
+      "type": "physical",
+      "base": 28,
+      "scaling": {
+        "sense": 1.5,
+        "strength": 0.4
+      },
+      "cooldown": 1.05,
+      "projectile_speed": 1500,
+      "range": 1800
+    },
+    {
+      "id": "base:injector",
+      "name": "Sealed Injector",
+      "type": "chemical",
+      "base": 6,
+      "scaling": {
+        "intelligence": 0.6,
+        "agility": 0.3
+      },
+      "cooldown": 0.22,
+      "projectile_speed": 520,
+      "range": 540
+    },
+    {
+      "id": "base:thermal-emitter",
+      "name": "Thermal Emitter",
+      "type": "fire",
+      "base": 7,
+      "scaling": {
+        "mana": 0.8,
+        "intelligence": 0.3
+      },
+      "cooldown": 0.55,
+      "projectile_speed": 480,
+      "range": 900,
+      "on_hit_statuses": [
+        "base:burn"
+      ]
+    },
+    {
+      "id": "base:condensing-projector",
+      "name": "Condensing Projector",
+      "type": "cold",
+      "base": 8,
+      "scaling": {
+        "mana": 0.7,
+        "sense": 0.3
+      },
+      "cooldown": 0.55,
+      "projectile_speed": 480,
+      "range": 900,
+      "on_hit_statuses": [
+        "base:cold-slow"
+      ]
+    }
+  ],
+  "chassis": [
+    {
+      "id": "base:scout",
+      "name": "Scout",
+      "attributes": {
+        "strength": 8,
+        "agility": 12,
+        "constitution": 10,
+        "intelligence": 6,
+        "sense": 8,
+        "mana": 4
+      },
+      "hp": 120,
+      "armor": 3,
+      "speed": 190,
+      "weapon": "base:carbine",
+      "skills": [
+        "base:barrier-skill",
+        "base:haste-skill",
+        "base:burst-skill",
+        "base:mend-skill"
+      ]
+    },
+    {
+      "id": "base:arcanist",
+      "name": "Arcanist",
+      "attributes": {
+        "strength": 4,
+        "agility": 6,
+        "constitution": 8,
+        "intelligence": 14,
+        "sense": 10,
+        "mana": 14
+      },
+      "hp": 100,
+      "armor": 1,
+      "speed": 180,
+      "weapon": "base:focus",
+      "skills": [
+        "base:barrier-skill",
+        "base:haste-skill",
+        "base:root-skill",
+        "base:mend-skill"
+      ]
+    },
+    {
+      "id": "base:bulwark",
+      "name": "Warrior",
+      "attributes": {
+        "strength": 14,
+        "agility": 7,
+        "constitution": 14,
+        "intelligence": 3,
+        "sense": 5,
+        "mana": 3
+      },
+      "hp": 150,
+      "armor": 6,
+      "speed": 170,
+      "weapon": "base:sword",
+      "skills": [
+        "base:barrier-skill",
+        "base:haste-skill",
+        "base:burst-skill",
+        "base:mend-skill"
+      ]
+    },
+    {
+      "id": "base:renewal-frame",
+      "name": "Renewal frame",
+      "attributes": {
+        "strength": 4,
+        "agility": 6,
+        "constitution": 8,
+        "intelligence": 14,
+        "sense": 10,
+        "mana": 14
+      },
+      "hp": 100,
+      "armor": 1,
+      "speed": 180,
+      "weapon": "base:focus",
+      "skills": [
+        "base:barrier-skill",
+        "base:haste-skill",
+        "base:root-skill",
+        "base:renew-skill"
+      ],
+      "required_perk": "base:renewal-unlock"
+    }
+  ],
+  "enemies": [
+    {
+      "id": "base:stalker",
+      "name": "Stalker",
+      "hp": 50,
+      "damage": 12,
+      "armor": 1,
+      "speed": 65,
+      "radius": 13,
+      "behavior": "base:chase",
+      "armor_per_floor": 0.5,
+      "resistance_per_floor": {
+        "physical": 0.03
+      }
+    },
+    {
+      "id": "base:warden",
+      "name": "Warden",
+      "hp": 400,
+      "damage": 20,
+      "armor": 4,
+      "speed": 45,
+      "radius": 28,
+      "behavior": "base:chase",
+      "attack_range": 900,
+      "fire_interval": 2.4,
+      "projectile_speed": 240,
+      "projectile_count": 5,
+      "damage_type": "fire",
+      "enrage_threshold": 0.4,
+      "enrage_factor": 1.5,
+      "speed_per_floor": 0.1,
+      "fire_per_floor": 0.15,
+      "threat_distance": 300,
+      "threat_damage": 0.03,
+      "control_resistance": 0.5,
+      "resistance": {
+        "physical": 0.1
+      },
+      "armor_per_floor": 0.5,
+      "resistance_per_floor": {
+        "physical": 0.03
+      },
+      "enrage_projectiles": 2
+    },
+    {
+      "id": "base:spitter",
+      "name": "Spitter",
+      "hp": 48,
+      "damage": 10,
+      "armor": 1,
+      "speed": 45,
+      "radius": 14,
+      "behavior": "base:chase",
+      "attack_range": 650,
+      "fire_interval": 1.7,
+      "projectile_speed": 220,
+      "projectile_count": 1,
+      "damage_type": "chemical",
+      "threat_damage": 0.02,
+      "threat_distance": 300,
+      "speed_per_floor": 0.1,
+      "fire_per_floor": 0.15,
+      "resistance": {
+        "chemical": 0.25
+      },
+      "control_resistance": 0.1,
+      "armor_per_floor": 0.5,
+      "resistance_per_floor": {
+        "physical": 0.03
+      }
+    },
+    {
+      "id": "base:dragger",
+      "name": "Dragger",
+      "hp": 48,
+      "damage": 12,
+      "armor": 1,
+      "speed": 72,
+      "radius": 14,
+      "appearance": "dragger",
+      "behavior": "base:chase",
+      "armor_per_floor": 0.5,
+      "threat_distance": 300,
+      "threat_damage": 0.025
+    },
+    {
+      "id": "base:bagbound",
+      "name": "Bagbound",
+      "hp": 30,
+      "damage": 9,
+      "armor": 0,
+      "speed": 95,
+      "radius": 12,
+      "appearance": "bag",
+      "behavior": "base:chase",
+      "armor_per_floor": 0.5,
+      "threat_distance": 300,
+      "threat_damage": 0.025,
+      "attacks": [
+        {
+          "kind": "rush",
+          "windup": 0.55,
+          "recovery": 0.9,
+          "cooldown": 1.2,
+          "range": 430,
+          "speed": 460,
+          "active": 0.55
+        }
+      ]
+    },
+    {
+      "id": "base:burdened",
+      "name": "Burdened",
+      "hp": 120,
+      "damage": 18,
+      "armor": 5,
+      "speed": 42,
+      "radius": 22,
+      "appearance": "load",
+      "behavior": "base:chase",
+      "armor_per_floor": 0.5,
+      "threat_distance": 300,
+      "threat_damage": 0.025
+    },
+    {
+      "id": "base:shard-spitter",
+      "name": "Shard Spitter",
+      "hp": 38,
+      "damage": 11,
+      "armor": 1,
+      "speed": 65,
+      "radius": 14,
+      "appearance": "spitter",
+      "behavior": "base:midrange",
+      "armor_per_floor": 0.5,
+      "threat_distance": 300,
+      "threat_damage": 0.025,
+      "attack_range": 720,
+      "projectile_speed": 240,
+      "projectile_count": 1,
+      "damage_type": "physical",
+      "attacks": [
+        {
+          "kind": "shoot",
+          "windup": 0.6,
+          "recovery": 0.7,
+          "cooldown": 1.1,
+          "range": 700
+        }
+      ]
+    },
+    {
+      "id": "base:leaker",
+      "name": "Leaker",
+      "hp": 50,
+      "damage": 12,
+      "armor": 1,
+      "speed": 57,
+      "radius": 16,
+      "appearance": "leaker",
+      "behavior": "base:midrange",
+      "armor_per_floor": 0.5,
+      "threat_distance": 300,
+      "threat_damage": 0.025,
+      "attack_range": 650,
+      "projectile_speed": 210,
+      "projectile_count": 1,
+      "damage_type": "chemical",
+      "attacks": [
+        {
+          "kind": "shoot",
+          "windup": 0.5,
+          "recovery": 0.6,
+          "cooldown": 1.2,
+          "range": 650
+        }
+      ],
+      "resistance": {
+        "chemical": 0.3
+      }
+    },
+    {
+      "id": "base:lensform",
+      "name": "Lensform",
+      "hp": 34,
+      "damage": 18,
+      "armor": 0,
+      "speed": 68,
+      "radius": 14,
+      "appearance": "lens",
+      "behavior": "base:midrange",
+      "armor_per_floor": 0.5,
+      "threat_distance": 300,
+      "threat_damage": 0.025,
+      "attack_range": 900,
+      "projectile_speed": 450,
+      "projectile_count": 1,
+      "damage_type": "electromagnetic",
+      "attacks": [
+        {
+          "kind": "shoot",
+          "windup": 0.95,
+          "recovery": 0.75,
+          "cooldown": 1.8,
+          "range": 900
+        }
+      ]
+    },
+    {
+      "id": "base:encased",
+      "name": "Encased",
+      "hp": 210,
+      "damage": 18,
+      "armor": 7,
+      "speed": 37,
+      "radius": 26,
+      "appearance": "encased",
+      "behavior": "base:chase",
+      "armor_per_floor": 0.5,
+      "threat_distance": 300,
+      "threat_damage": 0.025,
+      "attack_range": 850,
+      "projectile_speed": 235,
+      "projectile_count": 5,
+      "damage_type": "physical",
+      "attacks": [
+        {
+          "kind": "shoot",
+          "windup": 0.85,
+          "recovery": 1.1,
+          "cooldown": 1.5,
+          "range": 850
+        }
+      ],
+      "control_resistance": 0.25
+    },
+    {
+      "id": "base:lens-array",
+      "name": "Lens Array",
+      "hp": 155,
+      "damage": 18,
+      "armor": 2,
+      "speed": 62,
+      "radius": 23,
+      "appearance": "array",
+      "behavior": "base:midrange",
+      "armor_per_floor": 0.5,
+      "threat_distance": 300,
+      "threat_damage": 0.025,
+      "attack_range": 950,
+      "projectile_speed": 400,
+      "projectile_count": 3,
+      "damage_type": "electromagnetic",
+      "attacks": [
+        {
+          "kind": "shoot",
+          "windup": 1,
+          "recovery": 0.9,
+          "cooldown": 1.6,
+          "range": 950
+        }
+      ],
+      "control_resistance": 0.25
+    },
+    {
+      "id": "base:carrier",
+      "name": "The Carrier",
+      "hp": 720,
+      "damage": 22,
+      "armor": 5,
+      "speed": 45,
+      "radius": 36,
+      "appearance": "carrier",
+      "behavior": "base:chase",
+      "armor_per_floor": 0.5,
+      "threat_distance": 300,
+      "threat_damage": 0.025,
+      "attack_range": 1100,
+      "projectile_speed": 220,
+      "projectile_count": 7,
+      "damage_type": "physical",
+      "attacks": [
+        {
+          "kind": "shoot",
+          "windup": 0.95,
+          "recovery": 0.9,
+          "cooldown": 1.2,
+          "range": 1100
+        },
+        {
+          "kind": "rush",
+          "windup": 0.9,
+          "recovery": 1.35,
+          "cooldown": 1,
+          "range": 1100,
+          "speed": 480,
+          "active": 0.85
+        }
+      ],
+      "control_resistance": 0.45
+    },
+    {
+      "id": "base:carrier-enhanced",
+      "name": "The Carrier — Enhanced",
+      "hp": 720,
+      "damage": 25,
+      "armor": 5,
+      "speed": 49,
+      "radius": 36,
+      "appearance": "carrier",
+      "behavior": "base:chase",
+      "armor_per_floor": 0.5,
+      "threat_distance": 300,
+      "threat_damage": 0.025,
+      "attack_range": 1150,
+      "projectile_speed": 245,
+      "projectile_count": 9,
+      "damage_type": "physical",
+      "attacks": [
+        {
+          "kind": "shoot",
+          "windup": 0.8,
+          "recovery": 0.8,
+          "cooldown": 1,
+          "range": 1150
+        },
+        {
+          "kind": "rush",
+          "windup": 0.8,
+          "recovery": 1.35,
+          "cooldown": 0.8,
+          "range": 1150,
+          "speed": 510,
+          "active": 0.9
+        }
+      ],
+      "control_resistance": 0.5
+    }
+  ],
+  "inventory": {
+    "capacity": 27,
+    "accessory_slots": 12,
+    "equipment": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "next_id": 0,
+    "revision": 0,
+    "_comment": "Standard: 27 backpack cells, 9 equipment cells, 12 separate accessory slots."
+  },
+  "resource": {
+    "maximum": 100,
+    "regeneration": 5
+  },
+  "statuses": [
+    {
+      "id": "base:barrier",
+      "name": "Barrier",
+      "description": "Absorbs incoming damage. Does not regenerate.",
+      "level": 0,
+      "max_layers": 1,
+      "duration_ms": 15000,
+      "shield": 60,
+      "modifiers": [],
+      "name_key": "content.base:barrier.name",
+      "description_key": "content.base:barrier.description"
+    },
+    {
+      "id": "base:haste",
+      "name": "Haste",
+      "description": "Movement speed +20%.",
+      "level": 1,
+      "max_layers": 1,
+      "duration_ms": 8000,
+      "modifiers": [
+        {
+          "id": "base:haste-speed",
+          "stat": "speed",
+          "operation": "percent",
+          "group": "skill",
+          "value": 0.2
+        }
+      ],
+      "name_key": "content.base:haste.name",
+      "description_key": "content.base:haste.description"
+    },
+    {
+      "id": "base:burn",
+      "name": "Burning",
+      "description": "Each independent layer deals snapshot fire damage every second.",
+      "level": 1,
+      "max_layers": 3,
+      "duration_ms": 5000,
+      "modifiers": [],
+      "periodic": [
+        {
+          "kind": "damage",
+          "type": "fire",
+          "amount": 3,
+          "scaling": {
+            "mana": 0.2
+          },
+          "interval_ms": 1000
+        }
+      ],
+      "name_key": "content.base:burn.name",
+      "description_key": "content.base:burn.description"
+    },
+    {
+      "id": "base:root",
+      "name": "Rooted",
+      "description": "Cannot move or dodge.",
+      "level": 1,
+      "max_layers": 1,
+      "duration_ms": 1600,
+      "modifiers": [],
+      "controls": [
+        "root"
+      ],
+      "name_key": "content.base:root.name",
+      "description_key": "content.base:root.description"
+    },
+    {
+      "id": "base:renew",
+      "name": "Renewal",
+      "description": "Restores snapshot health every second.",
+      "level": 1,
+      "max_layers": 1,
+      "duration_ms": 6000,
+      "modifiers": [],
+      "periodic": [
+        {
+          "kind": "heal",
+          "amount": 4,
+          "scaling": {
+            "mana": 0.1
+          },
+          "interval_ms": 1000
+        }
+      ],
+      "name_key": "content.base:renew.name",
+      "description_key": "content.base:renew.description"
+    },
+    {
+      "id": "base:cold-slow",
+      "name": "Cold",
+      "description": "Movement speed -25%; sources keep separate timers, only the strongest slow applies.",
+      "level": 1,
+      "max_layers": 1,
+      "duration_ms": 2500,
+      "modifiers": [
+        {
+          "id": "base:cold-slow:speed",
+          "stat": "speed",
+          "operation": "percent",
+          "group": "cold",
+          "value": -0.25
+        }
+      ],
+      "name_key": "content.base:cold-slow.name",
+      "description_key": "content.base:cold-slow.description",
+      "modifier_policy": "strongest"
+    },
+    {
+      "id": "base:stress-window",
+      "name": "Stress Bypass",
+      "description": "Weapon attack damage +40% (action group).",
+      "level": 1,
+      "max_layers": 1,
+      "duration_ms": 4000,
+      "modifiers": [],
+      "combat": [
+        {
+          "kind": "hit_multiplier",
+          "condition": "weapon_attack",
+          "group": "action",
+          "amount": 0.4
+        }
+      ],
+      "name_key": "content.base:stress-window.name",
+      "description_key": "content.base:stress-window.description"
+    },
+    {
+      "id": "base:backup-barrier",
+      "name": "Backup Barrier",
+      "description": "Snapshot shield equal to 40% maximum health; does not regenerate.",
+      "level": 0,
+      "max_layers": 1,
+      "duration_ms": 30000,
+      "modifiers": [],
+      "shield_max_hp": 0.4,
+      "name_key": "content.base:backup-barrier.name",
+      "description_key": "content.base:backup-barrier.description"
+    }
+  ],
+  "skills": [
+    {
+      "id": "base:barrier-skill",
+      "name": "Barrier",
+      "description": "Development: 60 shield for 15 seconds.",
+      "cost": 20,
+      "cooldown_ms": 12000,
+      "effects": [
+        {
+          "kind": "apply_status",
+          "status": "base:barrier"
+        }
+      ]
+    },
+    {
+      "id": "base:haste-skill",
+      "name": "Haste",
+      "description": "Development: +20% movement for 8 seconds.",
+      "cost": 15,
+      "cooldown_ms": 12000,
+      "effects": [
+        {
+          "kind": "apply_status",
+          "status": "base:haste"
+        }
+      ]
+    },
+    {
+      "id": "base:burst-skill",
+      "name": "Arcane bolt",
+      "description": "Development: launches an arcane bolt.",
+      "cost": 12,
+      "cooldown_ms": 1500,
+      "weapon": "base:focus"
+    },
+    {
+      "id": "base:mend-skill",
+      "name": "Mend",
+      "description": "Development: restores 20 health.",
+      "cost": 25,
+      "cooldown_ms": 12000,
+      "effects": [
+        {
+          "kind": "heal",
+          "amount": 20,
+          "scaling": {
+            "mana": 0.25
+          }
+        }
+      ]
+    },
+    {
+      "id": "base:root-skill",
+      "name": "Rooting shot",
+      "description": "Development control projectile.",
+      "cost": 15,
+      "cooldown_ms": 5000,
+      "weapon": "base:root-bolt"
+    },
+    {
+      "id": "base:renew-skill",
+      "name": "Renewal",
+      "description": "Development: snapshot healing over time.",
+      "cost": 20,
+      "cooldown_ms": 10000,
+      "effects": [
+        {
+          "kind": "apply_status",
+          "status": "base:renew"
+        }
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "base:carbine-item",
+      "name": "Colt M4 Carbine",
+      "description": "Sustained physical projectile fire.",
+      "kind": "weapon",
+      "value": 30,
+      "weapon": "base:carbine"
+    },
+    {
+      "id": "base:focus-item",
+      "name": "Handheld Coupler",
+      "description": "Fires a pure magic projectile.",
+      "kind": "weapon",
+      "value": 30,
+      "weapon": "base:focus"
+    },
+    {
+      "id": "base:armor-head",
+      "name": "Work Helmet",
+      "description": "Armor +1; Constitution +1.",
+      "kind": "armor",
+      "value": 30,
+      "slot": "head",
+      "modifiers": [
+        {
+          "id": "base:armor-head:armor",
+          "stat": "armor",
+          "operation": "add",
+          "value": 1
+        },
+        {
+          "id": "base:armor-head:secondary",
+          "stat": "constitution",
+          "operation": "add",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "base:armor-body",
+      "name": "Layered Work Jacket",
+      "description": "Armor +2; Maximum health +10.",
+      "kind": "armor",
+      "value": 30,
+      "slot": "body",
+      "modifiers": [
+        {
+          "id": "base:armor-body:armor",
+          "stat": "armor",
+          "operation": "add",
+          "value": 2
+        },
+        {
+          "id": "base:armor-body:secondary",
+          "stat": "max_hp",
+          "operation": "add",
+          "value": 10
+        }
+      ]
+    },
+    {
+      "id": "base:armor-legs",
+      "name": "Reinforced Knee Guards",
+      "description": "Armor +1; Strength +1.",
+      "kind": "armor",
+      "value": 30,
+      "slot": "legs",
+      "modifiers": [
+        {
+          "id": "base:armor-legs:armor",
+          "stat": "armor",
+          "operation": "add",
+          "value": 1
+        },
+        {
+          "id": "base:armor-legs:secondary",
+          "stat": "strength",
+          "operation": "add",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "base:armor-feet",
+      "name": "Protective Work Boots",
+      "description": "Armor +1; Constitution +1.",
+      "kind": "armor",
+      "value": 30,
+      "slot": "feet",
+      "modifiers": [
+        {
+          "id": "base:armor-feet:armor",
+          "stat": "armor",
+          "operation": "add",
+          "value": 1
+        },
+        {
+          "id": "base:armor-feet:secondary",
+          "stat": "constitution",
+          "operation": "add",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "base:physical-charm",
+      "name": "Physical charm",
+      "description": "Development: physical weapon damage +30%.",
+      "kind": "accessory",
+      "group": "base:physical-charm",
+      "value": 45,
+      "damage_modifiers": [
+        {
+          "group": "accessory",
+          "source": "base:physical-charm",
+          "percent": 0.3,
+          "type": "physical"
+        }
+      ]
+    },
+    {
+      "id": "base:healing-potion",
+      "name": "Emergency Dressing",
+      "description": "Restores 35 + 20% Constitution health.",
+      "kind": "consumable",
+      "value": 30,
+      "stack_limit": 30,
+      "use": [
+        {
+          "kind": "heal",
+          "amount": 35,
+          "scaling": {
+            "constitution": 0.2
+          }
+        }
+      ]
+    },
+    {
+      "id": "base:barrier-potion",
+      "name": "Portable Barrier",
+      "description": "Grants a 60-point shield for 15s.",
+      "kind": "consumable",
+      "value": 30,
+      "stack_limit": 30,
+      "use": [
+        {
+          "kind": "apply_status",
+          "status": "base:barrier"
+        }
+      ]
+    },
+    {
+      "id": "base:cleanse",
+      "name": "Cleansing Token",
+      "description": "Removes the team curse when used.",
+      "kind": "consumable",
+      "value": 30,
+      "stack_limit": 30,
+      "use": [
+        {
+          "kind": "clear_curse"
+        }
+      ]
+    },
+    {
+      "id": "base:support",
+      "name": "Support Beacon",
+      "description": "Select an unfinished battle room outside combat, then use to provide rapid support.",
+      "kind": "consumable",
+      "value": 30,
+      "stack_limit": 30,
+      "use": [
+        {
+          "kind": "support"
+        }
+      ]
+    },
+    {
+      "id": "base:sword-item",
+      "name": "Utility Blade",
+      "description": "A fast, short-range blade strike.",
+      "kind": "weapon",
+      "value": 30,
+      "weapon": "base:sword"
+    },
+    {
+      "id": "base:wave-sword-item",
+      "name": "Oscillating Blade",
+      "description": "Releases a short, piercing blade wave.",
+      "kind": "weapon",
+      "value": 30,
+      "weapon": "base:wave-sword"
+    },
+    {
+      "id": "base:seeker-item",
+      "name": "Tracking Marker",
+      "description": "Tracks nearby valid targets with a limited turning rate.",
+      "kind": "weapon",
+      "value": 30,
+      "weapon": "base:seeker"
+    },
+    {
+      "id": "base:dual-focus-item",
+      "name": "Dual-Channel Coupler",
+      "description": "One hit deals magic and fire segments with a shared critical roll.",
+      "kind": "weapon",
+      "value": 30,
+      "weapon": "base:dual-focus",
+      "lore": "In the maintenance log, both ends always share one serial number."
+    },
+    {
+      "id": "base:ember-charm",
+      "name": "Ember charm",
+      "description": "Attacks apply Burning on hit.",
+      "kind": "accessory",
+      "value": 60,
+      "group": "ember"
+    },
+    {
+      "id": "base:drain-charm",
+      "name": "Rare drain charm",
+      "description": "Attack damage restores 3% of actual health lost. Development rarity placeholder.",
+      "kind": "accessory",
+      "value": 120,
+      "group": "drain"
+    },
+    {
+      "id": "base:pry-bar-item",
+      "name": "Weighted Pry Bar",
+      "description": "A slow, heavy close-range strike.",
+      "kind": "weapon",
+      "value": 30,
+      "weapon": "base:pry-bar"
+    },
+    {
+      "id": "base:model-700-item",
+      "name": "Remington Model 700",
+      "description": "A powerful, long-range single shot with a slow cadence.",
+      "kind": "weapon",
+      "value": 30,
+      "weapon": "base:model-700"
+    },
+    {
+      "id": "base:injector-item",
+      "name": "Sealed Injector",
+      "description": "Rapid chemical droplets at short to medium range.",
+      "kind": "weapon",
+      "value": 30,
+      "weapon": "base:injector"
+    },
+    {
+      "id": "base:thermal-emitter-item",
+      "name": "Thermal Emitter",
+      "description": "Applies Burning on hit; each layer has its own timer.",
+      "kind": "weapon",
+      "value": 30,
+      "weapon": "base:thermal-emitter"
+    },
+    {
+      "id": "base:condensing-projector-item",
+      "name": "Condensing Projector",
+      "description": "Applies a refreshing, non-stacking cold slow on hit.",
+      "kind": "weapon",
+      "value": 30,
+      "weapon": "base:condensing-projector"
+    },
+    {
+      "id": "base:grip-ring",
+      "name": "Grip Ring",
+      "description": "Strength +10%.",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 1,
+      "group": "base:grip-ring",
+      "modifiers": [
+        {
+          "id": "base:grip-ring:stat",
+          "stat": "strength",
+          "operation": "percent",
+          "value": 0.1,
+          "group": "equipment"
+        }
+      ],
+      "lore": "The inside bears the impression of a different grip."
+    },
+    {
+      "id": "base:balance-weight",
+      "name": "Balance Weight",
+      "description": "Agility +10%.",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 1,
+      "group": "base:balance-weight",
+      "modifiers": [
+        {
+          "id": "base:balance-weight:stat",
+          "stat": "agility",
+          "operation": "percent",
+          "value": 0.1,
+          "group": "equipment"
+        }
+      ]
+    },
+    {
+      "id": "base:support-liner",
+      "name": "Support Liner",
+      "description": "Constitution +10%.",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 1,
+      "group": "base:support-liner",
+      "modifiers": [
+        {
+          "id": "base:support-liner:stat",
+          "stat": "constitution",
+          "operation": "percent",
+          "value": 0.1,
+          "group": "equipment"
+        }
+      ]
+    },
+    {
+      "id": "base:note-clip",
+      "name": "Note Clip",
+      "description": "Intelligence +10%.",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 1,
+      "group": "base:note-clip",
+      "modifiers": [
+        {
+          "id": "base:note-clip:stat",
+          "stat": "intelligence",
+          "operation": "percent",
+          "value": 0.1,
+          "group": "equipment"
+        }
+      ],
+      "lore": "An undated shopping list is tucked behind it."
+    },
+    {
+      "id": "base:range-tag",
+      "name": "Range Tag",
+      "description": "Sense +10%.",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 1,
+      "group": "base:range-tag",
+      "modifiers": [
+        {
+          "id": "base:range-tag:stat",
+          "stat": "sense",
+          "operation": "percent",
+          "value": 0.1,
+          "group": "equipment"
+        }
+      ]
+    },
+    {
+      "id": "base:spare-capacitor",
+      "name": "Spare Capacitor",
+      "description": "Mana +10%.",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 1,
+      "group": "base:spare-capacitor",
+      "modifiers": [
+        {
+          "id": "base:spare-capacitor:stat",
+          "stat": "mana",
+          "operation": "percent",
+          "value": 0.1,
+          "group": "equipment"
+        }
+      ],
+      "lore": "The label reads: “Check after waking.”"
+    },
+    {
+      "id": "base:buffer-pad",
+      "name": "Buffer Pad",
+      "description": "Maximum health +10%.",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 1,
+      "group": "base:buffer-pad",
+      "modifiers": [
+        {
+          "id": "base:buffer-pad:stat",
+          "stat": "max_hp",
+          "operation": "percent",
+          "value": 0.1,
+          "group": "equipment"
+        }
+      ]
+    },
+    {
+      "id": "base:reinforcement-plate",
+      "name": "Reinforcement Plate",
+      "description": "Armor +10%.",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 1,
+      "group": "base:reinforcement-plate",
+      "modifiers": [
+        {
+          "id": "base:reinforcement-plate:stat",
+          "stat": "armor",
+          "operation": "percent",
+          "value": 0.1,
+          "group": "equipment"
+        }
+      ]
+    },
+    {
+      "id": "base:metronome",
+      "name": "Metronome",
+      "description": "Attack speed +10%.",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 1,
+      "group": "base:metronome",
+      "modifiers": [
+        {
+          "id": "base:metronome:stat",
+          "stat": "attack_speed",
+          "operation": "percent",
+          "value": 0.1,
+          "group": "equipment"
+        }
+      ]
+    },
+    {
+      "id": "base:light-foot-clip",
+      "name": "Light Foot Clip",
+      "description": "Movement speed +10%.",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 1,
+      "group": "base:light-foot-clip",
+      "modifiers": [
+        {
+          "id": "base:light-foot-clip:stat",
+          "stat": "speed",
+          "operation": "percent",
+          "value": 0.1,
+          "group": "equipment"
+        }
+      ]
+    },
+    {
+      "id": "base:etched-weight",
+      "name": "Etched Weight",
+      "description": "Physical damage +10% (accessory group).",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 1,
+      "group": "base:etched-weight",
+      "damage_modifiers": [
+        {
+          "group": "accessory",
+          "source": "base:etched-weight",
+          "type": "physical",
+          "percent": 0.1
+        }
+      ]
+    },
+    {
+      "id": "base:coupling-contact",
+      "name": "Coupling Contact",
+      "description": "Magic damage +10% (accessory group).",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 1,
+      "group": "base:coupling-contact",
+      "damage_modifiers": [
+        {
+          "group": "accessory",
+          "source": "base:coupling-contact",
+          "type": "magic",
+          "percent": 0.1
+        }
+      ]
+    },
+    {
+      "id": "base:hot-contact",
+      "name": "Hot-End Contact",
+      "description": "Fire damage +20% (accessory group).",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 2,
+      "group": "base:hot-contact",
+      "damage_modifiers": [
+        {
+          "group": "accessory",
+          "source": "base:hot-contact",
+          "type": "fire",
+          "percent": 0.2
+        }
+      ]
+    },
+    {
+      "id": "base:cold-contact",
+      "name": "Cold-End Contact",
+      "description": "Cold damage +20% (accessory group).",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 2,
+      "group": "base:cold-contact",
+      "damage_modifiers": [
+        {
+          "group": "accessory",
+          "source": "base:cold-contact",
+          "type": "cold",
+          "percent": 0.2
+        }
+      ]
+    },
+    {
+      "id": "base:grounding-braid",
+      "name": "Grounding Braid",
+      "description": "Electromagnetic damage +20% (accessory group).",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 2,
+      "group": "base:grounding-braid",
+      "damage_modifiers": [
+        {
+          "group": "accessory",
+          "source": "base:grounding-braid",
+          "type": "electromagnetic",
+          "percent": 0.2
+        }
+      ]
+    },
+    {
+      "id": "base:filter-sample",
+      "name": "Filter Sample",
+      "description": "Chemical damage +20% (accessory group).",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 2,
+      "group": "base:filter-sample",
+      "damage_modifiers": [
+        {
+          "group": "accessory",
+          "source": "base:filter-sample",
+          "type": "chemical",
+          "percent": 0.2
+        }
+      ]
+    },
+    {
+      "id": "base:weighted-sleeve",
+      "name": "Weighted Sleeve",
+      "description": "Physical damage +20% (accessory group).",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 2,
+      "group": "base:weighted-sleeve",
+      "damage_modifiers": [
+        {
+          "group": "accessory",
+          "source": "base:weighted-sleeve",
+          "type": "physical",
+          "percent": 0.2
+        }
+      ]
+    },
+    {
+      "id": "base:bidirectional-coupler",
+      "name": "Bidirectional Coupler",
+      "description": "Magic damage +20% (accessory group).",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 2,
+      "group": "base:bidirectional-coupler",
+      "damage_modifiers": [
+        {
+          "group": "accessory",
+          "source": "base:bidirectional-coupler",
+          "type": "magic",
+          "percent": 0.2
+        }
+      ]
+    },
+    {
+      "id": "base:heat-sink",
+      "name": "Recirculating Heat Sink",
+      "description": "Attack speed +20%.",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 2,
+      "group": "base:heat-sink",
+      "modifiers": [
+        {
+          "id": "base:heat-sink:stat",
+          "stat": "attack_speed",
+          "operation": "percent",
+          "value": 0.2,
+          "group": "equipment"
+        }
+      ]
+    },
+    {
+      "id": "base:calibration-pendant",
+      "name": "Calibration Pendant",
+      "description": "Critical damage +20% relative: default 150% → 180%.",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 2,
+      "group": "base:calibration-pendant",
+      "combat": [
+        {
+          "kind": "critical_damage",
+          "amount": 0.2
+        }
+      ]
+    },
+    {
+      "id": "base:first-aid-kit",
+      "name": "Folding First-Aid Kit",
+      "description": "Fixed and periodic healing received +20%; excludes lifesteal, rescue and resurrection.",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 2,
+      "group": "base:first-aid-kit",
+      "combat": [
+        {
+          "kind": "healing",
+          "amount": 0.2
+        }
+      ]
+    },
+    {
+      "id": "base:fiber-bundle",
+      "name": "Fiber Bundle",
+      "description": "After armor, incoming damage ×80%.",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 2,
+      "group": "base:fiber-bundle",
+      "combat": [],
+      "reductions": [
+        0.2
+      ]
+    },
+    {
+      "id": "base:stress-bypass",
+      "name": "Stress Bypass",
+      "description": "After starting a dodge, weapon attack damage +40% for 4s (action group).",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 3,
+      "group": "base:stress-bypass",
+      "combat": [
+        {
+          "kind": "dodge_status",
+          "status": "base:stress-window"
+        }
+      ]
+    },
+    {
+      "id": "base:fixed-focus-lens",
+      "name": "Fixed-Focus Lens",
+      "description": "If the target is at full health before the hit, hit damage +50% (target state).",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 3,
+      "group": "base:fixed-focus-lens",
+      "combat": [
+        {
+          "kind": "hit_multiplier",
+          "condition": "full_health",
+          "group": "target_state",
+          "amount": 0.5
+        }
+      ]
+    },
+    {
+      "id": "base:feedback-clip",
+      "name": "Feedback Clip",
+      "description": "Weapon hits append electromagnetic damage with a base equal to 40% of the original pre-multiplier attack base.",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 3,
+      "group": "base:feedback-clip",
+      "combat": [
+        {
+          "kind": "append_damage",
+          "type": "electromagnetic",
+          "amount": 0.4
+        }
+      ]
+    },
+    {
+      "id": "base:residual-heat-tag",
+      "name": "Residual-Heat Tag",
+      "description": "If the target is already Burning before the hit, hit damage +40% (target state).",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 3,
+      "group": "base:residual-heat-tag",
+      "combat": [
+        {
+          "kind": "hit_multiplier",
+          "condition": "burning",
+          "group": "target_state",
+          "amount": 0.4
+        }
+      ]
+    },
+    {
+      "id": "base:isolation-box",
+      "name": "Emergency Isolation Box",
+      "description": "At 35% health or less before a hit, take 35% less damage after armor.",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 3,
+      "group": "base:isolation-box",
+      "combat": [
+        {
+          "kind": "low_health_reduction",
+          "threshold": 0.35,
+          "amount": 0.35
+        }
+      ]
+    },
+    {
+      "id": "base:backup-barrier-unit",
+      "name": "Backup Barrier Unit",
+      "description": "On battle entry, gain a 30s shield equal to 40% maximum health, once per player per battle.",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 3,
+      "group": "base:backup-barrier-unit",
+      "combat": [
+        {
+          "kind": "battle_shield",
+          "status": "base:backup-barrier"
+        }
+      ]
+    },
+    {
+      "id": "base:timing-relay",
+      "name": "Timing Relay",
+      "description": "Attack speed +30%.",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 3,
+      "group": "base:timing-relay",
+      "modifiers": [
+        {
+          "id": "base:timing-relay:stat",
+          "stat": "attack_speed",
+          "operation": "percent",
+          "value": 0.3,
+          "group": "equipment"
+        }
+      ]
+    },
+    {
+      "id": "base:parallel-reserve",
+      "name": "Parallel Reserve",
+      "description": "Maximum health +30%.",
+      "kind": "accessory",
+      "value": 30,
+      "tier": 3,
+      "group": "base:parallel-reserve",
+      "modifiers": [
+        {
+          "id": "base:parallel-reserve:stat",
+          "stat": "max_hp",
+          "operation": "percent",
+          "value": 0.3,
+          "group": "equipment"
+        }
+      ]
+    },
+    {
+      "id": "base:light-goggles",
+      "name": "Lightweight Goggles",
+      "description": "Armor +0.5; Sense +1.",
+      "kind": "armor",
+      "value": 30,
+      "slot": "head",
+      "modifiers": [
+        {
+          "id": "base:light-goggles:armor",
+          "stat": "armor",
+          "operation": "add",
+          "value": 0.5
+        },
+        {
+          "id": "base:light-goggles:secondary",
+          "stat": "sense",
+          "operation": "add",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "base:light-jacket",
+      "name": "Lightweight Jacket",
+      "description": "Armor +1.5; Agility +1.",
+      "kind": "armor",
+      "value": 30,
+      "slot": "body",
+      "modifiers": [
+        {
+          "id": "base:light-jacket:armor",
+          "stat": "armor",
+          "operation": "add",
+          "value": 1.5
+        },
+        {
+          "id": "base:light-jacket:secondary",
+          "stat": "agility",
+          "operation": "add",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "base:stretch-trousers",
+      "name": "Stretch Trousers",
+      "description": "Armor +0.5; Attack speed +5%.",
+      "kind": "armor",
+      "value": 30,
+      "slot": "legs",
+      "modifiers": [
+        {
+          "id": "base:stretch-trousers:armor",
+          "stat": "armor",
+          "operation": "add",
+          "value": 0.5
+        },
+        {
+          "id": "base:stretch-trousers:secondary",
+          "stat": "attack_speed",
+          "operation": "percent",
+          "value": 0.05,
+          "group": "equipment"
+        }
+      ]
+    },
+    {
+      "id": "base:soft-shoes",
+      "name": "Soft-Sole Shoes",
+      "description": "Armor +0.5; Movement speed +5%.",
+      "kind": "armor",
+      "value": 30,
+      "slot": "feet",
+      "modifiers": [
+        {
+          "id": "base:soft-shoes:armor",
+          "stat": "armor",
+          "operation": "add",
+          "value": 0.5
+        },
+        {
+          "id": "base:soft-shoes:secondary",
+          "stat": "speed",
+          "operation": "percent",
+          "value": 0.05,
+          "group": "equipment"
+        }
+      ]
+    },
+    {
+      "id": "base:filter-mask",
+      "name": "Filter Mask",
+      "description": "Armor +0.5; chemical resistance +10%.",
+      "kind": "armor",
+      "value": 30,
+      "slot": "head",
+      "modifiers": [
+        {
+          "id": "base:filter-mask:armor",
+          "stat": "armor",
+          "operation": "add",
+          "value": 0.5
+        }
+      ],
+      "resistance": {
+        "chemical": 0.1
+      }
+    },
+    {
+      "id": "base:isolation-coat",
+      "name": "Isolation Coat",
+      "description": "Armor +1.5; fire resistance +8%; cold resistance +8%.",
+      "kind": "armor",
+      "value": 30,
+      "slot": "body",
+      "modifiers": [
+        {
+          "id": "base:isolation-coat:armor",
+          "stat": "armor",
+          "operation": "add",
+          "value": 1.5
+        }
+      ],
+      "resistance": {
+        "fire": 0.08,
+        "cold": 0.08
+      }
+    },
+    {
+      "id": "base:insulated-guards",
+      "name": "Insulated Leg Guards",
+      "description": "Armor +0.5; electromagnetic resistance +10%.",
+      "kind": "armor",
+      "value": 30,
+      "slot": "legs",
+      "modifiers": [
+        {
+          "id": "base:insulated-guards:armor",
+          "stat": "armor",
+          "operation": "add",
+          "value": 0.5
+        }
+      ],
+      "resistance": {
+        "electromagnetic": 0.1
+      }
+    },
+    {
+      "id": "base:shielded-boots",
+      "name": "Shielded Boots",
+      "description": "Armor +0.5; magic resistance +10%.",
+      "kind": "armor",
+      "value": 30,
+      "slot": "feet",
+      "modifiers": [
+        {
+          "id": "base:shielded-boots:armor",
+          "stat": "armor",
+          "operation": "add",
+          "value": 0.5
+        }
+      ],
+      "resistance": {
+        "magic": 0.1
+      }
+    },
+    {
+      "id": "base:recovery-patch",
+      "name": "Recovery Patch",
+      "description": "Restores 4 + 10% Mana health each second for 6s; snapshotted on application.",
+      "kind": "consumable",
+      "value": 30,
+      "stack_limit": 30,
+      "use": [
+        {
+          "kind": "apply_status",
+          "status": "base:renew"
+        }
+      ]
+    }
+  ],
+  "starting_items": [
+    "base:armor-head",
+    "base:armor-body",
+    "base:armor-legs",
+    "base:armor-feet",
+    "base:healing-potion",
+    "base:barrier-potion",
+    "base:support"
+  ],
+  "affixes": [
+    {
+      "id": "base:tempered",
+      "name": "Tempered",
+      "value": 12,
+      "modifiers": [],
+      "damage_modifiers": [
+        {
+          "group": "affix",
+          "percent": 0.15,
+          "source": "Tempered"
+        }
+      ]
+    }
+  ],
+  "clear_points": 5,
+  "perks": [
+    {
+      "id": "base:reserve-coins",
+      "name": "Starting reserve",
+      "description": "Development: +10 initial coins per rank.",
+      "cost": 1,
+      "max_rank": 5,
+      "coins": 10
+    },
+    {
+      "id": "base:fortitude",
+      "name": "Fortitude",
+      "description": "Development: +5 initial maximum health per rank.",
+      "cost": 1,
+      "max_rank": 5,
+      "modifiers": [
+        {
+          "id": "base:meta-health",
+          "stat": "max_hp",
+          "operation": "add",
+          "value": 5
+        }
+      ]
+    },
+    {
+      "id": "base:provisions",
+      "name": "Team provisions",
+      "description": "Development: each layer starts with +1 personal AP and +1 shared AP.",
+      "cost": 3,
+      "max_rank": 2,
+      "requires": [
+        "base:reserve-coins"
+      ],
+      "personal_ap": 1,
+      "shared_ap": 1
+    },
+    {
+      "id": "base:refuge",
+      "name": "Revival refuge",
+      "description": "Development: add a revival facility to each layer.",
+      "cost": 2,
+      "max_rank": 1,
+      "requires": [
+        "base:fortitude"
+      ],
+      "special_nodes": [
+        "base:revival"
+      ]
+    },
+    {
+      "id": "base:reserve-kit",
+      "name": "Reserve equipment",
+      "description": "Development: start with an additional healing potion and sword.",
+      "cost": 2,
+      "max_rank": 1,
+      "starting_items": [
+        "base:healing-potion",
+        "base:sword-item"
+      ]
+    },
+    {
+      "id": "base:renewal-unlock",
+      "name": "Renewal chassis",
+      "description": "Development: unlock the Renewal chassis.",
+      "cost": 3,
+      "max_rank": 1,
+      "requires": [
+        "base:fortitude"
+      ]
+    }
+  ],
+  "completion_rewards": [
+    {
+      "id": "base:first-victory",
+      "name": "First expedition clear",
+      "kind": "achievement",
+      "condition": "clear",
+      "points": 2
+    },
+    {
+      "id": "base:steady-clear",
+      "name": "No knockdowns",
+      "kind": "challenge",
+      "condition": "no_knockdowns",
+      "points": 3
+    },
+    {
+      "id": "base:enhanced-clear",
+      "name": "Enhanced BOSS clear",
+      "kind": "challenge",
+      "condition": "enhanced_clear",
+      "points": 2
+    }
+  ]
+}

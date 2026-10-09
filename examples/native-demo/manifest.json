@@ -1,0 +1,5 @@
+{
+  "_comment": "Pure Go module; manual static relink required. Development example only.",
+  "id": "native-demo", "version": "1.0.0", "sdk": 6, "type": "gameplay",
+  "go": {"package":"example.com/hsm-native-demo/v2", "shared":"Shared", "client":"Client"}
+}

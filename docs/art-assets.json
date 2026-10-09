@@ -1,0 +1,35 @@
+{
+  "_comment": "Development artwork created with the built-in image_gen.imagegen tool. Original PNGs are preserved. Menu, hall and HUD follow the approved minimalist near-modern v2 design. Previous slate artwork remains archived; the warrior is an existing single-pose placeholder. UI and workshop furniture use code-native drawing, not flattened concept screenshots.",
+  "date": "2026-10-08",
+  "tool": "image_gen.imagegen",
+  "assets": [
+    {
+      "file": "content/base/assets/slate-floor.png",
+      "transparent_background": false,
+      "prompt": "Create ONE original game-ready terrain texture image for a 2D cooperative fantasy adventure game. Asset use: a quiet arena floor, stretched across a hexagonal room in a native desktop game; the engine draws its own hex grid over it. Square canvas, full bleed, top-down orthographic flat surface. Muted slate blue stone with soft worn mineral mottling and sparse tiny warm sandstone flecks. A hand-painted indie adventure aesthetic, broad restrained shapes, low contrast, readable behind characters, predominantly dark cool blue gray. Even lighting everywhere, texture feels continuous and unobtrusive. No perspective, no borders, no text, no grid, no hexagons, no objects, no cracks that look like impassable walls, no bright highlights, no characters, no UI. Keep the edges compatible for tiling. Output an opaque high-quality square raster texture.",
+      "sha256": "c8dc68d908579133df532fc3c8deca98b1199a41dbd364bdd1007deb3c22434f"
+    },
+    {
+      "file": "content/base/assets/warrior.png",
+      "transparent_background": true,
+      "prompt": "Create ONE original transparent-background character sprite for a 2D fantasy adventure desktop game. A compact armored warrior automaton, broad shoulders, navy steel armor, warm brass trim, small glowing teal visor, a short broad sword in the right hand and a small round shield in the left. Friendly but capable, no franchise references. Three-quarter top-down view, facing down and slightly right, entire body including boots visible, camera elevated enough to see helmet top. Stylized hand-painted indie game asset with crisp dark outlines, simplified large shapes and restrained highlights, readable when reduced to 48 pixels. Static neutral ready pose, sword short and close to body, compact centered silhouette, generous clean transparent padding. All character details must remain within one single cutout, no ground plane, no cast shadow outside silhouette, no scenery, no text, no UI, no extra weapons or props, no sprite sheet. True transparent alpha background.",
+      "sha256": "ac00dc6f75d040dcbe12a118d4e5d75a697aead48cb4b7f7769bcd3d871fd594"
+    },
+    {
+      "file": "content/base/assets/workshop-menu.png",
+      "transparent_background": false,
+      "reference": "docs/ui-designs/2026-10-08-v2/main-menu-v2.png",
+      "prompt": "Use case: precise-object-edit\nAsset type: production background for native game main menu.\nInput image: the approved main menu design, edit target.\nPrimary request: turn this approved image into a clean background asset. Remove ALL user interface text and buttons: remove HSMultiplayer, all three rectangular buttons and their Chinese labels, remove version at bottom left. Reconstruct those areas as the same clean, softly lit off-white workshop wall/negative space, keep left third quiet and very low detail so native live UI can be drawn there. Keep the scene composition, practical modern studio/workshop, table, pegboard, concrete hex floor, storage shelves, computer, plants and warm daylight exactly in the approved style. Preserve 16:9 landscape framing and full bleed. This must be only the illustrated environment, NO text, NO logos, NO buttons, NO icons, NO HUD, NO added characters.",
+      "sha256": "52fd70c98edcb50aee96eef6ed3f7700cd8bc200eb839e1ab41bdc570c3ecaf7",
+      "use": "主菜单场景背景；按钮与文字由客户端实时绘制。"
+    },
+    {
+      "file": "content/base/assets/concrete-floor.png",
+      "transparent_background": false,
+      "reference": "docs/ui-designs/2026-10-08-v2/preparation-hall-v2.png",
+      "prompt": "Use case: stylized-concept\nAsset type: production floor texture for the approved modern base/workshop game, square opaque seamless texture.\nInput image: reference only for pale warm gray concrete color and restrained near-modern game art.\nPrimary request: create one flat top-down orthographic CONCRETE FLOOR TEXTURE for a native 2D adventure game. Warm light-gray microcement with very subtle irregular aggregate, soft broad tonal variation, low contrast, quiet behind small characters and white/charcoal HUD. Surface only, evenly lit, full bleed, no perspective, no vignette, no borders, no hex grid (engine draws its own grid), no tile seams, no objects, no text, no emblems, no UI, no bright patches, no dramatic cracks, no dirt piles, no shadows. Practical clean studio/workshop feel. Compatible edges for tiling, no obvious directional lighting. It is NOT slate stone, medieval paving, marble or sci-fi metal.",
+      "sha256": "5938026eeea910cb17d97a0e7b32fbbd28ad7cc8903b8b45c8a6423b0bc4a666",
+      "use": "大厅与房间地面；宿主叠加网格并降低纹理强度。"
+    }
+  ]
+}
