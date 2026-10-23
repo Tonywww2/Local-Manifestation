@@ -7,6 +7,7 @@ import (
 
 	"hsmultiplayer/internal/content"
 	"hsmultiplayer/internal/script"
+	"hsmultiplayer/pkg/animation"
 	"hsmultiplayer/pkg/damage"
 	"hsmultiplayer/pkg/geometry"
 	"hsmultiplayer/pkg/model"
@@ -41,8 +42,13 @@ func NewFreeSpace(c *content.Catalog, cfg Config, room model.RoomDef) (*FreeSpac
 	if c == nil || cfg.ID == "" || !timing.LogicRate(cfg.TickRate) || room.Width <= 0 || room.Height <= 0 || math.IsNaN(room.Width+room.Height) || math.IsInf(room.Width+room.Height, 0) {
 		return nil, fmt.Errorf("invalid free space")
 	}
+	arena, err := geometry.NewRoomArena(room.Width, room.Height, room.Hexes)
+	if err != nil {
+		return nil, err
+	}
+	room.Hexes = append([]model.HexCell(nil), room.Hexes...)
 	room.Obstacles = append([]model.Obstacle(nil), room.Obstacles...)
-	return &FreeSpace{world: world{shotOrigin: cfg.ShotOrigin, adventureTime: cfg.AdventureTime, catalog: c, room: room, id: cfg.ID, floor: cfg.Floor, logicRate: cfg.TickRate, state: "idle", rng: rand.New(rand.NewSource(cfg.Seed))}}, nil
+	return &FreeSpace{world: world{arena: arena, shotOrigin: cfg.ShotOrigin, adventureTime: cfg.AdventureTime, catalog: c, room: room, id: cfg.ID, floor: cfg.Floor, logicRate: cfg.TickRate, state: "idle", rng: rand.New(rand.NewSource(cfg.Seed))}}, nil
 }
 
 func (s *FreeSpace) StepPlayer(controls *PlayerActions, player model.Player, input model.Input, dt float64, open []int) (model.Player, error) {
@@ -65,9 +71,14 @@ func (s *FreeSpace) Launch(player model.Player, aim model.Vec, request damage.Re
 	return nil
 }
 
+func (s *FreeSpace) ApplyAction(player model.Player, aim model.Vec, plan content.ActionPlan) error {
+	return s.world.applyAction(player, aim, plan)
+}
+
 func (s *FreeSpace) Advance(dt float64) error {
 	s.world.tick++
 	s.world.clock += dt
+	s.world.advanceEnemyVisuals(dt)
 	return s.world.updateShots(dt)
 }
 
@@ -84,7 +95,26 @@ func (s *FreeSpace) AdvancePlayers(players []SpacePlayer, dt float64, now int64)
 	s.world.adventureTime = now
 	s.world.tick++
 	s.world.clock += dt
+	s.world.advanceEnemyVisuals(dt)
+	for _, p := range players {
+		if p.Player.Life != "alive" {
+			p.Actions.state.player = p.Player
+			p.Actions.state.syncVisualLife()
+			p.Actions.state.visual.Life = animation.AdvanceAction(p.Actions.state.visual.Life, dt)
+			p.Actions.state.player = model.Player{}
+		}
+	}
 	return s.sweepPlayers(players, dt)
+}
+
+// Carry final visual facts across a battle-to-free-space ownership transition.
+// These records contain no Enemy, collision, reward or script references.
+func (s *FreeSpace) ReceiveEnemyVisuals(values []model.EnemyActionState) {
+	for _, v := range values {
+		if animation.Active(v.Death) {
+			s.world.setEnemyVisual(v)
+		}
+	}
 }
 
 // Incoming sweeps settle the already elapsed part of a step without ticking

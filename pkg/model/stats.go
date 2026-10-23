@@ -9,12 +9,18 @@ type SourceRef struct {
 }
 
 type StatValues struct {
+	ZoomMin     float64    `json:"zoom_min,omitempty"`
+	ZoomMax     float64    `json:"zoom_max,omitempty"`
 	AttackSpeed float64    `json:"attack_speed"`
 	Attributes  Attributes `json:"attributes"`
 	MaxHP       float64    `json:"max_hp"`
 	Armor       float64    `json:"armor"`
 	Speed       float64    `json:"speed"`
 }
+
+// Zero in older base snapshots means the engine default, not an invisible view.
+const DefaultZoomMin = .5
+const DefaultZoomMax = 2.0
 
 // StatModifier is content data; StatContribution binds it to a runtime source.
 type StatModifier struct {
@@ -27,6 +33,10 @@ type StatModifier struct {
 type StatContribution struct {
 	StatModifier
 	Source SourceRef `json:"source"`
+}
+
+func AttributeKeys() [6]string {
+	return [6]string{"strength", "agility", "constitution", "intelligence", "sense", "mana"}
 }
 
 func (a Attributes) Value(key string) (float64, bool) {

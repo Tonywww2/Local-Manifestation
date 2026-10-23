@@ -26,8 +26,8 @@ func TestShopDeviceRejectsRemotePurchaseAtomically(t *testing.T) {
 	}
 }
 
-func TestLeavingDeviceOrInteractingAgainWithdrawsVote(t *testing.T) {
-	tm := fixture(t)
+func TestMapVotePersistsWithinRoomAndRepeatedInteractionWithdraws(t *testing.T) {
+	tm := mapTravelFixture(t)
 	a, b := tm.players["a"], tm.players["b"]
 	standAt(t, tm, a, "passage-b-shop", "shop")
 	standAt(t, tm, b, "passage-c-shop", "shop")
@@ -40,12 +40,8 @@ func TestLeavingDeviceOrInteractingAgainWithdrawsVote(t *testing.T) {
 	}
 	a.player.Position = tm.spaceArena(a.player.Node).Center
 	tm.stepSpaces()
-	if tm.vote != nil || tm.shared != before {
-		t.Fatal("departed vote charged or persisted")
-	}
-	standAt(t, tm, a, "passage-b-shop", "shop")
-	if err := tm.request(a, protocol.Request{Kind: "device", Node: "shop"}); err != nil {
-		t.Fatal(err)
+	if tm.vote == nil || len(tm.vote.Yes) != 1 || tm.shared != before {
+		t.Fatal("map vote depends on physical door position")
 	}
 	if err := tm.request(a, protocol.Request{Kind: "device", Node: "shop"}); err != nil {
 		t.Fatal(err)

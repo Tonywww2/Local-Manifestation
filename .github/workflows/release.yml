@@ -1,0 +1,135 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing version tag to build, for example v0.8.0'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+  GOTOOLCHAIN: local
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: windows
+            runner: windows-latest
+          - target: linux
+            runner: ubuntu-24.04
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Validate tag format
+        run: |
+          if ($env:RELEASE_TAG -cnotmatch '^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?$') {
+            throw 'Expected a version tag such as v0.8.0 or v0.9.0-alpha.1'
+          }
+      - name: Check out the exact tag
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify source and content versions
+        run: |
+          $tagCommit = (& git rev-parse --verify "refs/tags/$($env:RELEASE_TAG)^{commit}").Trim()
+          if ($LASTEXITCODE -ne 0) { throw 'The version tag must already exist' }
+          $headCommit = (& git rev-parse HEAD).Trim()
+          if ($tagCommit -cne $headCommit) { throw 'Checkout does not match the version tag' }
+          $manifest = Get-Content content/base/manifest.json -Raw | ConvertFrom-Json
+          if ($env:RELEASE_TAG.Substring(1) -cne $manifest.version) { throw 'Tag and content versions must match' }
+      - name: Set up Go from go.mod
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Compile and package
+        run: ./tools/release.ps1 -Version ($env:RELEASE_TAG.Substring(1)) -Target '${{ matrix.target }}'
+      - name: Preserve release packages
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: release-${{ matrix.target }}
+          path: dist/*
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+
+  publish:
+    name: Publish GitHub Release
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - name: Check out release notes
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+          persist-credentials: false
+      - name: Download completed packages
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: release-*
+          path: dist
+          merge-multiple: true
+      - name: Verify packages and generate checksums
+        working-directory: dist
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          archives=(LocalManifestation-*.zip LocalManifestation-*.tar.gz)
+          checksums=(*.sha256)
+          [[ ${#archives[@]} -eq 2 && ${#checksums[@]} -eq 2 ]]
+          for checksum in "${checksums[@]}"; do
+            # PowerShell writes CRLF on Windows; normalize checksum records.
+            sed -i 's/\r$//' "$checksum"
+            sha256sum --check "$checksum"
+          done
+          sha256sum "${archives[@]}" > SHA256SUMS
+      - name: Upload assets, then publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          notes="docs/releases/$RELEASE_TAG.md"
+          note_flags=(--generate-notes)
+          if [[ -f "$notes" ]]; then note_flags=(--notes-file "$notes"); fi
+          preview_flags=()
+          if [[ "$RELEASE_TAG" == *-* ]]; then preview_flags=(--prerelease); fi
+          if gh release view "$RELEASE_TAG" --json isDraft > "$RUNNER_TEMP/existing-release.json"; then
+            [[ "$(jq -r .isDraft "$RUNNER_TEMP/existing-release.json")" == true ]] || {
+              echo 'This version is already published; create a new version instead.' >&2
+              exit 1
+            }
+          else
+            gh release create "$RELEASE_TAG" --verify-tag --draft \
+              --title "局部显现 / Local Manifestation $RELEASE_TAG" \
+              "${note_flags[@]}" "${preview_flags[@]}"
+          fi
+          gh release upload "$RELEASE_TAG" dist/*.zip dist/*.tar.gz dist/SHA256SUMS --clobber
+          gh release edit "$RELEASE_TAG" --draft=false
+          gh release view "$RELEASE_TAG" --json url --jq .url >> "$GITHUB_STEP_SUMMARY"

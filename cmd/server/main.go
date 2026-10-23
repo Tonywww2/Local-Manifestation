@@ -12,6 +12,7 @@ import (
 	"hsmultiplayer/internal/session"
 	"hsmultiplayer/pkg/lobby"
 	"hsmultiplayer/pkg/mods"
+	"hsmultiplayer/pkg/perf"
 	"io/fs"
 	"log"
 	"os"
@@ -32,7 +33,14 @@ func main() {
 	restore := flag.String("restore", "", "restore checkpoint path")
 	modRoot := flag.String("mods", launch.ModRoot, "verified mod package store")
 	combination := flag.String("combination", launch.Combination, "exact package lock")
+	cpuProfile := flag.String("cpuprofile", "", "write developer CPU profile on exit")
+	metrics := flag.String("metrics", "", "write bounded server/room performance JSON every second")
 	flag.Parse()
+	stopProfile, profileErr := perf.StartCPUProfile(*cpuProfile)
+	if profileErr != nil {
+		log.Fatal(profileErr)
+	}
+	defer stopProfile()
 	var options lobby.Config
 	if data := os.Getenv("HSM_ROOM_CONFIG"); data != "" {
 		if err := json.Unmarshal([]byte(data), &options); err != nil || options.Validate() != nil {
@@ -88,6 +96,8 @@ func main() {
 	}
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
+	stopMonitor := monitorServer(ctx, co, *metrics)
+	defer stopMonitor()
 	log.Printf("HSMultiplayer server %s; content %s; seed %d; logic %d TPS; snapshots %d Hz", listener.Addr(), c.Digest, *seed, *logicRate, *snapshotRate)
 	if err = server.Serve(ctx, listener, co, server.Distribution{Root: *modRoot, Lock: lock}); err != nil {
 		log.Fatal(err)

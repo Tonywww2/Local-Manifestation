@@ -18,7 +18,7 @@ type StatusDef struct {
 	DescriptionKey string         `json:"description_key,omitempty"`
 	Level          int            `json:"level"`
 	MaxLayers      int            `json:"max_layers"`
-	DurationMillis int64          `json:"duration_ms"`
+	DurationMillis int64          `json:"duration_ms"` // Zero with ClearOnLeave lasts until room departure.
 	Unique         bool           `json:"unique,omitempty"`
 	Conflicts      []string       `json:"conflicts,omitempty"`
 	ClearOnLeave   bool           `json:"clear_on_leave,omitempty"`

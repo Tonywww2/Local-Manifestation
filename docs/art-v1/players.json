@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-15",
+  "tool": "image_gen.imagegen",
+  "assets": [
+    {
+      "id": "base:bulwark",
+      "slug": "bulwark",
+      "subject": "A sturdy contemporary explorer wearing a short thick graphite work jacket, square padded shoulders, pale-gray safety helmet with a small muted teal visor, reinforced work trousers and heavy protective boots. Broad compact silhouette. Practical modern utility protection, not a knight, no armor plate suit.",
+      "source": "docs/art-v1/sources/players/bulwark.png",
+      "file": "content/base/assets/art-v1/players/bulwark.png",
+      "prompt": "A sturdy contemporary explorer wearing a short thick graphite work jacket, square padded shoulders, pale-gray safety helmet with a small muted teal visor, reinforced work trousers and heavy protective boots. Broad compact silhouette. Practical modern utility protection, not a knight, no armor plate suit.\nUse case: stylized-concept\nAsset type: production transparent 2D game character body sprite for Local Manifestation; separate weapons are rendered by engine, so BOTH HANDS EMPTY.\nInput image: STYLE reference ONLY for matte surface, crisp contour and restrained palette. Minimal contemporary indie-game hand-painted character, simplified large opaque shapes, charcoal outline, broad restrained highlights, graphite gray/warm white/muted teal. Calm everyday explorer, readable when only55px tall; no photorealism or 3D toy render.\nCamera/composition: orthographic elevated front-three-quarter sprite, looking slightly down-right, full head-to-boots body, neutral balanced standing pose, short compact proportions with head around1/4 body height. Centered on1024square canvas with15% genuine transparent margin on every side. No scene or sprite sheet. Feet level at bottom, arms close to torso but visibly separate.\nConstraints: truly transparent alpha background; no ground or cast shadow, no weapon, shield, staff, handheld gadget, effects, labels, text, symbols, watermark, UI, scenery, ornate armor, fantasy runes, medieval equipment or neon.",
+      "transparent_background": true,
+      "key": "player:base:bulwark",
+      "sha256": "d948f824b6a7cf1ddd34a4f52023bb29116fa2d4e3423f6a070942b2d8773117",
+      "source_sha256": "b93482f6bf50d6cbbae233963ace1a1ddcfd40b2b00c5e4af201059d7af8becb"
+    },
+    {
+      "id": "base:scout",
+      "slug": "scout",
+      "subject": "A lean contemporary explorer wearing a light warm-gray hooded field jacket, dark charcoal straight trousers, low soft shoes and a small close-fitting cross-body equipment pouch with one muted teal buckle. Hood down, short dark cap, unobtrusive neutral face. Agile slim silhouette, ordinary functional clothing, no military camouflage.",
+      "source": "docs/art-v1/sources/players/scout.png",
+      "file": "content/base/assets/art-v1/players/scout.png",
+      "prompt": "A lean contemporary explorer wearing a light warm-gray hooded field jacket, dark charcoal straight trousers, low soft shoes and a small close-fitting cross-body equipment pouch with one muted teal buckle. Hood down, short dark cap, unobtrusive neutral face. Agile slim silhouette, ordinary functional clothing, no military camouflage.\nUse case: stylized-concept\nAsset type: production transparent 2D game character body sprite for Local Manifestation; separate weapons are rendered by engine, so BOTH HANDS EMPTY.\nInput image: STYLE reference ONLY for matte surface, crisp contour and restrained palette. Minimal contemporary indie-game hand-painted character, simplified large opaque shapes, charcoal outline, broad restrained highlights, graphite gray/warm white/muted teal. Calm everyday explorer, readable when only55px tall; no photorealism or 3D toy render.\nCamera/composition: orthographic elevated front-three-quarter sprite, looking slightly down-right, full head-to-boots body, neutral balanced standing pose, short compact proportions with head around1/4 body height. Centered on1024square canvas with15% genuine transparent margin on every side. No scene or sprite sheet. Feet level at bottom, arms close to torso but visibly separate.\nConstraints: truly transparent alpha background; no ground or cast shadow, no weapon, shield, staff, handheld gadget, effects, labels, text, symbols, watermark, UI, scenery, ornate armor, fantasy runes, medieval equipment or neon.",
+      "transparent_background": true,
+      "key": "player:base:scout",
+      "sha256": "1a132d9e1b81c2d3b8abb9a0bb35601d661ea2949894f6e256bb09db67175070",
+      "source_sha256": "c6e1a7c155ef6510547f72acab09993724f8b7e939c50fcd6dae15d19df7a3a1"
+    },
+    {
+      "id": "base:arcanist",
+      "slug": "arcanist",
+      "subject": "A contemporary field researcher explorer in a short off-white laboratory work coat over graphite clothes, plain safety goggles, compact dark gloves and practical boots. A tiny desaturated lavender indicator on the sleeve hints at scientific coupling equipment. Distinct clean coat silhouette, technological magic without wand or fantasy robes.",
+      "source": "docs/art-v1/sources/players/arcanist.png",
+      "file": "content/base/assets/art-v1/players/arcanist.png",
+      "prompt": "A contemporary field researcher explorer in a short off-white laboratory work coat over graphite clothes, plain safety goggles, compact dark gloves and practical boots. A tiny desaturated lavender indicator on the sleeve hints at scientific coupling equipment. Distinct clean coat silhouette, technological magic without wand or fantasy robes.\nUse case: stylized-concept\nAsset type: production transparent 2D game character body sprite for Local Manifestation; separate weapons are rendered by engine, so BOTH HANDS EMPTY.\nInput image: STYLE reference ONLY for matte surface, crisp contour and restrained palette. Minimal contemporary indie-game hand-painted character, simplified large opaque shapes, charcoal outline, broad restrained highlights, graphite gray/warm white/muted teal. Calm everyday explorer, readable when only55px tall; no photorealism or 3D toy render.\nCamera/composition: orthographic elevated front-three-quarter sprite, looking slightly down-right, full head-to-boots body, neutral balanced standing pose, short compact proportions with head around1/4 body height. Centered on1024square canvas with15% genuine transparent margin on every side. No scene or sprite sheet. Feet level at bottom, arms close to torso but visibly separate.\nConstraints: truly transparent alpha background; no ground or cast shadow, no weapon, shield, staff, handheld gadget, effects, labels, text, symbols, watermark, UI, scenery, ornate armor, fantasy runes, medieval equipment or neon.",
+      "transparent_background": true,
+      "key": "player:base:arcanist",
+      "sha256": "9d6d652f538dcdf1fd0dd62b71a0ad2096f47bb315d7e40e46e07ae245c3545e",
+      "source_sha256": "a6c3142eba558144eb29a9458cf87fedc2aac34f6b6c6af55cb3debe50e20fe5"
+    },
+    {
+      "key": "player:base:renewal-frame",
+      "id": "base:renewal-frame",
+      "slug": "renewal-frame",
+      "category": "players",
+      "subject": "A contemporary support explorer in a clean sage-gray short utility coat, charcoal trousers and closed work shoes, soft pale-gray helmet and a small warm-white medical pack worn high on the back. Empty gloved hands, a tiny muted teal clip, no red cross or text. Compact medium silhouette clearly distinct from heavy worker, hooded scout and white-coated researcher.",
+      "camera": "Orthographic elevated front-three-quarter view, full body from head to boots, looking slightly down-right, neutral balanced standing pose, feet level, arms visibly separate but close. Proportions head about1/4 height. NO WEAPON or handheld equipment, no ground or cast shadow.",
+      "source": "docs/art-v1/sources/players/renewal-frame.png",
+      "file": "content/base/assets/art-v1/players/renewal-frame.png",
+      "prompt": "A contemporary support explorer in a clean sage-gray short utility coat, charcoal trousers and closed work shoes, soft pale-gray helmet and a small warm-white medical pack worn high on the back. Empty gloved hands, a tiny muted teal clip, no red cross or text. Compact medium silhouette clearly distinct from heavy worker, hooded scout and white-coated researcher.\nCamera: Orthographic elevated front-three-quarter view, full body from head to boots, looking slightly down-right, neutral balanced standing pose, feet level, arms visibly separate but close. Proportions head about1/4 height. NO WEAPON or handheld equipment, no ground or cast shadow.\nUse case: stylized-concept\nAsset type: production transparent 2D game sprite for Local Manifestation.\nInput: knife is STYLE REFERENCE ONLY, create the different subject. Match minimal contemporary hand-painted indie game art, matte polymer/cloth/steel, clean dark contour, broad opaque desaturated graphite/warm-gray/off-white blocks and very small muted teal functional accents. Calm everyday workshop aesthetic, readable at small game size. No photorealism, no 3D render, no fantasy runes, medieval details, steampunk ornaments or neon.\nOne subject on1024square canvas, whole silhouette centered with15% transparent padding. True transparent alpha; no scene, scenery, ground, cast shadow, text, numbers, logos, frame, border, UI or watermark.",
+      "transparent_background": true,
+      "sha256": "717f76fbc43ff6e594c8adfbf7ddd9a08e7df7dc7a10d13b5431b228ef9a46be",
+      "source_sha256": "1385c7bbd0fca790dd30dec5f9c30c0277727bec76ae534b3bd70c9f31e8ced0"
+    }
+  ]
+}

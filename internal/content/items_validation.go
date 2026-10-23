@@ -34,8 +34,11 @@ func (c *Catalog) validateItems(claim func(string) bool) error {
 		}
 	}
 	for _, d := range c.definitions.Items {
-		if d.Tier < 0 || d.Tier > 3 || d.Tier > 0 && d.Kind != "accessory" {
+		if d.Tier < 0 || d.Tier > 3 || d.Tier > 0 && d.Kind != "accessory" && d.Kind != "movement" && d.Kind != "passive" && d.Kind != "consumable" {
 			return fmt.Errorf("invalid item tier")
+		}
+		if err := c.validateSpecialConsumable(d); err != nil {
+			return fmt.Errorf("%s: %w", d.ID, err)
 		}
 		if err := c.validateCombat(d.Combat, false); err != nil {
 			return fmt.Errorf("%s: %w", d.ID, err)
@@ -70,7 +73,7 @@ func (c *Catalog) validateItems(claim func(string) bool) error {
 			if d.Slot != "head" && d.Slot != "body" && d.Slot != "legs" && d.Slot != "feet" {
 				return fmt.Errorf("invalid armor slot")
 			}
-		case "accessory", "consumable":
+		case "accessory", "consumable", "movement", "passive":
 		default:
 			return fmt.Errorf("invalid item kind")
 		}

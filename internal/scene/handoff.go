@@ -1,6 +1,7 @@
 package scene
 
 import (
+	"hsmultiplayer/pkg/animation"
 	"hsmultiplayer/pkg/damage"
 	"hsmultiplayer/pkg/model"
 	"hsmultiplayer/pkg/protocol"
@@ -11,6 +12,7 @@ func (a PlayerActions) Clone() PlayerActions {
 	f := a.state
 	if f.player.Life != "" && f.player.Life != "alive" {
 		f.attack, f.dodgeTime, f.invulnerable = nil, 0, 0
+		f.visual = animation.Cancel(f.visual)
 	}
 	f.player, f.input, f.contact, f.updated = model.Player{}, model.Input{}, nil, 0
 	if f.attack != nil {

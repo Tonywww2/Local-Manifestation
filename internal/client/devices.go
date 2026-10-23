@@ -5,11 +5,10 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	"hsmultiplayer/internal/client/ui"
 	"hsmultiplayer/pkg/device"
-	"hsmultiplayer/pkg/geometry"
 	"hsmultiplayer/pkg/model"
+	"hsmultiplayer/pkg/perf"
 	"hsmultiplayer/pkg/protocol"
 	"image/color"
-	"math"
 )
 
 func (g *Game) worldDevices(n model.Node, s protocol.Scene) []device.Device {
@@ -17,7 +16,7 @@ func (g *Game) worldDevices(n model.Node, s protocol.Scene) []device.Device {
 	if g.state.Vote != nil && (g.state.Vote.Node == "enhanced" || g.state.Vote.Node == "exhaust") {
 		emergency = g.state.Vote.Node
 	}
-	return device.World(device.Context{Node: n, Nodes: g.state.Nodes, Arena: geometry.NewArena(s.Width, s.Height), Phase: g.state.Phase, SharedAP: g.state.SharedAP, Emergency: emergency})
+	return device.World(device.Context{Node: n, Nodes: g.state.Nodes, Arena: g.sceneArena(s), Phase: g.state.Phase, SharedAP: g.state.SharedAP, Emergency: emergency})
 }
 func (g *Game) nearInteraction() (device.Device, bool) {
 	p := g.self()
@@ -78,15 +77,13 @@ func (g *Game) drawDevice(dst *ebiten.Image, c Camera, d device.Device) {
 	}
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(-48, -48)
-	if c.Oblique {
-		op.GeoM.Skew(-math.Atan(.38), 0)
-		op.GeoM.Scale(c.Scale, c.Scale*.68)
-	} else {
-		op.GeoM.Scale(c.Scale, c.Scale)
-	}
+	op.GeoM.Scale(c.Scale, c.Scale)
+	op.GeoM.Rotate(c.Angle)
 	op.GeoM.Translate(v.X, v.Y)
 	dst.DrawImage(g.deviceRing, op)
-	worldBox(dst, c, d.Position, 34, 26, 18, workshopMetal)
+	if !g.drawWorldProp(dst, "prop:"+d.Kind, c, d.Position, 76, 64) {
+		worldBox(dst, c, d.Position, 34, 26, 18, workshopMetal)
+	}
 	icon := "door"
 	if d.Kind == "shop" {
 		icon = "weapon"
@@ -97,10 +94,11 @@ func (g *Game) drawDevice(dst *ebiten.Image, c Camera, d device.Device) {
 	g.drawBox(dst, ui.Rect{X: v.X - 15, Y: v.Y - 33, W: 30, H: 30}, panel, uiEdge)
 	g.drawIconSized(dst, icon, v.X-10, v.Y-28, 20)
 	if g.state != nil && g.state.Vote != nil && g.state.Vote.Node == d.Target {
-		fitText(dst, g.tr("ui.device.vote", "yes", len(g.state.Vote.Yes), "required", g.state.Vote.Required), v.X-150, v.Y-37, 300, 14, true)
+		g.fitText(dst, g.tr("ui.device.vote", "yes", len(g.state.Vote.Yes), "required", g.state.Vote.Required), v.X-150, v.Y-37, 300, 14, true)
 	}
 }
 func (g *Game) drawDevices(dst *ebiten.Image, n model.Node, s protocol.Scene, c Camera) {
+	defer g.diagnostics.Since("client.render.devices", perf.Start())
 	for _, d := range g.worldDevices(n, s) {
 		g.drawDevice(dst, c, d)
 	}
@@ -134,14 +132,15 @@ func (g *Game) addDeviceControls(f *uiFrame, values []device.Device, c Camera) {
 }
 func (g *Game) useWorldDevice(id string) {
 	if g.state == nil {
+		if g.front.Page != "lobby" {
+			return
+		}
 		d, ok := device.Find(g.front.Devices, id)
-		if ok && !d.Interactive() {
+		if !ok || !d.Interactive() {
 			return
 		}
-		if !ok || !d.Near(g.front.Position) {
-			g.notify("error.door_distance")
-			return
-		}
+		// Hall facilities support remote mouse interaction. Keyboard interaction
+		// still chooses a nearby device in updateFront.
 		g.useHallDevice(d.Action)
 		return
 	}

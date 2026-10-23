@@ -3,10 +3,16 @@ package protocol
 import (
 	"hsmultiplayer/pkg/damage"
 	"hsmultiplayer/pkg/model"
+	"hsmultiplayer/pkg/perf"
+	"maps"
 	"slices"
 )
 
 func CloneScene(s Scene) Scene {
+	s.EnemyActions = slices.Clone(s.EnemyActions)
+	s.Actions = slices.Clone(s.Actions)
+	s.Performance = perf.Clone(s.Performance)
+	s.Hexes = slices.Clone(s.Hexes)
 	s.Obstacles = slices.Clone(s.Obstacles)
 	s.Players = slices.Clone(s.Players)
 	for i := range s.Players {
@@ -25,6 +31,8 @@ func CloneScene(s Scene) Scene {
 }
 
 func CloneState(s State) State {
+	s.GroundLoot = slices.Clone(s.GroundLoot)
+	s.Performance = perf.Clone(s.Performance)
 	s.LayerMembers = slices.Clone(s.LayerMembers)
 	s.Trades = slices.Clone(s.Trades)
 	for i := range s.Trades {
@@ -50,6 +58,8 @@ func CloneState(s State) State {
 		v.Eligible = slices.Clone(v.Eligible)
 		v.Yes = slices.Clone(v.Yes)
 		v.No = slices.Clone(v.No)
+		v.Entrants = slices.Clone(v.Entrants)
+		v.Tools = maps.Clone(v.Tools)
 		s.Vote = &v
 	}
 	return s

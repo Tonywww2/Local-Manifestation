@@ -8,9 +8,9 @@ import (
 	"math"
 )
 
-// Readable placeholder silhouettes retain the contemporary visual direction.
-// They are code-native so texture packs can replace each enemy:<id> asset.
-func (g *Game) drawEnemy(dst *ebiten.Image, c Camera, e model.Enemy) {
+// The full body is centered on its authoritative collider. Art size is
+// independent of collision size; missing assets keep a centered fallback.
+func (g *Game) drawEnemy(dst *ebiten.Image, c Camera, e model.Enemy, action model.EnemyActionState) float64 {
 	appearance := g.catalog.EnemyAppearance(e.Definition)
 	p := c.Project(e.Position)
 	r := max(4, e.Radius*c.Scale)
@@ -25,8 +25,16 @@ func (g *Game) drawEnemy(dst *ebiten.Image, c Camera, e model.Enemy) {
 		line(dst, p, end, color.RGBA{230, 174, 94, 150}, 3)
 		vector.StrokeCircle(dst, float32(p.X), float32(p.Y), float32(r+5), 2, color.RGBA{235, 181, 99, 255}, true)
 	}
-	if g.drawAsset(dst, "enemy:"+e.Definition, p, r*2, r*2) {
-		return
+	if height, ok := g.drawSkeletonEnemy(dst, c, e, action); ok {
+		return height
+	}
+	if image := g.resources.sprites["enemy:"+e.Definition]; image != nil {
+		visual := g.catalog.EnemyVisualRadius(e.Definition, e.Radius) * c.Scale
+		height := visual * 3.1
+		width := min(visual*3, height*float64(image.Bounds().Dx())/float64(image.Bounds().Dy()))
+		height = width * float64(image.Bounds().Dy()) / float64(image.Bounds().Dx())
+		drawActorTexture(dst, image, p, width, height, 0, 1, false)
+		return height / 2
 	}
 	vector.FillCircle(dst, float32(p.X), float32(p.Y+r*.45), float32(r), color.RGBA{24, 32, 37, 55}, true)
 	switch appearance {
@@ -62,4 +70,5 @@ func (g *Game) drawEnemy(dst *ebiten.Image, c Camera, e model.Enemy) {
 		rect(dst, p.X-r*.5, p.Y-r*.1, r, r*.95, ink)
 		line(dst, model.Vec{X: p.X - r*.3, Y: p.Y + r*.5}, model.Vec{X: p.X - r*1.3, Y: p.Y + r}, edge, 3)
 	}
+	return r
 }

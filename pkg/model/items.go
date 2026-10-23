@@ -17,6 +17,9 @@ type CombatContribution struct {
 	Source SourceRef
 }
 type ItemDef struct {
+	Durability      int                `json:"durability,omitempty"` // -1: unlimited; only special consumables.
+	Movement        *MovementItemDef   `json:"movement,omitempty"`
+	Passive         *PassiveItemDef    `json:"passive,omitempty"`
 	Tier            int                `json:"tier,omitempty"`
 	Lore            string             `json:"lore,omitempty"`
 	Combat          []CombatEffect     `json:"combat,omitempty"`
@@ -43,6 +46,8 @@ type ItemEffect struct {
 	Amount  float64    `json:"amount,omitempty"`
 }
 type ItemInstance struct {
+	Durability  int     `json:"durability,omitempty"`
+	SkillReady  int64   `json:"weapon_skill_ready,omitempty"`
 	ID          string  `json:"id"`
 	Definition  string  `json:"definition"`
 	Upgrade     int     `json:"upgrade,omitempty"`
@@ -69,6 +74,14 @@ func CloneInventory(v Inventory) Inventory {
 	return v
 }
 func CloneItemDef(v ItemDef) ItemDef {
+	if v.Movement != nil {
+		d := *v.Movement
+		v.Movement = &d
+	}
+	if v.Passive != nil {
+		d := *v.Passive
+		v.Passive = &d
+	}
 	v.Affixes = append([]string(nil), v.Affixes...)
 	if v.Resistance != nil {
 		m := map[string]float64{}
@@ -83,6 +96,19 @@ func CloneItemDef(v ItemDef) ItemDef {
 	v.Use = append([]ItemEffect(nil), v.Use...)
 	v.Combat = append([]CombatEffect(nil), v.Combat...)
 	return v
+}
+
+type MovementItemDef struct {
+	Mode  string `json:"mode"` // line, ring, anywhere; axial map coordinates.
+	Range int    `json:"range,omitempty"`
+	Free  bool   `json:"free,omitempty"`
+	Team  bool   `json:"team,omitempty"`
+}
+
+type PassiveItemDef struct {
+	Trigger   string `json:"trigger"` // lethal_damage, movement, movement_combat.
+	Status    string `json:"status,omitempty"`
+	Accessory bool   `json:"accessory,omitempty"`
 }
 
 type AffixDef struct {

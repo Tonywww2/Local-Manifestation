@@ -1,0 +1,25 @@
+//kage:unit pixels
+
+package main
+
+// The host submits only ordered quads. The GPU evaluates circle coverage in
+// screen pixels, so zoom never requires a regenerated mask or pixel upload.
+// custom: fill radius, ring radius, ring width, enemy ring color flag.
+func Fragment(dst vec4, local vec2, color vec4, custom vec4) vec4 {
+	d := length(local)
+	fill := float(0)
+	if custom.x > 0 {
+		fill = clamp(custom.x+0.5-d, 0, 1) * color.a
+	}
+	ring := float(0)
+	if custom.z > 0 {
+		ring = clamp(custom.z*0.5+0.5-abs(d-custom.y), 0, 1) * color.a
+	}
+	ringColor := color.rgb
+	if custom.w > 0 {
+		ringColor = vec3(220.0/255.0, 100.0/255.0, 100.0/255.0)
+	}
+	// Same source-over order as the old ring then disk draws. Return
+	// premultiplied alpha; overlapping bullets retain their original order.
+	return vec4(color.rgb*fill, fill) + vec4(ringColor*ring, ring)*(1-fill)
+}

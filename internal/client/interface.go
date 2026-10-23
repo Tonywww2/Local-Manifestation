@@ -3,11 +3,14 @@ package client
 import (
 	"encoding/json"
 	"fmt"
+	"hsmultiplayer/pkg/perf"
 	"image/color"
+	"maps"
 	"os"
 	"slices"
 	"strconv"
 	"strings"
+	"time"
 
 	"hsmultiplayer/internal/client/ui"
 	"hsmultiplayer/internal/content"
@@ -18,17 +21,23 @@ import (
 	"hsmultiplayer/pkg/model"
 	"hsmultiplayer/pkg/protocol"
 	"hsmultiplayer/pkg/stats"
-	"hsmultiplayer/pkg/status"
 )
 
 type uiControl struct {
+	Item                                       model.ItemInstance
+	ItemKind                                   string
+	Inspection                                 *inspectionNode
 	InventoryStatus                            *inventoryStatusCard
+	Peer                                       *hudPeerView
 	ID, Owner, Icon, Key, Action, Value, Title string
 	Badge                                      string
+	Slot                                       string
 	Caption                                    string
 	Count                                      int
 	Bounds                                     ui.Rect
 	Clip                                       ui.Rect
+	Hex                                        bool
+	HexAngle                                   float64
 	Summary, Details                           []string
 }
 type uiLabel struct {
@@ -52,25 +61,48 @@ type uiDot struct {
 	Available bool
 }
 type uiFrame struct {
-	Viewports map[string]windowViewport
-	Panels    []ui.Panel
-	Titles    map[string]string
-	Controls  []uiControl
-	Labels    []uiLabel
-	Meters    []uiMeter
-	Dots      []uiDot
-	Hints     []uiControl
-	Tooltip   *uiTooltip
+	MapTargets map[string]mapTravelTarget
+	Viewports  map[string]windowViewport
+	Panels     []ui.Panel
+	Titles     map[string]string
+	Controls   []uiControl
+	Labels     []uiLabel
+	Formulas   []uiFormula
+	Meters     []uiMeter
+	Dots       []uiDot
+	Hints      []uiControl
+	Tooltip    *uiTooltip
 }
 type uiTooltip struct {
 	Bounds   ui.Rect
 	Title    string
 	Rows     []string
-	RichRows [][]tooltipSpan
+	RichRows [][]textSpan
 }
 type clientUI struct {
+	travelPreview                       mapTravelPreview
+	developerItems                      developerItemBrowser
+	arrivalNode                         string
+	arrivalUntil                        time.Time
+	movementItem                        string
+	movementMenu                        bool
+	inspectionLayout                    ui.Layout
+	itemMenu                            *itemContextMenu
+	itemDetails                         map[string]*itemDetailsView
+	inspections                         map[string]inspectionNode
+	inspectNext                         uint64
+	formulaOffsets                      map[string]float64
+	routeState                          *protocol.State
+	routeFrom                           string
+	routes                              map[string][]string
+	visibilityState                     *protocol.State
+	visibilityFrom                      string
+	visibleNodes                        map[string]bool
+	entryShared                         bool
 	returnCursorPending                 bool
-	hoverStyles                         map[hoverStyleKey][][]tooltipSpan
+	textStyles                          map[string][]textSpan
+	textTerms                           []textTerm
+	textLanguage                        string
 	mouseInventory                      *model.Inventory
 	previewContributions                string
 	contentScroll                       map[string]float64
@@ -79,12 +111,15 @@ type clientUI struct {
 	statusControls                      []uiControl
 	wrapped                             map[wrapKey][]string
 	layout                              ui.Layout
+	windowSizes                         windowSizes
 	bindings                            bindings
 	windows                             []string
 	focus, hover                        string
 	cursor                              ui.Point
 	drag                                *ui.Drag
+	resize                              *windowResizeDrag
 	editor                              ui.Layout
+	hudEditor                           *hudEditorState
 	settingsPage                        string
 	settingsDraft                       *settings
 	bindMode                            string
@@ -106,6 +141,7 @@ type clientUI struct {
 }
 type wrapKey struct {
 	Text        string
+	Language    string
 	Width, Size float64
 }
 
@@ -113,14 +149,15 @@ func (g *Game) cachedWrap(lines []string, width, size float64) []string {
 	if len(lines) == 0 {
 		return nil
 	}
-	key := wrapKey{strings.Join(lines, "\n"), width, size}
+	key := wrapKey{strings.Join(lines, "\n"), g.language, width, size}
 	if rows, ok := g.u.wrapped[key]; ok {
 		return rows
 	}
 	if g.u.wrapped == nil || len(g.u.wrapped) > 512 {
 		g.u.wrapped = map[wrapKey][]string{}
 	}
-	rows := wrapLines(lines, width, size)
+	g.ensureTextTerms()
+	rows := wrapLines(lines, width, size, g.u.textTerms)
 	g.u.wrapped[key] = rows
 	return rows
 }
@@ -137,12 +174,16 @@ func (g *Game) initializeInterface() {
 		if s.Version <= 1 && s.Bindings != nil && validateBindings(migrateBindings(s.Bindings)) == nil {
 			g.u.bindings = migrateBindings(s.Bindings)
 		}
+		if s.Version <= 1 && validateWindowSizes(s.WindowSizes) == nil {
+			g.u.windowSizes = maps.Clone(s.WindowSizes)
+		}
 		g.mouseMode = s.InputMode == "mouse"
 		g.clickDirect = s.ClickDirect
 	}
 }
 func (g *Game) uiBounds() ui.Size { return ui.Size{W: float64(g.width), H: float64(g.height)} }
 func (g *Game) refreshPreview() {
+	defer g.diagnostics.Since("client.logic.ui_stats", perf.Start())
 	if g.u.previewState == g.state && g.u.previewPlayer == g.id && g.u.previewLanguage == g.language {
 		return
 	}
@@ -198,6 +239,20 @@ func (g *Game) openWindow(id string) {
 	}
 }
 func (g *Game) closeWindow(id string) {
+	if g.u.resize != nil && g.u.resize.ID == id {
+		g.u.resize = nil
+	}
+	delete(g.u.itemDetails, id)
+	delete(g.u.inspections, id)
+	delete(g.u.inspectionLayout, id)
+	for key := range g.u.formulaOffsets {
+		if strings.HasPrefix(key, id+":") {
+			delete(g.u.formulaOffsets, key)
+		}
+	}
+	if id == "backpack" {
+		g.u.itemMenu = nil
+	}
 	if id == "backpack" {
 		g.returnInventoryCursor()
 	}
@@ -207,6 +262,7 @@ func (g *Game) closeWindow(id string) {
 	}
 	if id == "map" {
 		g.showMap = false
+		g.u.movementMenu = false
 	}
 	if id == "settings" {
 		g.u.settingsDraft = nil
@@ -281,7 +337,7 @@ func (g *Game) windowInfo(id string) (string, []string, []string) {
 	case "backpack":
 		return g.tr("ui.backpack"), []string{g.tr("ui.inventory.capacity", "count", inventory.BagCount(p.Inventory), "capacity", p.Inventory.Capacity)}, nil
 	case "self":
-		lines := []string{g.tr("ui.stats", "name", p.Name, "hp", fmt.Sprintf("%.2f", p.HP), "max_hp", fmt.Sprintf("%.2f", p.MaxHP), "ap", p.AP, "level", p.Level, "xp", p.XP, "coins", p.Coins, "upgrade", p.Upgrade, "life", g.tr("life."+p.Life), "downs", p.Downs, "dodges", p.Dodges), g.tr("ui.points", "count", p.Points)}
+		lines := []string{g.tr("ui.stats", "name", p.Name, "hp", fmt.Sprintf("%.2f", p.HP), "max_hp", fmt.Sprintf("%.2f", p.MaxHP), "ap", p.AP, "level", p.Level, "xp", p.XP, "coins", p.Coins, "upgrade", p.Upgrade, "life", g.tr("life."+p.Life), "downs", p.Downs, "dodges", p.Dodges)}
 		for _, key := range []string{"strength", "agility", "constitution", "intelligence", "sense", "mana"} {
 			value, _ := p.Attributes.Value(key)
 			lines = append(lines, fmt.Sprintf("%s: %.2f", g.tr("attribute."+key), value))
@@ -299,14 +355,20 @@ func (g *Game) windowInfo(id string) (string, []string, []string) {
 	return g.localized("ui."+id, id), nil, nil
 }
 func (g *Game) buildInterface() {
+	defer g.diagnostics.Since("client.logic.ui_build", perf.Start())
 	g.refreshPreview()
 	if g.u.entrance != "" {
-		if door, ok := g.nearbyDoor(); !ok || door.ID != g.u.entrance {
+		n, ok := g.mapNode(g.u.entrance)
+		canMove := g.canMapMove(n)
+		if g.u.entryShared {
+			canMove = g.canTeamMapMove(n)
+		}
+		if !ok || !canMove {
 			g.closeWindow("entrance")
 			g.u.entrance = ""
 		}
 	}
-	if g.state != nil && g.u.phase != g.state.Phase {
+	if g.u.editor == nil && g.state != nil && g.u.phase != g.state.Phase {
 		g.u.phase = g.state.Phase
 		if g.u.phase == "lobby" || g.u.phase == "preparation" {
 			g.openWindow("preparation")
@@ -314,178 +376,42 @@ func (g *Game) buildInterface() {
 			g.closeWindow("preparation")
 		}
 	}
-	f := uiFrame{Titles: map[string]string{}}
-	layout := g.u.layout
-	if len(g.resources.theme.Layout) > 0 {
-		layout = ui.Clone(g.resources.theme.Layout)
-		for id, p := range g.u.layout {
-			layout[id] = p
-		}
-	}
+	f := uiFrame{Titles: map[string]string{}, MapTargets: g.mapDestinations()}
+	layout := g.effectiveLayout(g.u.layout)
 	if g.u.editor != nil {
-		layout = g.u.editor
+		layout = g.effectiveLayout(g.u.editor)
 	}
 	if g.state == nil && g.u.editor == nil {
 		g.buildFrontInterface(&f, layout)
 		for _, id := range g.u.windows {
 			g.buildWindow(&f, layout, id)
 		}
+		g.buildItemContextMenu(&f)
 		if g.u.hover != "" {
 			g.buildHover(&f)
 		}
 		g.u.frame = f
 		return
 	}
-	if scene := g.currentScene(); scene != nil {
+	if scene := g.currentScene(); g.u.editor == nil && scene != nil {
 		g.addDeviceControls(&f, g.worldDevices(g.currentNode(), *scene), g.camera(*scene))
-	}
-	bounds := g.uiBounds()
-	addPanel := func(id, title string, size ui.Size, p ui.Placement, floating bool) ui.Rect {
-		r := ui.At(layout, id, p, size, bounds)
-		f.Panels = append(f.Panels, ui.Panel{ID: id, Bounds: r, Floating: floating})
-		f.Titles[id] = title
-		return r
-	}
-	label := func(r ui.Rect, value string) {
-		f.Labels = append(f.Labels, uiLabel{Owner: f.Panels[len(f.Panels)-1].ID, Bounds: r, Text: value, Size: 12})
-	}
-	control := func(owner, id, icon, key, action, value, title string, r ui.Rect, summary, details []string) {
-		f.Controls = append(f.Controls, uiControl{ID: id, Owner: owner, Icon: icon, Key: key, Action: action, Value: value, Title: title, Bounds: r, Summary: summary, Details: details})
+		g.addLootControls(&f, g.camera(*scene))
 	}
 	if p := g.self(); p != nil {
-		for gi, group := range []string{"skills", "consumables"} {
-			r := addPanel(group, g.tr("ui."+group), ui.Size{W: 248, H: 60}, ui.Placement{Anchor: "top_left", X: 18, Y: 18 + float64(gi)*74}, false)
-			for i := 0; i < 4; i++ {
-				prefix := "skill"
-				if gi == 1 {
-					prefix = "item"
-				}
-				id := fmt.Sprintf("%s%d", prefix, i+1)
-				control(group, id, "empty", g.bindingLabel(g.bound(id)), "", "", g.tr("ui.action."+id), ui.Rect{X: r.X + float64(i)*62, Y: r.Y, W: 56, H: 60}, []string{g.tr("ui.slot.empty")}, nil)
-				index := len(f.Controls) - 1
-				if gi == 1 {
-					it, _ := inventory.Find(p.Inventory, p.Inventory.Equipment[5+i])
-					c := g.itemControl(group, id, it, f.Controls[index].Bounds, "item-use")
-					c.Value = strconv.Itoa(i)
-					c.Key = f.Controls[index].Key
-					f.Controls[index] = c
-				} else if d, ok := g.catalog.Skill(p.Skills[i]); ok {
-					c := &f.Controls[index]
-					c.Icon = skillIcon(d.ID)
-					c.Title = g.contentName(d.ID, d.Name)
-					c.Action = "skill-use"
-					c.Value = strconv.Itoa(i)
-					c.Summary = []string{g.localized("content."+d.ID+".description", d.Description), g.tr("ui.skill.cost", "cost", d.Cost, "seconds", float64(d.CooldownMillis)/1000)}
-					if remaining := float64(p.SkillReady[i]-p.Statuses.Time) / float64(status.UnitsPerSecond); remaining > 0 {
-						c.Badge = fmt.Sprintf("%.1f", remaining)
-					}
-				}
-			}
-		}
-		journeyPlacement, journeyWidth := ui.Placement{Anchor: "top_center", Y: 18}, 260.0
-		if g.width < 820 {
-			journeyPlacement = ui.Placement{Anchor: "top_left", X: 18, Y: 166}
-			journeyWidth = 208
-		}
-		r := addPanel("journey", g.tr("ui.journey"), ui.Size{W: journeyWidth, H: 42}, journeyPlacement, false)
-		label(ui.Rect{X: r.X + 10, Y: r.Y + 5, W: r.W - 20, H: 18}, g.tr("ui.journey.floor", "floor", g.state.Floor, "floors", g.state.Floors))
-		label(ui.Rect{X: r.X + 10, Y: r.Y + 23, W: r.W - 20, H: 16}, g.nodeName(p.Node))
-		control("journey", "journey", "map", "", "", "", g.tr("ui.journey"), r, []string{g.tr("phase." + g.state.Phase)}, nil)
-		if s := g.currentScene(); s != nil && s.Waves > 0 {
-			f.Controls[len(f.Controls)-1].Summary = append(f.Controls[len(f.Controls)-1].Summary, g.tr("ui.wave.progress", "wave", s.Wave, "waves", s.Waves))
-			f.Labels[len(f.Labels)-1].Text = g.tr("ui.wave.progress", "wave", s.Wave, "waves", s.Waves)
-		}
-		r = addPanel("minimap", g.tr("ui.map"), ui.Size{W: 224, H: 152}, ui.Placement{Anchor: "top_right", X: -18, Y: 18}, false)
-		label(ui.Rect{X: r.X + 10, Y: r.Y + r.H - 25, W: r.W - 20, H: 20}, g.tr("ui.minimap.ap", "personal", p.AP, "shared", g.state.SharedAP))
-		control("minimap", "minimap", "map", g.bindingLabel(g.bound("map")), "window", "map", g.tr("ui.map"), r, nil, nil)
-		r = addPanel("view", g.tr("ui.view"), ui.Size{W: 90, H: 36}, ui.Placement{Anchor: "top_right", X: -152, Y: 180}, false)
-		view := "view.top_down"
-		if g.oblique {
-			view = "view.oblique"
-		}
-		control("view", "view", "view", g.bindingLabel(g.bound("view")), "view", "", g.tr("ui.view"), r, []string{g.tr(view)}, nil)
-		peers := g.orderedPeers()
-		rows := min(len(peers), max(1, (g.height-356)/52))
-		r = addPanel("party", g.tr("ui.team"), ui.Size{W: 224, H: float64(max(1, rows) * 52)}, ui.Placement{Anchor: "top_right", X: -18, Y: 226}, false)
-		start := min(g.u.scroll["party"], max(0, len(peers)-rows))
-		for i, v := range peers[start:min(start+rows, len(peers))] {
-			row := ui.Rect{X: r.X, Y: r.Y + float64(i)*52, W: r.W, H: 46}
-			title, short, detail := g.windowInfo("peer:" + v.ID)
-			control("party", "peer:"+v.ID, "person", "", "window", "peer:"+v.ID, title, row, short, detail)
-		}
-		cardWidth := min(264, float64(g.width)*.325)
-		r = addPanel("resources", g.tr("ui.resources"), ui.Size{W: min(400, float64(g.width)-2*(cardWidth+30)), H: 50}, ui.Placement{Anchor: "bottom_center", Y: -18}, false)
-		barWidth := r.W - 60
-		healthText := fmt.Sprintf("%.2f / %.2f", p.HP, p.MaxHP)
-		f.Meters = append(f.Meters, uiMeter{Owner: "resources", Bounds: ui.Rect{X: r.X + 4, Y: r.Y + 3, W: barWidth, H: 19}, Fraction: p.HP / mathMaxHP(p.MaxHP)})
-		if labelFits(healthText, barWidth-12, 12) {
-			f.Labels = append(f.Labels, uiLabel{Owner: "resources", Bounds: ui.Rect{X: r.X + 4, Y: r.Y + 3, W: barWidth, H: 19}, Text: healthText, Size: 12, Centered: true})
-		}
-		if shield := status.ShieldTotal(p.Statuses); shield > 0 {
-			f.Meters = append(f.Meters, uiMeter{Owner: "resources", Bounds: ui.Rect{X: r.X + 4, Y: r.Y + 25, W: barWidth, H: 3}, Fraction: min(1, shield/max(1, p.MaxHP)), Kind: "shield"})
-		}
-		f.Meters = append(f.Meters, uiMeter{Owner: "resources", Bounds: ui.Rect{X: r.X + 4, Y: r.Y + 32, W: barWidth, H: 12}, Fraction: p.Energy / max(1, p.MaxEnergy), Kind: "energy"})
-		f.Labels = append(f.Labels, uiLabel{Owner: "resources", Bounds: ui.Rect{X: r.X + 4, Y: r.Y + 29, W: barWidth, H: 16}, Text: fmt.Sprintf("%.0f / %.0f", p.Energy, p.MaxEnergy), Size: 11, Centered: true})
-		for i := 0; i < 2; i++ {
-			f.Dots = append(f.Dots, uiDot{Owner: "resources", Center: ui.Point{X: r.X + r.W - 32 + float64(i)*21, Y: r.Y + 13}, Available: i < p.Dodges})
-		}
-		title, short, detail := g.windowInfo("self")
-		control("resources", "self", "heart", "", "", "", title, r, short, detail)
-		r = addPanel("statuses", g.tr("ui.statuses"), ui.Size{W: min(348, float64(g.width)-2*(cardWidth+30)), H: 48}, ui.Placement{Anchor: "bottom_center", X: 0, Y: -80}, false)
-		statusControlStart := len(f.Controls)
-		i := 0
-		for _, id := range []string{"penalty", "curse"} {
-			if id == "penalty" && p.Downs == 0 || id == "curse" && !g.state.Cursed {
-				continue
-			}
-			title, short, detail := g.windowInfo(id)
-			control("statuses", id, "status", "", "", "", title, ui.Rect{X: r.X + float64(i)*54, Y: r.Y, W: 48, H: 46}, short, detail)
-			f.Controls[len(f.Controls)-1].Badge = "∞"
-			i++
-		}
-		statusSlots := max(3, int((r.W+6)/54)) - i
-		moreStatuses := len(g.u.statusControls) > statusSlots
-		if moreStatuses {
-			statusSlots--
-		}
-		statusStart := min(g.u.scroll["statuses"], max(0, len(g.u.statusControls)-statusSlots))
-		for _, status := range g.u.statusControls[statusStart:min(statusStart+statusSlots, len(g.u.statusControls))] {
-			status.Bounds = ui.Rect{X: r.X + float64(i)*54, Y: r.Y, W: 48, H: 46}
-			f.Controls = append(f.Controls, status)
-			i++
-		}
-		if moreStatuses {
-			summary := []string{g.tr("ui.status.scroll")}
-			for _, row := range g.u.statusControls {
-				summary = append(summary, row.Title+" · "+row.Badge)
-			}
-			control("statuses", "statuses:more", "status", "", "", "", g.tr("ui.status.more"), ui.Rect{X: r.X + float64(i)*54, Y: r.Y, W: 48, H: 46}, summary, nil)
-			f.Controls[len(f.Controls)-1].Badge = fmt.Sprintf("+%d", len(g.u.statusControls)-statusSlots)
-		}
-		statusOffset := (r.W - float64(len(f.Controls)-statusControlStart)*54 + 6) / 2
-		for j := statusControlStart; j < len(f.Controls); j++ {
-			f.Controls[j].Bounds.X += statusOffset
-		}
-		r = addPanel("equipment", g.tr("ui.backpack_status"), ui.Size{W: cardWidth, H: 98}, ui.Placement{Anchor: "bottom_right", X: -18, Y: -18}, false)
-		f.Controls = append(f.Controls, g.inventoryStatusControl(r, *p))
-		if d, ok := g.nearInteraction(); ok {
-			r = addPanel("entrance-prompt", "", ui.Size{W: 320, H: 44}, ui.Placement{Anchor: "bottom_center", Y: -140}, false)
-			label(ui.Rect{X: r.X + 8, Y: r.Y + 4, W: 250, H: 36}, g.deviceName(d))
-			control("entrance-prompt", "entrance-open", "door", g.bindingLabel(g.bound("interact")), "world-device", d.ID, g.deviceName(d), ui.Rect{X: r.X + 268, Y: r.Y + 4, W: 44, H: 36}, nil, []string{g.deviceDescription(d)})
-		}
-	}
-	r := addPanel("tools", "", ui.Size{W: 92, H: 38}, ui.Placement{Anchor: "bottom_left", X: 18, Y: -18}, false)
-	control("tools", "settings", "settings", g.bindingLabel(g.bound("settings")), "window", "settings", g.tr("ui.settings"), ui.Rect{X: r.X, Y: r.Y, W: 38, H: 38}, nil, nil)
-	if g.self() != nil && g.performanceVisible {
-		control("tools", "developer", "tools", "F7", "window", "developer", g.tr("ui.developer"), ui.Rect{X: r.X + 46, Y: r.Y, W: 38, H: 38}, nil, nil)
+		g.buildCombatHUD(&f, layout, *p, false)
+	} else if g.u.editor != nil {
+		g.buildCombatHUD(&f, layout, g.u.hudEditor.Preview, true)
 	}
 	for _, id := range g.u.windows {
 		g.buildWindow(&f, layout, id)
 	}
+	g.buildItemContextMenu(&f)
+	g.buildMovementMenu(&f)
 	if g.u.editor != nil {
+		g.prepareHUDEditorFrame(&f)
 		g.buildEditor(&f)
 	}
-	if g.u.hover != "" {
+	if g.u.hover != "" && g.u.editor == nil {
 		g.buildHover(&f)
 	}
 	g.u.frame = f

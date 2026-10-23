@@ -44,12 +44,14 @@ func CloneConfig(c Config) Config {
 	return c
 }
 
-const Width, Height = 1000.0, 760.0
+const Width, Height = 1800.0, 1640.0
 
-func Spawn() model.Vec { return model.Vec{X: 500, Y: 440} }
+const hallRadius = 260.0
+
+func Spawn() model.Vec { return model.Vec{X: Width / 2, Y: Height / 2} }
 
 var hallFootprint = func() geometry.Footprint {
-	f, _ := geometry.NewFootprint(Spawn(), 200, []geometry.Cell{{Q: 0, R: 0}, {Q: -1, R: 0}, {Q: 1, R: -1}})
+	f, _ := geometry.NewFootprint(Spawn(), hallRadius, []geometry.Cell{{}, {Q: -1}, {R: -1}, {Q: 1, R: -1}, {Q: 1}, {R: 1}, {Q: -1, R: 1}})
 	return f
 }()
 
@@ -57,11 +59,11 @@ func Footprint() geometry.Footprint { return hallFootprint }
 
 func Devices() []device.Device {
 	var values []device.Device
-	points := [6]model.Vec{{X: 500, Y: 300}, {X: 200, Y: 330}, {X: 500, Y: 570}, {X: 800, Y: 170}, {X: 800, Y: 330}, {X: 200, Y: 170}}
+	cells := [6]geometry.Cell{{Q: -1}, {Q: -1, R: 1}, {Q: 1}, {R: -1}, {Q: 1, R: -1}, {R: 1}}
 	for i, id := range []string{"solo", "room-settings", "progression", "host", "join", "warehouse"} {
 		// Facilities surround a clear walking area; these are interaction points.
-		point := points[i]
-		values = append(values, device.Device{ID: "hall:" + id, Kind: "hall", NameKey: "hall." + id, DescriptionKey: "hall." + id + ".description", Position: point, Range: 70, Radius: 24, Action: id, Target: id})
+		point := Spawn().Add(geometry.AxialPoint(cells[i].Q, cells[i].R).Scale(hallRadius * .85))
+		values = append(values, device.Device{ID: "hall:" + id, Kind: "hall", NameKey: "hall." + id, DescriptionKey: "hall." + id + ".description", Position: point, Range: 85, Radius: 24, Action: id, Target: id})
 	}
 	return values
 }

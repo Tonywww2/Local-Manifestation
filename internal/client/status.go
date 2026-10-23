@@ -43,7 +43,11 @@ func (g *Game) statusControls(p model.Player) []uiControl {
 				}
 			}
 			remaining := max(0, float64(l.Expires-p.Statuses.Time)/float64(status.UnitsPerSecond))
-			c.Summary = append(c.Summary, g.tr("ui.status.layer_time", "layer", i+1, "seconds", fmt.Sprintf("%.2f", remaining)))
+			if d.DurationMillis == 0 && d.ClearOnLeave {
+				c.Summary = append(c.Summary, g.tr("ui.status.until_leave"))
+			} else {
+				c.Summary = append(c.Summary, g.tr("ui.status.layer_time", "layer", i+1, "seconds", fmt.Sprintf("%.2f", remaining)))
+			}
 			earliest = min(earliest, l.Expires-p.Statuses.Time)
 		}
 		for _, step := range evaluated.Steps {
@@ -67,6 +71,9 @@ func (g *Game) statusControls(p model.Player) []uiControl {
 			}
 		}
 		c.Badge = g.tr("ui.status.badge", "level", v.Level, "seconds", int(math.Ceil(float64(max(0, earliest))/float64(status.UnitsPerSecond))))
+		if d.DurationMillis == 0 && d.ClearOnLeave {
+			c.Badge = fmt.Sprintf("%d · ∞", v.Level)
+		}
 		if v.Shield {
 			c.Badge = fmt.Sprintf("%ds", int(math.Ceil(float64(max(0, earliest))/float64(status.UnitsPerSecond))))
 			c.Summary = append(c.Summary, g.tr("ui.shield.balance", "remaining", fmt.Sprintf("%.2f", v.Layers[0].Shield), "capacity", fmt.Sprintf("%.2f", v.Layers[0].Capacity)))

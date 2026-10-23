@@ -2,13 +2,33 @@ package client
 
 import (
 	"fmt"
+	"hsmultiplayer/pkg/perf"
 	"slices"
 	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"hsmultiplayer/internal/client/ui"
+	"hsmultiplayer/pkg/model"
+	"hsmultiplayer/pkg/protocol"
+	"math"
 )
+
+func controlContains(c uiControl, p ui.Point) bool {
+	if isFormulaToken(c.ID) && (c.Clip.W <= 0 || c.Clip.H <= 0) {
+		return false
+	}
+	if !c.Bounds.Contains(p) || c.Clip.W > 0 && !c.Clip.Contains(p) {
+		return false
+	}
+	if !c.Hex {
+		return true
+	}
+	r := c.Bounds.W / 2
+	v := rotatePoint(model.Vec{X: p.X - c.Bounds.X - r, Y: p.Y - c.Bounds.Y - r}, -c.HexAngle)
+	x, y := math.Abs(v.X), math.Abs(v.Y)
+	return y <= math.Sqrt(3)*r/2 && math.Sqrt(3)*x+y <= math.Sqrt(3)*r
+}
 
 func hitControl(f uiFrame, p ui.Point) (uiControl, bool) {
 	panel, ok := ui.HitPanel(f.Panels, p)
@@ -17,7 +37,7 @@ func hitControl(f uiFrame, p ui.Point) (uiControl, bool) {
 	}
 	for i := len(f.Controls) - 1; i >= 0; i-- {
 		c := f.Controls[i]
-		if c.Owner == panel.ID && c.Bounds.Contains(p) && (c.Clip.W == 0 || c.Clip.Contains(p)) {
+		if c.Owner == panel.ID && controlContains(c, p) {
 			return c, true
 		}
 	}
@@ -51,8 +71,14 @@ func (g *Game) updateHover(c uiControl, overControl bool) {
 // Only panels and actionable controls participate in clicks. Tooltips and passive
 // world hints are separate values and cannot start dragging or consume attacks.
 func (g *Game) clickInterface(cursor ui.Point) bool {
+	if g.u.editor != nil {
+		return true
+	}
 	panel, overPanel := ui.HitPanel(g.u.frame.Panels, cursor)
 	c, overControl := hitControl(g.u.frame, cursor)
+	if !overControl || c.Action != "developer-search" {
+		g.u.developerItems.Editing = false
+	}
 	if !overPanel {
 		return false
 	}
@@ -61,13 +87,13 @@ func (g *Game) clickInterface(cursor ui.Point) bool {
 		g.u.windows = slices.DeleteFunc(g.u.windows, func(id string) bool { return id == panel.ID })
 		g.u.windows = append(g.u.windows, panel.ID)
 	}
-	if overControl && (g.u.editor == nil || panel.Floating || panel.ID == "editor") {
+	if overControl {
 		g.performControl(c)
-	} else if panel.ID != "editor" && (panel.Floating && panel.Bounds.Header().Contains(cursor) || g.u.editor != nil) {
+	} else if panel.Floating && panel.Bounds.Header().Contains(cursor) {
 		anchor := "top_left"
 		layout := g.u.layout
-		if g.u.editor != nil {
-			layout = g.u.editor
+		if inspectionWindowID(panel.ID) {
+			layout = g.u.inspectionLayout
 		}
 		if p, ok := layout[panel.ID]; ok {
 			anchor = p.Anchor
@@ -96,6 +122,9 @@ func (g *Game) captureBinding(code string) {
 	g.u.bindingError = ""
 }
 func (g *Game) performControl(c uiControl) {
+	if g.developerAction(c) {
+		return
+	}
 	if g.modAction(c) {
 		return
 	}
@@ -106,6 +135,26 @@ func (g *Game) performControl(c uiControl) {
 		return
 	}
 	switch c.Action {
+	case "window-resize":
+		g.beginWindowResize(c.Value)
+	case "performance-export":
+		g.exportPerformance()
+	case "performance-room":
+		g.performanceRoom = c.Value
+	case "performance-toggle":
+		s := g.preferences()
+		switch c.Value {
+		case "fps":
+			s.ShowFPS = !s.ShowFPS
+		case "latency":
+			s.ShowLatency = !s.ShowLatency
+		case "diagnostics":
+			s.ShowDiagnostics = !s.ShowDiagnostics
+		}
+		if err := g.commitPreferences(s); err != nil {
+			g.notifyError(err)
+		}
+		g.u.settingsDraft = &s
 	case "inventory-page":
 		key, direction, _ := strings.Cut(c.Value, ":")
 		delta := 1
@@ -166,6 +215,14 @@ func (g *Game) performControl(c uiControl) {
 	case "identity-clear":
 		delete(g.tokens, g.address)
 		g.notify("notice.identity_cleared")
+	case "movement-menu":
+		g.u.movementMenu = !g.u.movementMenu
+	case "movement-select":
+		g.u.movementItem = c.Value
+		g.u.movementMenu = false
+		g.u.itemMenu = nil
+		g.closeWindow("entrance")
+		g.closeWindow("node-actions")
 	case "shop-upgrade":
 		g.command("upgrade", "", false)
 	case "close":
@@ -174,17 +231,23 @@ func (g *Game) performControl(c uiControl) {
 		g.toggleWindow(c.Value)
 		g.u.hover = ""
 	case "view":
-		g.oblique = !g.oblique
+		g.beginCameraRotation()
 	case "entrance":
 		g.inspectInteraction(c.Value)
 	case "enter-confirm":
-		g.performControl(uiControl{Action: "node", Value: c.Value})
+		if it, _, ok := g.selectedMovementItem(); ok {
+			if g.link != nil {
+				g.link.Send(protocol.Request{Kind: "travel_tool", Node: c.Value, Item: it.ID})
+			}
+		} else if g.u.entryShared {
+			g.command("propose", c.Value, false)
+		} else {
+			g.command("enter", c.Value, false)
+		}
 		g.closeWindow("entrance")
 		g.u.entrance = ""
 	case "vote":
 		g.command("vote", "", c.Value == "true")
-	case "attribute":
-		g.command("attribute", c.Value, false)
 	case "command":
 		if c.Value == "exhaust" || c.Value == "enhanced" {
 			g.command("propose", c.Value, false)
@@ -193,10 +256,22 @@ func (g *Game) performControl(c uiControl) {
 		}
 	case "select-node":
 		g.u.selectedNode = c.Value
+	case "map-node":
+		g.u.selectedNode = c.Value
+		if n, ok := g.mapNode(c.Value); ok && g.canMapMove(n) {
+			g.confirmMapEntry(c.Value, false)
+		}
+	case "map-personal", "map-team":
+		g.confirmMapEntry(c.Value, c.Action == "map-team")
+	case "map-withdraw":
+		g.command("withdraw_vote", "", false)
+		g.closeWindow("node-actions")
+	case "vote-enter", "vote-only", "vote-no":
+		g.submitMapVote(c.Action != "vote-no", c.Action == "vote-enter")
 	case "node":
 		for _, n := range g.state.Nodes {
 			if n.ID == c.Value {
-				if n.Kind == "boss" || n.Payment == "shared" && !n.Open {
+				if n.Kind == "boss" || n.Payment == "shared" {
 					g.command("propose", n.ID, false)
 				} else {
 					g.command("enter", n.ID, false)
@@ -206,11 +281,7 @@ func (g *Game) performControl(c uiControl) {
 	case "settings-page":
 		g.u.settingsPage = c.Value
 		if c.Value == "layout" {
-			g.u.editor = ui.Clone(g.u.layout)
-			g.closeWindow("settings")
-			for _, id := range []string{"backpack", "self", "map"} {
-				g.openWindow(id)
-			}
+			g.beginHUDLayoutEditor()
 		}
 	case "choose-language":
 		g.u.settingsDraft.Language = c.Value
@@ -256,19 +327,13 @@ func (g *Game) performControl(c uiControl) {
 		if err := g.commitPreferences(s); err != nil {
 			g.notify("notice.settings_save", "detail", err.Error())
 		} else {
-			g.u.editor = nil
-			g.u.windows = nil
-			g.showMap = false
-			g.u.focus = ""
+			g.finishHUDLayoutEditor()
 			g.notify("notice.settings_saved")
 		}
 	case "layout-cancel":
-		g.u.editor = nil
-		g.u.windows = nil
-		g.showMap = false
-		g.u.focus = ""
+		g.finishHUDLayoutEditor()
 	case "layout-reset":
-		g.u.editor = ui.Layout{}
+		g.u.editor = resetCombatHUD(g.u.editor)
 	case "fps":
 		g.cycleFPS()
 		s := g.preferences()
@@ -282,15 +347,24 @@ func (g *Game) performControl(c uiControl) {
 
 // updateInterface consumes input before the host produces any gameplay intent.
 func (g *Game) updateInterface() (mouseConsumed, keysConsumed bool) {
+	defer g.diagnostics.Since("client.logic.ui_input", perf.Start())
 	mx, my := ebiten.CursorPosition()
 	cursor := ui.Point{X: float64(mx), Y: float64(my)}
 	g.u.cursor = cursor
 	g.u.expanded = bindingDown(g.bound("detail")) || g.cfg.SmokeFrames > 0 && g.cfg.SmokeDetails
 	g.buildInterface()
 	if !ebiten.IsFocused() && g.cfg.SmokeFrames == 0 {
+		g.cameraControls.resetRotationInput()
+		g.cameraControls.MapDrag = nil
 		g.u.hover = ""
 		g.u.drag = nil
+		g.u.resize = nil
 		g.u.capture = ""
+		g.buildInterface()
+		return true, true
+	}
+	if g.u.editor != nil {
+		g.updateHUDLayoutEditor(cursor)
 		g.buildInterface()
 		return true, true
 	}
@@ -324,29 +398,52 @@ func (g *Game) updateInterface() (mouseConsumed, keysConsumed bool) {
 		g.buildInterface()
 		return true, true
 	}
+	g.updateDeveloperSearch()
+	if g.u.resize != nil {
+		g.updateWindowResize(cursor)
+		g.u.hover = ""
+		g.buildInterface()
+		return true, true
+	}
+	if d := g.cameraControls.MapDrag; d != nil {
+		if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+			g.cameraControls.MapOffset, d.Moved = panMap(*d, cursor)
+		} else {
+			g.cameraControls.MapDrag = nil
+			g.cameraControls.MapOffset, d.Moved = panMap(*d, cursor)
+			if !d.Moved {
+				g.clickInterface(cursor)
+			}
+		}
+		g.u.hover = ""
+		g.buildInterface()
+		return true, g.frontCapturesKeys()
+	}
 	if g.u.drag != nil {
 		d := *g.u.drag
 		if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
-			if g.u.editor != nil {
-				g.u.editor = ui.DragTo(g.u.editor, d, cursor, g.uiBounds())
+			if inspectionWindowID(d.ID) {
+				g.u.inspectionLayout = ui.DragTo(g.u.inspectionLayout, d, cursor, g.uiBounds())
 			} else {
 				g.u.layout = ui.DragTo(g.u.layout, d, cursor, g.uiBounds())
 			}
 		} else {
 			g.u.drag = nil
-			if g.u.editor == nil {
+			if !inspectionWindowID(d.ID) {
 				if err := g.saveSettings(); err != nil {
 					g.notify("notice.settings_save", "detail", err.Error())
 				}
 			}
 		}
 		g.buildInterface()
-		return true, g.u.editor != nil || g.frontCapturesKeys()
+		return true, g.frontCapturesKeys()
 	}
 	_, pointerCaptured := ui.HitPanel(g.u.frame.Panels, cursor)
 	if bindingAvailable(g.bound("settings"), pointerCaptured) && bindingPressed(g.bound("settings")) {
-		if g.u.editor != nil {
-			g.performControl(uiControl{Action: "layout-cancel"})
+		if g.u.itemMenu != nil {
+			g.u.itemMenu = nil
+		} else if g.u.movementMenu {
+			g.u.movementMenu = false
 		} else if len(g.u.windows) > 0 {
 			g.closeWindow(g.u.windows[len(g.u.windows)-1])
 		} else {
@@ -367,16 +464,51 @@ func (g *Game) updateInterface() (mouseConsumed, keysConsumed bool) {
 		g.updateHover(c, overControl)
 	}
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-		mouseConsumed = g.clickInterface(cursor)
+		if g.u.movementMenu && panel.ID != "movement-menu" && (!overControl || c.Action != "movement-menu") {
+			g.u.movementMenu = false
+		}
+		if g.u.itemMenu != nil && panel.ID != "item-context" {
+			g.u.itemMenu = nil
+			mouseConsumed = true
+		} else if overControl && (c.Action == "window-resize" || c.Action == "movement-menu") {
+			mouseConsumed = g.clickInterface(cursor)
+		} else if panel.ID == "map" && g.u.editor == nil && mapContentBounds(panel.Bounds).Contains(cursor) {
+			g.u.focus = "map"
+			g.u.windows = append(slices.DeleteFunc(g.u.windows, func(id string) bool { return id == "map" }), "map")
+			g.cameraControls.MapDrag = &mapPanDrag{Start: cursor, Offset: g.cameraControls.MapOffset}
+			mouseConsumed = true
+		} else {
+			mouseConsumed = g.clickInterface(cursor)
+		}
 	}
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) && overPanel {
-		if slot, ok := hitControl(g.u.frame, cursor); ok && strings.HasPrefix(slot.Action, "inventory-") {
-			g.inventoryClick(slot, true)
+		if slot, ok := hitControl(g.u.frame, cursor); ok {
+			if slot.Action == "movement-menu" && g.u.editor == nil {
+				g.u.movementMenu = !g.u.movementMenu
+			} else if g.displayInventory().Cursor == "" && slot.Item.ID != "" && g.u.editor == nil {
+				g.u.itemMenu = &itemContextMenu{Item: slot.Item, Position: cursor}
+			} else if strings.HasPrefix(slot.Action, "inventory-") && g.displayInventory().Cursor != "" {
+				g.inventoryClick(slot, true)
+			} else if slot.Action == "map-node" && g.u.editor == nil {
+				g.mapNodeMenu(slot.Value, cursor)
+			}
 		}
 		mouseConsumed = true
 	}
 	_, wheel := ebiten.Wheel()
-	if overPanel {
+	mapArea := panel.Bounds
+	if panel.ID == "map" {
+		mapArea = mapContentBounds(panel.Bounds)
+	} else if panel.ID == "minimap" {
+		mapArea = minimapContentBounds(panel.Bounds)
+	}
+	if wheel != 0 && g.u.editor == nil && (panel.ID == "minimap" || panel.ID == "map") && mapArea.Contains(cursor) {
+		g.zoomMapAt(panel.ID, wheel, cursor, mapArea)
+	} else if wheel != 0 && g.u.editor == nil && (!overPanel || strings.HasPrefix(panel.ID, "world-device:") || strings.HasPrefix(panel.ID, "world-loot:")) && (g.state != nil || g.front.Page == "lobby") {
+		g.zoomCamera("world", wheel)
+	} else if overPanel && panel.ID == developerItemsWindow {
+		g.u.scroll[panel.ID] = max(0, g.u.scroll[panel.ID]-int(wheel))
+	} else if overPanel {
 		if v, ok := g.u.frame.Viewports[panel.ID]; ok && v.MaxScroll > 0 && cursor.Y < v.Bounds.Y+v.Bounds.H-v.Footer {
 			g.u.contentScroll[panel.ID] = max(0, min(v.MaxScroll, g.u.contentScroll[panel.ID]-wheel*36))
 		} else {

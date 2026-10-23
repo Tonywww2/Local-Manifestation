@@ -8,11 +8,12 @@ import (
 
 const sqrt3 = 1.7320508075688772
 
-// Arena is a regular, flat-top hexagon centered in its content envelope.
-// Width/height limit its size; they do not stretch the hexagon or its grid.
+// Arena has a regular, flat-top base hexagon and an optional immutable union.
+// Width/height limit each hexagon; they do not stretch it or its grid.
 type Arena struct {
 	Center model.Vec
 	Radius float64
+	shape  *Footprint
 }
 type Segment struct{ A, B model.Vec }
 
@@ -31,6 +32,9 @@ func (a Arena) Vertices() [6]model.Vec {
 	return out
 }
 func (a Arena) ContainsDisk(p model.Vec, radius float64) bool {
+	if a.shape != nil {
+		return a.shape.ContainsDisk(p, radius)
+	}
 	if !p.Finite() || radius < 0 || math.IsNaN(radius) || math.IsInf(radius, 0) {
 		return false
 	}
@@ -49,6 +53,9 @@ func (a Arena) ContainsDisk(p model.Vec, radius float64) bool {
 // ClampDisk projects to the closest point of the inset hexagon, including corners.
 // Its result keeps the whole collision disk inside, rather than just its center.
 func (a Arena) ClampDisk(p model.Vec, radius float64) model.Vec {
+	if a.shape != nil {
+		return a.shape.ClampDisk(p, radius)
+	}
 	if !p.Finite() || radius < 0 || math.IsNaN(radius) || radius >= a.Radius*sqrt3/2 {
 		return a.Center
 	}
@@ -73,8 +80,11 @@ func (a Arena) ClampDisk(p model.Vec, radius float64) model.Vec {
 	return best
 }
 
-// ClipSegment clips a line to the convex room in world coordinates.
+// ClipSegment returns the first continuous portion inside the room.
 func (a Arena) ClipSegment(s Segment) (Segment, bool) {
+	if a.shape != nil {
+		return a.shape.ClipSegment(s)
+	}
 	lo, hi := 0.0, 1.0
 	d := s.B.Sub(s.A)
 	for _, n := range normals {
@@ -102,6 +112,9 @@ func (a Arena) ClipSegment(s Segment) (Segment, bool) {
 // Grid uses a flat-top axial tiling. Three edges per cell avoid duplicate strokes.
 // Boundary cells are clipped; no rectangular lines extend into the void.
 func (a Arena) Grid(cellRadius float64) []Segment {
+	if a.shape != nil {
+		return a.shape.Grid(cellRadius)
+	}
 	if cellRadius <= 0 || math.IsNaN(cellRadius) || math.IsInf(cellRadius, 0) || a.Radius <= 0 {
 		return nil
 	}

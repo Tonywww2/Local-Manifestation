@@ -23,8 +23,16 @@ func addControl(f *uiFrame, owner, id, icon, key, action, value, title string, r
 }
 func (g *Game) windowPanel(f *uiFrame, layout ui.Layout, id, title string, size ui.Size) ui.Rect {
 	placement := ui.Placement{Anchor: "center"}
+	if inspectionWindowID(id) {
+		layout = g.u.inspectionLayout
+	}
 	if id == "room-settings" {
 		placement = ui.Placement{Anchor: "top_right", X: -18, Y: 104}
+	}
+	if id == "map" {
+		if saved, ok := g.u.windowSizes[id]; ok {
+			size = ui.Size{W: max(420, saved.W), H: max(300, saved.H)}
+		}
 	}
 	r := ui.At(layout, id, placement, size, g.uiBounds())
 	f.Panels = append(f.Panels, ui.Panel{ID: id, Bounds: r, Floating: true})
@@ -41,6 +49,20 @@ func (g *Game) windowPanel(f *uiFrame, layout ui.Layout, id, title string, size 
 }
 func (g *Game) buildWindow(f *uiFrame, layout ui.Layout, id string) {
 	defer g.finishWindowContent(f, id)
+	if id == developerItemsWindow {
+		g.buildDeveloperItems(f, layout)
+		return
+	}
+	if id == "performance" {
+		g.buildPerformanceWindow(f, layout, id)
+		return
+	}
+	if g.buildInspectionWindow(f, layout, id) {
+		return
+	}
+	if g.buildMapActionWindow(f, layout, id) {
+		return
+	}
 	if id == "mods" {
 		g.buildMods(f, layout)
 		return
@@ -56,11 +78,14 @@ func (g *Game) buildWindow(f *uiFrame, layout ui.Layout, id string) {
 		return
 	}
 	size := ui.Size{W: 480, H: 320}
+	if id == "developer" {
+		size.H = 400
+	}
 	if id == "settings" {
 		size = ui.Size{W: 520, H: 490}
 	}
 	if id == "map" {
-		size = ui.Size{W: 600, H: 450}
+		size = defaultMapWindowSize(g.uiBounds())
 	}
 	if id == "weapon" && g.u.expanded && g.u.focus == id {
 		size = ui.Size{W: 620, H: 450}
@@ -75,23 +100,13 @@ func (g *Game) buildWindow(f *uiFrame, layout ui.Layout, id string) {
 	if id == "developer" {
 		title = g.tr("ui.developer")
 	}
-	if id == "entrance" {
-		title = g.tr("ui.door.inspect")
-		size = ui.Size{W: 440, H: 180}
-	}
 	r := g.windowPanel(f, layout, id, title, size)
-	if id == "entrance" {
-		if door, ok := g.nearbyDoor(); ok && door.ID == g.u.entrance {
-			g.addWindowLines(f, id, r, []string{g.nodeName(door.ID), g.doorSummary(door)}, 80)
-			addControl(f, id, "door:confirm", "approve", "", "enter-confirm", door.ID, g.tr("ui.door.confirm"), ui.Rect{X: r.X + 14, Y: r.Y + r.H - 44, W: 38, H: 30})
-			addControl(f, id, "door:cancel", "cancel", "", "close", id, g.tr("ui.cancel"), ui.Rect{X: r.X + 60, Y: r.Y + r.H - 44, W: 38, H: 30})
-		}
-		return
-	}
 	if id == "shop" {
 		if p := g.self(); p != nil {
 			g.addWindowLines(f, id, r, []string{g.tr("ui.shop.balance", "coins", p.Coins), g.tr("ui.shop.upgrade")}, 140)
-			addControl(f, id, "shop:upgrade", "weapon", "", "shop-upgrade", "", g.tr("ui.upgrade"), ui.Rect{X: r.X + 14, Y: r.Y + r.H - 48, W: 38, H: 32})
+			if g.catalog.Node(g.currentNode().Definition).WeaponUpgrade {
+				addControl(f, id, "shop:upgrade", "weapon", "", "shop-upgrade", "", g.tr("ui.upgrade"), ui.Rect{X: r.X + 14, Y: r.Y + r.H - 48, W: 38, H: 32})
+			}
 		}
 		return
 	}
@@ -115,31 +130,30 @@ func (g *Game) buildWindow(f *uiFrame, layout ui.Layout, id string) {
 		if g.state == nil {
 			return
 		}
-		positions, radius := mapPositionsWithTerrain(g.state.Nodes, g.state.Terrain, ui.Rect{X: r.X + 12, Y: r.Y + 40, W: r.W - 24, H: r.H - 120})
+		mapBounds := mapContentBounds(r)
+		positions, radius := g.mapLayout(mapBounds, "map")
 		for _, n := range g.state.Nodes {
 			v := positions[n.ID]
-			addControl(f, id, "map-node:"+n.ID, "", "", "select-node", n.ID, g.nodeName(n.ID), ui.Rect{X: v.X - radius, Y: v.Y - radius, W: radius * 2, H: radius * 2})
+			addControl(f, id, "map-node:"+n.ID, "", "", "map-node", n.ID, g.mapNodeLabel(n), ui.Rect{X: v.X - radius, Y: v.Y - radius, W: radius * 2, H: radius * 2})
+			f.Controls[len(f.Controls)-1].Summary = g.nodeHover(n)
+			f.Controls[len(f.Controls)-1].Clip = mapBounds
+			f.Controls[len(f.Controls)-1].Hex = true
+			f.Controls[len(f.Controls)-1].HexAngle = g.cameraAngle()
 		}
 		for _, t := range g.state.Terrain {
 			v := positions[terrainID(t)]
 			addControl(f, id, "map-node:"+terrainID(t), "", "", "", "", g.localized(t.NameKey, t.Name), ui.Rect{X: v.X - radius, Y: v.Y - radius, W: radius * 2, H: radius * 2})
+			f.Controls[len(f.Controls)-1].Clip = mapBounds
+			f.Controls[len(f.Controls)-1].Hex = true
+			f.Controls[len(f.Controls)-1].HexAngle = g.cameraAngle()
 		}
-		if g.u.selectedNode != "" {
-			for _, n := range g.state.Nodes {
-				if n.ID == g.u.selectedNode {
-					info := g.nodeName(n.ID)
-					from := g.currentNode()
-					if n.ID == from.ID || slices.Contains(from.Edges, n.ID) {
-						info += "\n" + g.localized(n.HintKey, n.Hint)
-					}
-					g.addLabel(f, id, ui.Rect{X: r.X + 12, Y: r.Y + r.H - 65, W: r.W - 24, H: 52}, info)
-				}
-			}
-		}
+		g.buildMovementSelector(f, mapBounds)
+		g.addMapResizeControl(f, r)
 		return
 	}
 	if id == "developer" {
 		g.addLabel(f, id, ui.Rect{X: r.X + 12, Y: r.Y + 38, W: r.W - 24, H: 48}, g.tr("ui.developer.help"))
+		f.Controls = append(f.Controls, uiControl{ID: "dev:items", Owner: id, Action: "window", Value: developerItemsWindow, Title: g.tr("ui.developer.items"), Caption: g.tr("ui.developer.items"), Bounds: ui.Rect{X: r.X + 12, Y: r.Y + 292, W: r.W - 24, H: 34}})
 		for i, action := range []string{"start", "rescue", "upgrade", "exhaust", "enhanced"} {
 			g.addLabel(f, id, ui.Rect{X: r.X + 12, Y: r.Y + 98 + float64(i)*36, W: r.W - 64, H: 28}, g.tr("ui."+action))
 			addControl(f, id, "dev:"+action, "tools", "", "command", action, g.tr("ui."+action), ui.Rect{X: r.X + r.W - 46, Y: r.Y + 96 + float64(i)*36, W: 30, H: 30})
@@ -189,11 +203,10 @@ func (g *Game) buildSettings(f *uiFrame, r ui.Rect) {
 	}
 	switch g.u.settingsPage {
 	case "home":
-		for i, page := range []string{"language", "bindings", "layout"} {
+		for i, page := range []string{"language", "bindings", "layout", "performance"} {
 			row(i, g.tr("ui.settings."+page), "settings-page", page, "settings", "")
 		}
-		row(3, g.tr("ui.fps_limit", "limit", g.frameLimitLabel()), "fps", "", "view", "F4")
-		row(4, g.tr("ui.vsync", "enabled", g.tr("bool."+fmt.Sprint(g.vsync))), "vsync", "", "view", "F5")
+
 		row(6, g.tr("ui.mouse.click", "direct", g.tr("bool."+fmt.Sprint(g.clickDirect))), "click-mode", "", "view", "")
 		row(7, g.tr("ui.mods"), "window", "mods", "settings", "")
 		row(9, g.tr("ui.settings.rules"), "settings-page", "rules", "map", "")
@@ -205,6 +218,17 @@ func (g *Game) buildSettings(f *uiFrame, r ui.Rect) {
 		} else if g.front.Page == "lobby" {
 			row(5, g.tr("main.return"), "front", "main", "door", "")
 		}
+	case "performance":
+		row(0, g.tr("ui.fps_limit", "limit", g.frameLimitLabel()), "fps", "", "view", "F4")
+		row(1, g.tr("ui.vsync", "enabled", g.tr("bool."+fmt.Sprint(g.vsync))), "vsync", "", "view", "F5")
+		for i, option := range []struct {
+			key     string
+			enabled bool
+		}{{"fps", g.showFPS}, {"latency", g.showLatency}, {"diagnostics", g.performanceVisible}} {
+			row(i+2, g.tr("ui.performance.show_"+option.key, "enabled", g.tr("bool."+fmt.Sprint(option.enabled))), "performance-toggle", option.key, "view", "")
+		}
+		row(5, g.tr("ui.performance.open"), "window", "performance", "tools", "")
+		g.addLabel(f, id, ui.Rect{X: r.X + 14, Y: r.Y + 294, W: r.W - 28, H: 76}, g.tr("ui.performance.note"))
 	case "language":
 		for i, lang := range g.translations.Languages() {
 			name := g.translations.Name(lang)
@@ -250,15 +274,6 @@ func (g *Game) buildSettings(f *uiFrame, r ui.Rect) {
 			}
 			addControl(f, id, action, strings.TrimPrefix(action, "settings-"), "", action, "", g.tr("ui."+strings.TrimPrefix(action, "settings-")), ui.Rect{X: r.X + 14 + float64(i)*46, Y: r.Y + r.H - 42, W: 38, H: 30})
 		}
-	}
-}
-func (g *Game) buildEditor(f *uiFrame) {
-	r := ui.Resolve(ui.Placement{Anchor: "top_center", Y: 72}, ui.Size{W: 330, H: 62}, g.uiBounds())
-	f.Panels = append(f.Panels, ui.Panel{ID: "editor", Bounds: r})
-	f.Titles["editor"] = g.tr("ui.layout.title")
-	g.addLabel(f, "editor", ui.Rect{X: r.X + 8, Y: r.Y + 4, W: r.W - 16, H: 22}, g.tr("ui.layout.help"))
-	for i, action := range []string{"layout-save", "layout-cancel", "layout-reset"} {
-		addControl(f, "editor", action, strings.TrimPrefix(action, "layout-"), "", action, "", g.tr("ui."+strings.TrimPrefix(action, "layout-")), ui.Rect{X: r.X + 8 + float64(i)*46, Y: r.Y + 28, W: 38, H: 28})
 	}
 }
 func (g *Game) buildHover(f *uiFrame) {

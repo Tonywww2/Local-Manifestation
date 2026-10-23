@@ -2,26 +2,27 @@ package client
 
 import (
 	"encoding/json"
-	"fmt"
+	"image"
 	"image/color"
 	"image/png"
 	"math"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
+	"hsmultiplayer/internal/client/ui"
 	"hsmultiplayer/internal/content"
 	"hsmultiplayer/internal/persistence"
 	"hsmultiplayer/internal/script"
-	"hsmultiplayer/pkg/geometry"
+	"hsmultiplayer/pkg/inventory"
 	"hsmultiplayer/pkg/lobby"
 	"hsmultiplayer/pkg/localization"
 	"hsmultiplayer/pkg/model"
+	"hsmultiplayer/pkg/perf"
 	"hsmultiplayer/pkg/protocol"
 	"hsmultiplayer/pkg/status"
 	"hsmultiplayer/pkg/timing"
@@ -33,6 +34,7 @@ var accent = color.RGBA{112, 211, 208, 255}
 var muted = color.RGBA{143, 157, 159, 255}
 
 type Config struct {
+	ProjectileRenderer string
 	ModRoot            string
 	Combination        string
 	ReloadContent      func(string, *content.Catalog) (*content.Catalog, error)
@@ -58,11 +60,13 @@ type Config struct {
 	RoomConfig         lobby.Config
 	SmokePage          string
 	SmokeAction        string
+	SmokeDuration      time.Duration
 	SmokeFrames        int
 	Screenshot         string
 	SmokeState         string
 	SmokeMap           bool
-	SmokeOblique       bool
+	SmokeRotation      float64
+	SmokeZoom          float64
 	SmokeDetails       bool
 	SmokeDetailOffset  int
 	SmokeContentOffset int
@@ -74,69 +78,80 @@ type dialResult struct {
 	err  error
 }
 type Game struct {
-	worldHistory       worldHistory
-	renderRooms        map[string]protocol.Scene
-	itemViews          map[itemViewKey]itemView
-	mods               modManager
-	resources          resourceBundle
-	adminToken         string
-	profiles           persistence.Profiles
-	progressionError   error
-	extensions         *script.Runtime
-	waypoints          []model.Vec
-	pathAt             time.Time
-	clickDirect        bool
-	closed             chan struct{}
-	front              frontState
-	exitRequested      bool
-	autoStart          bool
-	hosted             bool
-	roomSurfaces       map[string]roomSurface
-	prediction         MovementPrediction
-	localInput         model.Input
-	deviceRing         *ebiten.Image
-	selfMarker         *ebiten.Image
-	selfMarkerRadius   float64
-	u                  clientUI
-	width, height      int
-	frameLimit         int
-	vsync              bool
-	pacer              timing.Pacer
-	frameMeter         timing.Meter
-	snapshotMeter      timing.Meter
-	performanceVisible bool
-	performanceStart   time.Time
-	nextMetrics        time.Time
-	performance        performanceSample
-	performanceSamples []performanceSample
-	renderedFrames     int
-	interpolatedFrames int
-	lastRenderView     protocol.Scene
-	smokeNextAction    time.Time
-	catalog            *content.Catalog
-	cfg                Config
-	link               *Link
-	pending            chan dialResult
-	state              *protocol.State
-	id                 string
-	tokens             map[string]string
-	address            string
-	name               string
-	chassis            int
-	field              int
-	translations       *localization.Catalog
-	language           string
-	noticeCode         string
-	noticeParams       map[string]string
-	noticeUntil        time.Time
-	oblique            bool
-	mouseMode          bool
-	showMap            bool
-	tick               int
-	destination        *model.Vec
-	mouseFrames        int
-	screenshotDone     bool
-	previewOnly        bool
+	projectilePipeline   projectilePipeline
+	renderWork           renderWork
+	actorSprites         []actorSprite
+	projectileArt        projectileArt
+	diagnostics          perf.Recorder
+	processSampler       perf.ProcessSampler
+	showFPS, showLatency bool
+	lastFrameAt          time.Time
+	frameSpikes          uint64
+	performanceRoom      string
+	arenaShapes          map[string]sceneGeometry
+	worldHistory         worldHistory
+	renderRooms          map[string]protocol.Scene
+	itemViews            map[itemViewKey]itemView
+	mods                 modManager
+	resources            resourceBundle
+	adminToken           string
+	profiles             persistence.Profiles
+	progressionError     error
+	extensions           *script.Runtime
+	waypoints            []model.Vec
+	pathAt               time.Time
+	clickDirect          bool
+	closed               chan struct{}
+	front                frontState
+	exitRequested        bool
+	autoStart            bool
+	hosted               bool
+	roomSurfaces         map[string]roomSurface
+	prediction           MovementPrediction
+	localInput           model.Input
+	deviceRing           *ebiten.Image
+	selfMarker           *ebiten.Image
+	selfMarkerRadius     float64
+	u                    clientUI
+	width, height        int
+	frameLimit           int
+	vsync                bool
+	pacer                timing.Pacer
+	frameMeter           timing.Meter
+	snapshotMeter        timing.Meter
+	performanceVisible   bool
+	performanceStart     time.Time
+	nextMetrics          time.Time
+	performance          performanceSample
+	performanceSamples   []performanceSample
+	renderedFrames       int
+	interpolatedFrames   int
+	lastRenderView       protocol.Scene
+	smokeNextAction      time.Time
+	catalog              *content.Catalog
+	cfg                  Config
+	link                 *Link
+	pending              chan dialResult
+	state                *protocol.State
+	id                   string
+	tokens               map[string]string
+	address              string
+	name                 string
+	chassis              int
+	field                int
+	translations         *localization.Catalog
+	language             string
+	noticeCode           string
+	noticeParams         map[string]string
+	noticeUntil          time.Time
+	cameraControls       cameraControls
+	mouseMode            bool
+	showMap              bool
+	tick                 int
+	destination          *model.Vec
+	mouseFrames          int
+	screenshotDone       bool
+	previewOnly          bool
 }
 
 func New(c *content.Catalog, cfg Config) *Game {
@@ -153,11 +168,13 @@ func New(c *content.Catalog, cfg Config) *Game {
 	g.initializeFront()
 	g.initializeProgression()
 	g.initializeMods()
+	g.initializeProjectilePipeline()
 	if cfg.SmokeFrames > 0 {
 		if cfg.SmokeAction != "" {
 			g.front.Page = "lobby"
 		}
-		g.oblique = cfg.SmokeOblique
+		g.cameraControls.Rotation = cfg.SmokeRotation
+		g.cameraControls.Zoom = cfg.SmokeZoom
 	}
 	if b, err := os.ReadFile(cfg.Profile); err == nil {
 		_ = json.Unmarshal(b, &g.tokens)
@@ -173,7 +190,8 @@ func New(c *content.Catalog, cfg Config) *Game {
 			g.id = s.Players[0].ID
 			g.previewOnly = true
 			g.showMap = cfg.SmokeMap
-			g.oblique = cfg.SmokeOblique
+			g.cameraControls.Rotation = cfg.SmokeRotation
+			g.cameraControls.Zoom = cfg.SmokeZoom
 		} else {
 			g.notify("notice.render_state")
 		}
@@ -181,17 +199,45 @@ func New(c *content.Catalog, cfg Config) *Game {
 	if cfg.SmokeFrames > 0 {
 		if cfg.SmokeMap {
 			g.openWindow("map")
+			g.smokeSelectMovement(cfg.SmokeNode)
 		}
-		if cfg.SmokeWindow != "" {
-			id := cfg.SmokeWindow
-			if id == "entrance" {
-				if door, ok := g.nearbyDoor(); ok {
-					g.u.entrance = door.ID
+		if cfg.SmokeWindow == "layout" {
+			g.openWindow("settings")
+			g.beginHUDLayoutEditor()
+			if combatHUDKey(cfg.SmokeNode) != "" {
+				g.u.hudEditor.Selected = cfg.SmokeNode
+			}
+		} else if cfg.SmokeWindow == "item-details" && g.self() != nil {
+			if item, ok := inventory.Find(g.self().Inventory, g.self().Inventory.Equipment[0]); ok {
+				g.openItemDetails(item)
+				if cfg.SmokeDetails {
+					for _, view := range g.u.itemDetails {
+						g.refreshItemDetails(view)
+						if len(view.Equations) > 0 {
+							for _, part := range view.Equations[0].Parts {
+								if len(part.Children) > 1 {
+									g.u.cursor = ui.Point{X: 690, Y: 120}
+									g.openInspection(part)
+									break
+								}
+							}
+						}
+						break
+					}
 				}
 			}
-			if id == "language" || id == "bindings" {
+		} else if cfg.SmokeWindow != "" {
+			id := cfg.SmokeWindow
+			if id == "entrance" {
+				if n, ok := g.mapNode(cfg.SmokeNode); ok {
+					g.u.entrance = n.ID
+				} else if n := g.currentNode(); len(n.Edges) > 0 {
+					g.u.entrance = n.Edges[0]
+				}
+			}
+			if id == "language" || id == "bindings" || id == "performance-settings" {
 				g.openWindow("settings")
-				g.u.settingsPage = id
+				g.u.settingsPage = strings.TrimSuffix(id, "-settings")
 			} else {
 				g.openWindow(id)
 			}
@@ -247,6 +293,8 @@ func (g *Game) Close() {
 	if g.selfMarker != nil {
 		g.selfMarker.Dispose()
 	}
+	g.releaseProjectileArt()
+	g.releaseProjectilePipeline()
 	g.saveMetrics()
 	if g.link != nil {
 		g.link.Close()
@@ -260,14 +308,20 @@ func (g *Game) connect() {
 	g.connectWithRetry(false, nil)
 }
 func (g *Game) resetConnectionView() {
+	g.u.movementItem, g.u.movementMenu = "", false
+	g.u.arrivalNode, g.u.arrivalUntil = "", time.Time{}
 	if g.link != nil {
 		g.link.Close()
 		g.link = nil
 	}
 	g.state = nil
 	g.prediction = MovementPrediction{}
+	g.cameraControls.resetRotationInput()
+	g.cameraControls.MapOffset = model.Vec{}
+	g.cameraControls.MiniOffset = model.Vec{}
 	g.localInput = model.Input{}
 	g.u.windows = nil
+	g.clearInspections()
 	g.u.phase = ""
 	g.u.hover = ""
 	g.worldHistory.Clear()
@@ -288,13 +342,14 @@ func (g *Game) notify(key string, pairs ...any) {
 	g.noticeUntil = time.Now().Add(8 * time.Second)
 }
 func (g *Game) Update() error {
+	defer g.diagnostics.Since("client.logic.total", perf.Start())
 	g.pollMods()
 	g.updateAudio()
 	if g.exitRequested {
 		return ebiten.Termination
 	}
 	g.tick++
-	if g.cfg.SmokeFrames > 0 && g.tick > g.cfg.SmokeFrames {
+	if g.cfg.SmokeFrames > 0 && (g.tick > g.cfg.SmokeFrames || g.cfg.SmokeDuration > 0 && !g.performanceStart.IsZero() && time.Since(g.performanceStart) >= g.cfg.SmokeDuration) {
 		return ebiten.Termination
 	}
 	if g.previewOnly {
@@ -322,6 +377,7 @@ func (g *Game) Update() error {
 		}
 	}
 	if g.link != nil {
+		networkStart := perf.Start()
 	drain:
 		for {
 			select {
@@ -362,6 +418,7 @@ func (g *Game) Update() error {
 					g.link = nil
 					g.state = nil
 					g.u.windows = nil
+					g.clearInspections()
 					g.u.phase = ""
 					g.u.hover = ""
 					g.front.Page = "lobby"
@@ -378,6 +435,7 @@ func (g *Game) Update() error {
 				break
 			}
 		}
+		g.diagnostics.Since("client.logic.network_apply", networkStart)
 	}
 	g.smokeActions()
 	g.smokeFrontActions()
@@ -385,6 +443,9 @@ func (g *Game) Update() error {
 		g.returnInventoryCursor()
 	}
 	mouseConsumed, keysConsumed := g.updateInterface()
+	if g.updateCameraControls(mouseConsumed, keysConsumed, time.Now()) {
+		mouseConsumed = true
+	}
 	if !keysConsumed {
 		if inpututil.IsKeyJustPressed(ebiten.KeyF4) {
 			g.cycleFPS()
@@ -402,9 +463,6 @@ func (g *Game) Update() error {
 	if g.state == nil || (g.link == nil && !g.previewOnly) {
 		g.updateFront(mouseConsumed, keysConsumed)
 	} else {
-		if !keysConsumed && bindingAvailable(g.bound("view"), mouseConsumed) && bindingPressed(g.bound("view")) {
-			g.oblique = !g.oblique
-		}
 		if !keysConsumed && inpututil.IsKeyJustPressed(ebiten.KeyF2) {
 			g.mouseMode = !g.mouseMode
 			g.destination = nil
@@ -425,7 +483,9 @@ func (g *Game) Update() error {
 				if !keysConsumed {
 					g.actionKeys(in.Aim, mouseConsumed)
 					if bindingAvailable(g.bound("interact"), mouseConsumed) && bindingPressed(g.bound("interact")) {
-						if d, ok := g.nearInteraction(); ok {
+						if drop, ok := g.nearLoot(); ok {
+							g.sendItem(protocol.Request{Kind: "pickup", Item: drop.Item.ID})
+						} else if d, ok := g.nearInteraction(); ok {
 							g.inspectInteraction(d.Target)
 						}
 					}
@@ -441,7 +501,7 @@ func (g *Game) Update() error {
 							in.Move = in.Aim.Sub(p.Position).Unit()
 						} else if g.mouseFrames > 0 {
 							if g.mouseFrames < 10 {
-								target := geometry.NewArena(s.Width, s.Height).ClampDisk(in.Aim, 12)
+								target := g.sceneArena(*s).ClampDisk(in.Aim, 12)
 								g.destination = &target
 								g.waypoints = nil
 								g.pathAt = time.Time{}
@@ -469,6 +529,7 @@ func (g *Game) Update() error {
 						if bindingAvailable(g.bound("right"), mouseConsumed) && bindingDown(g.bound("right")) {
 							in.Move.X++
 						}
+						in.Move = g.camera(*s).WorldDirection(in.Move)
 					}
 					in.Dodge = bindingAvailable(g.bound("dodge"), mouseConsumed) && bindingPressed(g.bound("dodge"))
 				} else {
@@ -507,31 +568,53 @@ func line(dst *ebiten.Image, a, b model.Vec, c color.Color, width float32) {
 	vector.StrokeLine(dst, float32(a.X), float32(a.Y), float32(b.X), float32(b.Y), width, c, true)
 }
 func (g *Game) Draw(dst *ebiten.Image) {
+	paceStart := perf.Start()
 	now := g.pacer.Wait()
+	g.diagnostics.Since("client.render.pacing_wait", paceStart)
+	defer g.diagnostics.Since("client.render.cpu_total", perf.Start())
+	if !g.lastFrameAt.IsZero() {
+		interval := now.Sub(g.lastFrameAt)
+		g.diagnostics.Observe("client.frame.interval", interval)
+		if interval > max(33*time.Millisecond, 2*time.Second/time.Duration(max(1, g.frameLimit))) && g.frameLimit > 0 || g.frameLimit == 0 && interval > 33*time.Millisecond {
+			g.frameSpikes++
+		}
+	}
+	g.lastFrameAt = now
 	g.observeFrame(now)
+	g.renderWork = renderWork{ProjectileRenderer: "sprites"}
+	if g.projectilePipeline.shader != nil {
+		g.renderWork.ProjectileRenderer = "batch"
+	}
+	g.warmProjectilePipeline()
 	col := bg
 	if v := g.resources.theme.Background; v[3] != 0 {
 		col = color.RGBA{v[0], v[1], v[2], v[3]}
 	}
 	dst.Fill(col)
-	if g.state == nil || (g.link == nil && !g.previewOnly) {
+	if g.u.editor != nil && g.state == nil {
+		// HUD editing from the menu has its own neutral preview background.
+	} else if g.state == nil || (g.link == nil && !g.previewOnly) {
 		g.drawFront(dst)
 	} else {
 		g.drawGame(dst)
 	}
+	uiStart := perf.Start()
 	g.drawInterface(dst)
-	if g.performanceVisible {
-		s := g.performance
-		fitText(dst, g.tr("ui.performance", "fps", fmt.Sprintf("%.1f", s.FPS), "tps", fmt.Sprintf("%.1f", s.SceneTPS), "server", fmt.Sprintf("%.1f", s.ServerTPS), "snapshots", fmt.Sprintf("%.1f", s.SnapshotHz), "input", fmt.Sprintf("%.1f", s.InputHz)), 450, 59, 805, 11, false)
+	g.diagnostics.Since("client.render.ui", uiStart)
+	if g.u.editor == nil {
+		g.drawPerformanceHUD(dst)
 	}
+
 	if g.noticeCode != "" && (g.noticeUntil.IsZero() || time.Now().Before(g.noticeUntil)) {
 		rect(dst, 12, 92, float64(g.width-244), 30, color.RGBA{63, 35, 43, 255})
-		fitText(dst, g.translations.Text(g.language, g.noticeCode, g.noticeParams), 20, 96, float64(g.width-260), 14, false)
+		g.fitText(dst, g.translations.Text(g.language, g.noticeCode, g.noticeParams), 20, 96, float64(g.width-260), 14, false)
 	}
 	if g.cfg.Screenshot != "" && !g.screenshotDone && g.tick > 10 && (g.cfg.SmokeAction == "" || g.state != nil && (g.cfg.SmokeAction != "solo" || g.state.Phase == "exploring")) && (g.cfg.Metrics == "" || now.Sub(g.performanceStart) > 4*time.Second) {
 		f, err := os.Create(g.cfg.Screenshot)
 		if err == nil {
-			err = png.Encode(f, dst)
+			pixels := image.NewRGBA(dst.Bounds())
+			dst.ReadPixels(pixels.Pix)
+			err = png.Encode(f, pixels)
 			closeErr := f.Close()
 			if err == nil {
 				err = closeErr
@@ -567,26 +650,29 @@ func (g *Game) currentScene() *protocol.Scene {
 	return g.spaceView()
 }
 func (g *Game) drawGame(dst *ebiten.Image) {
+	defer g.diagnostics.Since("client.render.world", perf.Start())
 	if p := g.self(); p == nil {
 		return
 	}
 	if sc := g.currentScene(); sc != nil {
 		view := *sc
+		interpolationStart := perf.Start()
 		g.renderRooms = g.worldHistory.View(time.Now(), g.cfg.InterpolationDelay)
+		g.diagnostics.Since("client.render.interpolation", interpolationStart)
 		if interpolated, ok := g.renderRooms[g.currentNode().ID]; ok {
 			view = interpolated
 		}
 		if p := g.self(); p != nil {
-			a := geometry.NewArena(sc.Width, sc.Height)
+			a := g.sceneArena(*sc)
 			if !g.prediction.Valid {
-				g.prediction = g.prediction.Reconcile(*p, a, time.Now(), g.walkingSides()...)
+				g.prediction = g.prediction.Reconcile(*p, a, time.Now())
 			}
 			movable := p.Life == "alive" && (sc.State == "idle" && g.state.Phase != "won" && g.state.Phase != "lost" || sc.State == "fighting" || sc.State == "waiting" || sc.State == "between_waves")
 			if status.Controlled(p.Statuses, "stun") || status.Controlled(p.Statuses, "root") {
 				movable = false
 			}
 			previous := g.prediction.Position
-			g.prediction = g.prediction.Advance(g.localInput, p.Speed, a, time.Now(), movable, g.walkingSides()...)
+			g.prediction = g.prediction.Advance(g.localInput, p.Speed, a, time.Now(), movable)
 			if !g.clearWalk(*sc, previous, g.prediction.Position) {
 				g.prediction.Position = previous
 			}
@@ -604,16 +690,16 @@ func (g *Game) drawGame(dst *ebiten.Image) {
 		g.drawBattle(dst, view)
 	} else {
 		p := g.self()
-		drawText(dst, g.nodeName(p.Node), float64(g.width)/2-120, float64(g.height)/2-40, 18)
+		g.drawText(dst, g.nodeName(p.Node), float64(g.width)/2-120, float64(g.height)/2-40, 18)
 		if g.state.Phase == "won" || g.state.Phase == "lost" {
-			drawText(dst, g.tr("ui.finished.title", "phase", g.tr("phase."+g.state.Phase)), 30, 150, 18)
+			g.drawText(dst, g.tr("ui.finished.title", "phase", g.tr("phase."+g.state.Phase)), 30, 150, 18)
 		}
 	}
 }
-func hexagon(dst *ebiten.Image, c model.Vec, r float64, col color.Color) {
+func hexagon(dst *ebiten.Image, c model.Vec, r float64, col color.Color, rotation float64) {
 	var p vector.Path
 	for i := 0; i < 6; i++ {
-		a := math.Pi / 3 * float64(i)
+		a := math.Pi/3*float64(i) + rotation
 		x, y := float32(c.X+r*math.Cos(a)), float32(c.Y+r*math.Sin(a))
 		if i == 0 {
 			p.MoveTo(x, y)
@@ -637,74 +723,40 @@ func hexagon(dst *ebiten.Image, c model.Vec, r float64, col color.Color) {
 var whiteImage = func() *ebiten.Image { i := ebiten.NewImage(3, 3); i.Fill(color.White); return i }()
 
 func (g *Game) camera(s protocol.Scene) Camera {
-	return g.roomCamera(g.currentNode(), s, g.worldCamera())
+	return g.worldCamera()
 }
 func (g *Game) drawBattle(dst *ebiten.Image, s protocol.Scene) {
 	g.drawNeighborhood(dst, s)
 	c := g.camera(s)
 	if s.State == "waiting" || s.State == "between_waves" {
-		v := c.Project(geometry.NewArena(s.Width, s.Height).Center)
-		fitText(dst, g.tr("ui.wave.countdown", "seconds", int(math.Ceil(s.Countdown))), v.X-200, v.Y-68, 400, 26, true)
+		v := c.Project(g.sceneArena(s).Center)
+		g.fitText(dst, g.tr("ui.wave.countdown", "seconds", int(math.Ceil(s.Countdown))), v.X-200, v.Y-68, 400, 26, true)
 	}
 	if s.State == "paused" {
-		fitText(dst, g.tr("ui.paused"), float64(g.width)/2-220, 80, 440, 16, true)
+		g.fitText(dst, g.tr("ui.paused"), float64(g.width)/2-220, 80, 440, 16, true)
 	}
 	if s.State == "fighting" && s.ObjectiveRemaining > 0 {
-		fitText(dst, g.tr("ui.objective.survive", "seconds", int(math.Ceil(s.ObjectiveRemaining))), float64(g.width)/2-220, 80, 440, 16, true)
+		g.fitText(dst, g.tr("ui.objective.survive", "seconds", int(math.Ceil(s.ObjectiveRemaining))), float64(g.width)/2-220, 80, 440, 16, true)
 	}
 	if s.Error != "" {
-		fitText(dst, g.tr("ui.script_error", "detail", s.Error), 18, 230, float64(g.width)-270, 14, false)
+		g.fitText(dst, g.tr("ui.script_error", "detail", s.Error), 18, 230, float64(g.width)-270, 14, false)
 	}
 }
 func (g *Game) drawRoomEntities(dst *ebiten.Image, s protocol.Scene, c Camera) {
+	defer g.diagnostics.Since("client.render.actors", perf.Start())
 	if p := g.self(); p != nil {
-		for _, drop := range p.Loot {
-			if drop.Node == strings.TrimPrefix(s.ID, "space:") {
-				v := c.Project(drop.Position)
-				hexagon(dst, v, 7*c.Scale, color.RGBA{100, 230, 170, 255})
+		for _, list := range g.lootLists() {
+			for _, drop := range list {
+				if drop.Node == strings.TrimPrefix(s.ID, "space:") {
+					v := c.Project(drop.Position)
+					hexagon(dst, v, 7*c.Scale, color.RGBA{100, 230, 170, 255}, c.Angle)
+					if g.resources.images["icon:"+drop.Item.Definition] != nil {
+						g.drawIconSized(dst, drop.Item.Definition, v.X-11*c.Scale, v.Y-18*c.Scale, 22*c.Scale)
+					}
+				}
 			}
 		}
 	}
-	type sprite struct {
-		y    float64
-		draw func()
-	}
-	var sprites []sprite
-	for _, e := range s.Enemies {
-		e := e
-		sprites = append(sprites, sprite{e.Position.Y, func() {
-			p := c.Project(e.Position)
-			g.drawEnemy(dst, c, e)
-			rect(dst, p.X-20, p.Y-e.Radius-10, 40, 4, muted)
-			rect(dst, p.X-20, p.Y-e.Radius-10, 40*e.HP/e.MaxHP, 4, accent)
-		}})
-	}
-	for _, p := range s.Players {
-		p := p
-		sprites = append(sprites, sprite{p.Position.Y, func() {
-			v := c.Project(p.Position)
-			col := accent
-			if p.ID != g.id {
-				col = color.RGBA{118, 166, 247, 255}
-			}
-			if p.Life != "alive" {
-				col = muted
-			}
-			radius := max(4, 12*c.Scale)
-			if p.ID == g.id {
-				radius = max(7, radius)
-			}
-			if p.ID == g.id {
-				g.drawSelfMarker(dst, v, radius)
-			}
-			height := g.drawPlayerBody(dst, p.Chassis, p.Life, v, radius, col)
-			fitText(dst, p.Name, v.X-60, v.Y-height-17, 120, 12, true)
-			rect(dst, v.X-20, v.Y+radius+7, 40*p.HP/mathMaxHP(p.MaxHP), 4, col)
-		}})
-	}
-	sort.SliceStable(sprites, func(i, j int) bool { return sprites[i].y < sprites[j].y })
-	for _, s := range sprites {
-		s.draw()
-	}
+	g.drawSortedActors(dst, s, c)
 	g.drawProjectiles(dst, s.Projectiles, c)
 }

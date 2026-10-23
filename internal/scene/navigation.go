@@ -4,6 +4,7 @@ import (
 	"hsmultiplayer/pkg/geometry"
 	"hsmultiplayer/pkg/model"
 	"hsmultiplayer/pkg/navigation"
+	"hsmultiplayer/pkg/perf"
 )
 
 type enemyPath struct {
@@ -16,8 +17,9 @@ func (w *world) clearObstacles(a, b model.Vec, radius float64) bool {
 	return geometry.ObstaclesClear(a, b, radius, w.room.Obstacles)
 }
 func (w *world) enemyMove(e model.Enemy, move, target model.Vec, speed, dt float64) model.Vec {
+	defer w.performance.Since("scene.logic.enemy_navigation", perf.Start())
 	candidate := w.clamp(e.Position.Add(move.Unit().Scale(speed*dt)), e.Radius)
-	if w.clearObstacles(e.Position, candidate, e.Radius) {
+	if w.clearMove(e.Position, candidate, e.Radius) {
 		return candidate
 	}
 	if w.paths == nil {
@@ -25,7 +27,7 @@ func (w *world) enemyMove(e model.Enemy, move, target model.Vec, speed, dt float
 	}
 	cached, ok := w.paths[e.ID]
 	if !ok || w.clock-cached.at > .3 || target.Sub(cached.target).Length() > 96 {
-		path, err := navigation.Path(navigation.Space{Arena: geometry.NewArena(w.room.Width, w.room.Height), Obstacles: w.room.Obstacles, Radius: e.Radius}, e.Position, target)
+		path, err := navigation.Path(navigation.Space{Arena: w.arenaGeometry(), Obstacles: w.room.Obstacles, Radius: e.Radius}, e.Position, target)
 		if err != nil {
 			path = nil
 		}
@@ -39,7 +41,7 @@ func (w *world) enemyMove(e model.Enemy, move, target model.Vec, speed, dt float
 		return e.Position
 	}
 	next := e.Position.Add(cached.points[0].Sub(e.Position).Unit().Scale(speed * dt))
-	if w.clearObstacles(e.Position, next, e.Radius) {
+	if w.clearMove(e.Position, next, e.Radius) {
 		return next
 	}
 	return e.Position

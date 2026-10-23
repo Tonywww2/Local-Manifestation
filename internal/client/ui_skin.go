@@ -13,9 +13,32 @@ var uiEdge = color.RGBA{101, 117, 121, 255}
 var uiInk = color.RGBA{238, 241, 239, 255}
 var menuInk = color.RGBA{43, 51, 53, 255}
 
+// Item categories are display values, independent of rarity and slot anatomy.
+// Empty slots and other buttons retain their existing neutral treatment.
+func backpackItemBorder(c uiControl) (color.RGBA, bool) {
+	if c.Owner != "backpack" || c.Item.ID == "" {
+		return color.RGBA{}, false
+	}
+	switch c.ItemKind {
+	case "weapon":
+		return color.RGBA{200, 151, 100, 255}, true
+	case "armor":
+		return color.RGBA{118, 169, 205, 255}, true
+	case "accessory":
+		return color.RGBA{231, 207, 148, 255}, true
+	case "consumable":
+		return color.RGBA{171, 149, 202, 255}, true
+	case "movement":
+		return color.RGBA{100, 210, 190, 255}, true
+	case "passive":
+		return color.RGBA{212, 146, 178, 255}, true
+	}
+	return color.RGBA{}, false
+}
+
 func unframedHUD(id string) bool {
 	switch id {
-	case "statuses", "skills", "consumables", "equipment", "tools", "resources", "party", "view", "main-menu", "hall-heading", "hall-wealth":
+	case "statuses", "weapon-skill", "consumables", "equipment", "tools", "resources", "health", "energy", "dodges", "performance-hud", "party", "view", "developer-tools", "main-menu", "hall-heading", "hall-wealth":
 		return true
 	}
 	return false
@@ -45,8 +68,15 @@ func (g *Game) drawControlSkin(dst *ebiten.Image, c uiControl) {
 		fill = color.RGBA{32, 40, 43, 220}
 		edge = color.RGBA{76, 89, 92, 255}
 	}
+	typeEdge, typed := backpackItemBorder(c)
+	if typed {
+		edge = typeEdge
+	}
 	if c.ID == g.u.hover {
 		fill, edge = color.RGBA{48, 66, 68, 250}, accent
+	}
+	if g.u.hudEditor != nil && (c.ID == "layout:select:"+g.u.hudEditor.Selected || c.ID == "layout:coordinate:"+g.u.hudEditor.Axis) {
+		edge = hudGold
 	}
 	if strings.HasPrefix(c.ID, "chassis:") && strings.HasPrefix(c.Caption, "[ ") {
 		edge = accent
@@ -67,6 +97,14 @@ func (g *Game) drawControlSkin(dst *ebiten.Image, c uiControl) {
 		return
 	}
 	g.drawBox(dst, r, fill, edge)
+	if c.Slot != "" {
+		g.drawEquipmentSlot(dst, c)
+	}
+	if typed {
+		// Keep the category visible inside the separate Hover outline. This uses
+		// the shared cached nine-slice skin, with no per-frame texture creation.
+		g.drawBox(dst, r.Inset(2), color.RGBA{}, typeEdge)
+	}
 }
 
 func drawMeterSkin(dst *ebiten.Image, meter uiMeter) {

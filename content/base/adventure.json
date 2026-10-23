@@ -1,13 +1,18 @@
 {
   "_comment": "Batch 01. Authored first-floor encounters; later floors reuse templates with DEVELOPMENT scaling. Ordinary battle final rewards: two 50% accessory rolls (mean 1), development tier weights 70:25:5. No set bonuses.",
-  "format": 3,
+  "format": 4,
   "floors": [
     {
       "id": "base:floor-1",
-      "map": "base:branch-map",
+      "map": "base:first-map",
       "personal_ap": 4,
       "shared_ap": 3,
-      "enhanced_room": "base:guardian-enhanced"
+      "enhanced_room": "base:guardian-enhanced",
+      "excluded_random_kinds": [
+        "revival",
+        "shrine",
+        "shop"
+      ]
     },
     {
       "id": "base:floor-2",
@@ -39,6 +44,202 @@
     }
   ],
   "maps": [
+    {
+      "id": "base:first-map",
+      "start": "start",
+      "boss": "boss",
+      "nodes": [
+        {
+          "id": "start",
+          "definition": "base:start",
+          "q": 0,
+          "r": 0,
+          "edges": [
+            "boss"
+          ]
+        },
+        {
+          "id": "boss",
+          "definition": "base:boss",
+          "q": 1,
+          "r": 0,
+          "edges": [
+            "start"
+          ]
+        }
+      ],
+      "terrain": [
+        {
+          "q": -1,
+          "r": 0,
+          "name": "Mountain wall",
+          "name_key": "terrain.mountain"
+        },
+        {
+          "q": -1,
+          "r": 1,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": -1,
+          "r": 2,
+          "name": "Mountain wall",
+          "name_key": "terrain.mountain"
+        },
+        {
+          "q": -1,
+          "r": 3,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": -1,
+          "r": 4,
+          "name": "Mountain wall",
+          "name_key": "terrain.mountain"
+        },
+        {
+          "q": -1,
+          "r": 5,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 0,
+          "r": -1,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 0,
+          "r": 5,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 1,
+          "r": -1,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 1,
+          "r": 1,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 1,
+          "r": 4,
+          "name": "Mountain wall",
+          "name_key": "terrain.mountain"
+        },
+        {
+          "q": 2,
+          "r": -1,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 2,
+          "r": 3,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 3,
+          "r": -2,
+          "name": "Mountain wall",
+          "name_key": "terrain.mountain"
+        },
+        {
+          "q": 3,
+          "r": 0,
+          "name": "Mountain wall",
+          "name_key": "terrain.mountain"
+        },
+        {
+          "q": 3,
+          "r": 1,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 3,
+          "r": 3,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 4,
+          "r": -3,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 4,
+          "r": -1,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 4,
+          "r": 1,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 4,
+          "r": 3,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 5,
+          "r": -3,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 5,
+          "r": -2,
+          "name": "Mountain wall",
+          "name_key": "terrain.mountain"
+        },
+        {
+          "q": 5,
+          "r": 1,
+          "name": "Cliff",
+          "name_key": "terrain.cliff"
+        },
+        {
+          "q": 5,
+          "r": 2,
+          "name": "Mountain wall",
+          "name_key": "terrain.mountain"
+        }
+      ],
+      "generator": {
+        "count": {
+          "base": 18,
+          "per_player": 3,
+          "per_floor": 2
+        },
+        "pool": [
+          "base:combat-a",
+          "base:combat-b",
+          "base:combat-c",
+          "base:leak-node",
+          "base:ranged-node",
+          "base:grouped-node",
+          "base:cleanse-node"
+        ],
+        "extra_edge_chance": 0.8,
+        "passage": "base:passage",
+        "boss_approach": "base:supply-shop"
+      }
+    },
     {
       "id": "base:branch-map",
       "start": "start",
@@ -351,9 +552,9 @@
       ],
       "generator": {
         "count": {
-          "base": 8,
-          "per_player": 2,
-          "per_floor": 1
+          "base": 18,
+          "per_player": 3,
+          "per_floor": 2
         },
         "pool": [
           "base:combat-a",
@@ -367,7 +568,8 @@
           "base:revival",
           "base:cleanse-node"
         ],
-        "extra_edge_chance": 0
+        "extra_edge_chance": 0.8,
+        "passage": "base:passage"
       }
     }
   ],
@@ -381,7 +583,8 @@
       "hint_key": "",
       "payment": "none",
       "cost": 0,
-      "handler": "engine:noop"
+      "handler": "engine:noop",
+      "blocking": false
     },
     {
       "id": "base:combat-a",
@@ -393,7 +596,8 @@
       "payment": "personal",
       "cost": 1,
       "room": "base:skirmish",
-      "handler": "engine:noop"
+      "handler": "engine:noop",
+      "blocking": true
     },
     {
       "id": "base:combat-b",
@@ -405,7 +609,8 @@
       "payment": "personal",
       "cost": 1,
       "room": "base:behind-cover",
-      "handler": "engine:noop"
+      "handler": "engine:noop",
+      "blocking": true
     },
     {
       "id": "base:combat-c",
@@ -417,7 +622,8 @@
       "payment": "personal",
       "cost": 1,
       "room": "base:heavy-pile",
-      "handler": "engine:noop"
+      "handler": "engine:noop",
+      "blocking": true
     },
     {
       "id": "base:shrine",
@@ -431,7 +637,8 @@
       "handler": "base:rest",
       "parameters": {
         "penalty_removal": 1
-      }
+      },
+      "blocking": true
     },
     {
       "id": "base:forge",
@@ -440,7 +647,7 @@
       "name_key": "node.shop",
       "hint": "Weapon forge: upgrades for coins.",
       "hint_key": "hint.forge",
-      "payment": "shared",
+      "payment": "personal",
       "cost": 1,
       "handler": "base:forge",
       "parameters": {
@@ -643,8 +850,64 @@
         {
           "item": "base:support",
           "price": 20
+        },
+        {
+          "item": "base:route-fold-2",
+          "price": 100
+        },
+        {
+          "item": "base:ring-ticket",
+          "price": 100
+        },
+        {
+          "item": "base:ring-pass",
+          "price": 200
+        },
+        {
+          "item": "base:route-fold-3",
+          "price": 200
+        },
+        {
+          "item": "base:coordinate-pass",
+          "price": 300
+        },
+        {
+          "item": "base:free-coordinate-ticket",
+          "price": 300
+        },
+        {
+          "item": "base:team-coordinate-ticket",
+          "price": 300
+        },
+        {
+          "item": "base:emergency-fuse",
+          "price": 300
+        },
+        {
+          "item": "base:arrival-envelope",
+          "price": 100
+        },
+        {
+          "item": "base:entry-kit",
+          "price": 200
+        },
+        {
+          "item": "base:entry-metronome",
+          "price": 200
         }
-      ]
+      ],
+      "hexes": [
+        {
+          "q": 0,
+          "r": 0
+        },
+        {
+          "q": -1,
+          "r": 0
+        }
+      ],
+      "blocking": false,
+      "weapon_upgrade": true
     },
     {
       "id": "base:boss",
@@ -656,7 +919,8 @@
       "payment": "shared",
       "cost": 1,
       "room": "base:guardian",
-      "handler": "engine:noop"
+      "handler": "engine:noop",
+      "blocking": true
     },
     {
       "id": "base:passage",
@@ -665,9 +929,10 @@
       "name_key": "node.passage",
       "hint": "A free route between rooms.",
       "hint_key": "hint.passage",
-      "payment": "none",
-      "cost": 0,
-      "handler": "engine:noop"
+      "payment": "personal",
+      "cost": 1,
+      "handler": "engine:noop",
+      "blocking": false
     },
     {
       "id": "base:revival",
@@ -680,7 +945,8 @@
       "cost": 1,
       "handler": "engine:noop",
       "facility": "revive",
-      "facility_cost": 30
+      "facility_cost": 30,
+      "blocking": true
     },
     {
       "id": "base:ranged-node",
@@ -692,7 +958,8 @@
       "payment": "personal",
       "cost": 1,
       "room": "base:ranged-room",
-      "handler": "engine:noop"
+      "handler": "engine:noop",
+      "blocking": true
     },
     {
       "id": "base:survival-node",
@@ -704,7 +971,8 @@
       "payment": "personal",
       "cost": 1,
       "room": "base:survival-room",
-      "handler": "engine:noop"
+      "handler": "engine:noop",
+      "blocking": true
     },
     {
       "id": "base:cleanse-node",
@@ -715,7 +983,8 @@
       "hint_key": "hint.cleanse",
       "payment": "personal",
       "cost": 1,
-      "handler": "base:cleanse-node"
+      "handler": "base:cleanse-node",
+      "blocking": true
     },
     {
       "id": "base:leak-node",
@@ -727,7 +996,8 @@
       "payment": "personal",
       "cost": 1,
       "room": "base:leak-zone",
-      "handler": "engine:noop"
+      "handler": "engine:noop",
+      "blocking": true
     },
     {
       "id": "base:grouped-node",
@@ -739,20 +1009,285 @@
       "payment": "personal",
       "cost": 1,
       "room": "base:grouped-forms",
-      "handler": "engine:noop"
+      "handler": "engine:noop",
+      "blocking": true
+    },
+    {
+      "id": "base:supply-shop",
+      "kind": "shop",
+      "name": "Supply counter",
+      "name_key": "node.supply_shop",
+      "hint": "Supplies available before the exit.",
+      "hint_key": "hint.supply_shop",
+      "payment": "personal",
+      "cost": 1,
+      "handler": "engine:noop",
+      "shop": [
+        {
+          "item": "base:sword-item",
+          "price": 50
+        },
+        {
+          "item": "base:pry-bar-item",
+          "price": 50
+        },
+        {
+          "item": "base:wave-sword-item",
+          "price": 50
+        },
+        {
+          "item": "base:carbine-item",
+          "price": 50
+        },
+        {
+          "item": "base:model-700-item",
+          "price": 50
+        },
+        {
+          "item": "base:injector-item",
+          "price": 50
+        },
+        {
+          "item": "base:focus-item",
+          "price": 50
+        },
+        {
+          "item": "base:thermal-emitter-item",
+          "price": 50
+        },
+        {
+          "item": "base:condensing-projector-item",
+          "price": 50
+        },
+        {
+          "item": "base:seeker-item",
+          "price": 50
+        },
+        {
+          "item": "base:dual-focus-item",
+          "price": 50
+        },
+        {
+          "item": "base:armor-head",
+          "price": 35
+        },
+        {
+          "item": "base:armor-body",
+          "price": 35
+        },
+        {
+          "item": "base:armor-legs",
+          "price": 35
+        },
+        {
+          "item": "base:armor-feet",
+          "price": 35
+        },
+        {
+          "item": "base:light-goggles",
+          "price": 35
+        },
+        {
+          "item": "base:light-jacket",
+          "price": 35
+        },
+        {
+          "item": "base:stretch-trousers",
+          "price": 35
+        },
+        {
+          "item": "base:soft-shoes",
+          "price": 35
+        },
+        {
+          "item": "base:filter-mask",
+          "price": 35
+        },
+        {
+          "item": "base:isolation-coat",
+          "price": 35
+        },
+        {
+          "item": "base:insulated-guards",
+          "price": 35
+        },
+        {
+          "item": "base:shielded-boots",
+          "price": 35
+        },
+        {
+          "item": "base:grip-ring",
+          "price": 55
+        },
+        {
+          "item": "base:balance-weight",
+          "price": 55
+        },
+        {
+          "item": "base:support-liner",
+          "price": 55
+        },
+        {
+          "item": "base:note-clip",
+          "price": 55
+        },
+        {
+          "item": "base:range-tag",
+          "price": 55
+        },
+        {
+          "item": "base:spare-capacitor",
+          "price": 55
+        },
+        {
+          "item": "base:buffer-pad",
+          "price": 55
+        },
+        {
+          "item": "base:reinforcement-plate",
+          "price": 55
+        },
+        {
+          "item": "base:metronome",
+          "price": 55
+        },
+        {
+          "item": "base:light-foot-clip",
+          "price": 55
+        },
+        {
+          "item": "base:etched-weight",
+          "price": 55
+        },
+        {
+          "item": "base:coupling-contact",
+          "price": 55
+        },
+        {
+          "item": "base:hot-contact",
+          "price": 55
+        },
+        {
+          "item": "base:cold-contact",
+          "price": 55
+        },
+        {
+          "item": "base:grounding-braid",
+          "price": 55
+        },
+        {
+          "item": "base:filter-sample",
+          "price": 55
+        },
+        {
+          "item": "base:weighted-sleeve",
+          "price": 55
+        },
+        {
+          "item": "base:bidirectional-coupler",
+          "price": 55
+        },
+        {
+          "item": "base:heat-sink",
+          "price": 55
+        },
+        {
+          "item": "base:calibration-pendant",
+          "price": 55
+        },
+        {
+          "item": "base:first-aid-kit",
+          "price": 55
+        },
+        {
+          "item": "base:fiber-bundle",
+          "price": 55
+        },
+        {
+          "item": "base:healing-potion",
+          "price": 20
+        },
+        {
+          "item": "base:recovery-patch",
+          "price": 20
+        },
+        {
+          "item": "base:barrier-potion",
+          "price": 20
+        },
+        {
+          "item": "base:support",
+          "price": 20
+        },
+        {
+          "item": "base:route-fold-2",
+          "price": 100
+        },
+        {
+          "item": "base:ring-ticket",
+          "price": 100
+        },
+        {
+          "item": "base:ring-pass",
+          "price": 200
+        },
+        {
+          "item": "base:route-fold-3",
+          "price": 200
+        },
+        {
+          "item": "base:coordinate-pass",
+          "price": 300
+        },
+        {
+          "item": "base:free-coordinate-ticket",
+          "price": 300
+        },
+        {
+          "item": "base:team-coordinate-ticket",
+          "price": 300
+        },
+        {
+          "item": "base:emergency-fuse",
+          "price": 300
+        },
+        {
+          "item": "base:arrival-envelope",
+          "price": 100
+        },
+        {
+          "item": "base:entry-kit",
+          "price": 200
+        },
+        {
+          "item": "base:entry-metronome",
+          "price": 200
+        }
+      ],
+      "hexes": [
+        {
+          "q": 0,
+          "r": 0
+        },
+        {
+          "q": -1,
+          "r": 0
+        }
+      ],
+      "blocking": false
     }
   ],
   "rooms": [
     {
       "id": "base:skirmish",
-      "width": 2000,
-      "height": 1250,
+      "width": 800,
+      "height": 500,
       "objective": "clear",
       "join": "between_waves",
       "initial_delay": 1.5,
       "spawn_radius": {
-        "x": 750,
-        "y": 450
+        "x": 300.0,
+        "y": 180.0
       },
       "scaling": {
         "hp_factor": 1,
@@ -1070,8 +1605,37 @@
                   {
                     "item": "base:support",
                     "weight": 1
+                  },
+                  {
+                    "item": "base:route-fold-2",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:ring-ticket",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:ring-pass",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:route-fold-3",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:arrival-envelope",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:entry-kit",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:entry-metronome",
+                    "weight": 1
                   }
-                ]
+                ],
+                "_comment": "DEVELOPMENT: 30% final reward roll, tier 1/2 consumables only."
               }
             ]
           }
@@ -1080,14 +1644,14 @@
     },
     {
       "id": "base:guardian",
-      "width": 2000,
-      "height": 1250,
+      "width": 800,
+      "height": 500,
       "objective": "clear",
       "join": "never",
       "initial_delay": 1.5,
       "spawn_radius": {
-        "x": 750,
-        "y": 450
+        "x": 300.0,
+        "y": 180.0
       },
       "scaling": {
         "hp_factor": 1,
@@ -1380,24 +1944,67 @@
                   {
                     "item": "base:support",
                     "weight": 1
+                  },
+                  {
+                    "item": "base:route-fold-2",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:ring-ticket",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:ring-pass",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:route-fold-3",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:arrival-envelope",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:entry-kit",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:entry-metronome",
+                    "weight": 1
                   }
-                ]
+                ],
+                "_comment": "DEVELOPMENT: 30% final reward roll, tier 1/2 consumables only."
               }
             ]
           }
+        }
+      ],
+      "hexes": [
+        {
+          "q": 0,
+          "r": 0
+        },
+        {
+          "q": 1,
+          "r": 0
+        },
+        {
+          "q": 0,
+          "r": 1
         }
       ]
     },
     {
       "id": "base:guardian-enhanced",
-      "width": 2000,
-      "height": 1250,
+      "width": 800,
+      "height": 500,
       "objective": "clear",
       "join": "never",
       "initial_delay": 1.5,
       "spawn_radius": {
-        "x": 750,
-        "y": 450
+        "x": 300.0,
+        "y": 180.0
       },
       "scaling": {
         "hp_factor": 1.45,
@@ -1690,24 +2297,67 @@
                   {
                     "item": "base:support",
                     "weight": 1
+                  },
+                  {
+                    "item": "base:route-fold-2",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:ring-ticket",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:ring-pass",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:route-fold-3",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:arrival-envelope",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:entry-kit",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:entry-metronome",
+                    "weight": 1
                   }
-                ]
+                ],
+                "_comment": "DEVELOPMENT: 30% final reward roll, tier 1/2 consumables only."
               }
             ]
           }
+        }
+      ],
+      "hexes": [
+        {
+          "q": 0,
+          "r": 0
+        },
+        {
+          "q": 1,
+          "r": 0
+        },
+        {
+          "q": 0,
+          "r": 1
         }
       ]
     },
     {
       "id": "base:ranged-room",
-      "width": 2000,
-      "height": 1250,
+      "width": 800,
+      "height": 500,
       "objective": "clear",
       "join": "between_waves",
       "initial_delay": 1.5,
       "spawn_radius": {
-        "x": 750,
-        "y": 450
+        "x": 300.0,
+        "y": 180.0
       },
       "scaling": {
         "hp_factor": 1,
@@ -2025,24 +2675,67 @@
                   {
                     "item": "base:support",
                     "weight": 1
+                  },
+                  {
+                    "item": "base:route-fold-2",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:ring-ticket",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:ring-pass",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:route-fold-3",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:arrival-envelope",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:entry-kit",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:entry-metronome",
+                    "weight": 1
                   }
-                ]
+                ],
+                "_comment": "DEVELOPMENT: 30% final reward roll, tier 1/2 consumables only."
               }
             ]
           }
+        }
+      ],
+      "hexes": [
+        {
+          "q": 0,
+          "r": 0
+        },
+        {
+          "q": 1,
+          "r": 0
+        },
+        {
+          "q": 2,
+          "r": 0
         }
       ]
     },
     {
       "id": "base:survival-room",
-      "width": 2000.0,
-      "height": 1250.0,
+      "width": 800,
+      "height": 500,
       "objective": "survive",
       "join": "between_waves",
       "initial_delay": 1,
       "spawn_radius": {
-        "x": 750.0,
-        "y": 450.0
+        "x": 300.0,
+        "y": 180.0
       },
       "scaling": {
         "hp_factor": 1,
@@ -2081,22 +2774,93 @@
                 "chance": 1
               }
             ],
-            "xp_policy": "total"
+            "xp_policy": "total",
+            "draws": [
+              {
+                "rolls": 1,
+                "chance": 0.3,
+                "items": [
+                  {
+                    "item": "base:healing-potion",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:barrier-potion",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:cleanse",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:support",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:recovery-patch",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:route-fold-2",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:ring-ticket",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:ring-pass",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:route-fold-3",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:arrival-envelope",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:entry-kit",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:entry-metronome",
+                    "weight": 1
+                  }
+                ],
+                "_comment": "DEVELOPMENT final battle consumable roll; tier 1/2 only."
+              }
+            ]
           }
         }
       ],
-      "objective_seconds": 20
+      "objective_seconds": 20,
+      "hexes": [
+        {
+          "q": 0,
+          "r": 0
+        },
+        {
+          "q": 1,
+          "r": 0
+        },
+        {
+          "q": 0,
+          "r": 1
+        }
+      ]
     },
     {
       "id": "base:behind-cover",
-      "width": 2000,
-      "height": 1250,
+      "width": 800,
+      "height": 500,
       "objective": "clear",
       "join": "between_waves",
       "initial_delay": 1.5,
       "spawn_radius": {
-        "x": 750,
-        "y": 450
+        "x": 300.0,
+        "y": 180.0
       },
       "scaling": {
         "hp_factor": 1,
@@ -2414,8 +3178,37 @@
                   {
                     "item": "base:support",
                     "weight": 1
+                  },
+                  {
+                    "item": "base:route-fold-2",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:ring-ticket",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:ring-pass",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:route-fold-3",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:arrival-envelope",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:entry-kit",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:entry-metronome",
+                    "weight": 1
                   }
-                ]
+                ],
+                "_comment": "DEVELOPMENT: 30% final reward roll, tier 1/2 consumables only."
               }
             ]
           }
@@ -2424,30 +3217,44 @@
       "obstacles": [
         {
           "position": {
-            "x": 800,
-            "y": 550
+            "x": 320.0,
+            "y": 220.0
           },
-          "radius": 95
+          "radius": 38.0
         },
         {
           "position": {
-            "x": 1250,
-            "y": 720
+            "x": 933.0127,
+            "y": 538.0
           },
-          "radius": 95
+          "radius": 38.0
+        }
+      ],
+      "hexes": [
+        {
+          "q": 0,
+          "r": 0
+        },
+        {
+          "q": 1,
+          "r": 0
+        },
+        {
+          "q": 1,
+          "r": 1
         }
       ]
     },
     {
       "id": "base:heavy-pile",
-      "width": 2000,
-      "height": 1250,
+      "width": 800,
+      "height": 500,
       "objective": "clear",
       "join": "between_waves",
       "initial_delay": 1.5,
       "spawn_radius": {
-        "x": 750,
-        "y": 450
+        "x": 300.0,
+        "y": 180.0
       },
       "scaling": {
         "hp_factor": 1,
@@ -2765,24 +3572,71 @@
                   {
                     "item": "base:support",
                     "weight": 1
+                  },
+                  {
+                    "item": "base:route-fold-2",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:ring-ticket",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:ring-pass",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:route-fold-3",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:arrival-envelope",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:entry-kit",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:entry-metronome",
+                    "weight": 1
                   }
-                ]
+                ],
+                "_comment": "DEVELOPMENT: 30% final reward roll, tier 1/2 consumables only."
               }
             ]
           }
+        }
+      ],
+      "hexes": [
+        {
+          "q": 0,
+          "r": 0
+        },
+        {
+          "q": 1,
+          "r": 0
+        },
+        {
+          "q": 0,
+          "r": 1
+        },
+        {
+          "q": 1,
+          "r": 1
         }
       ]
     },
     {
       "id": "base:leak-zone",
-      "width": 2000,
-      "height": 1250,
+      "width": 800,
+      "height": 500,
       "objective": "clear",
       "join": "between_waves",
       "initial_delay": 1.5,
       "spawn_radius": {
-        "x": 750,
-        "y": 450
+        "x": 300.0,
+        "y": 180.0
       },
       "scaling": {
         "hp_factor": 1,
@@ -3100,24 +3954,67 @@
                   {
                     "item": "base:support",
                     "weight": 1
+                  },
+                  {
+                    "item": "base:route-fold-2",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:ring-ticket",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:ring-pass",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:route-fold-3",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:arrival-envelope",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:entry-kit",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:entry-metronome",
+                    "weight": 1
                   }
-                ]
+                ],
+                "_comment": "DEVELOPMENT: 30% final reward roll, tier 1/2 consumables only."
               }
             ]
           }
+        }
+      ],
+      "hexes": [
+        {
+          "q": 0,
+          "r": 0
+        },
+        {
+          "q": 0,
+          "r": 1
+        },
+        {
+          "q": -1,
+          "r": 1
         }
       ]
     },
     {
       "id": "base:grouped-forms",
-      "width": 2000,
-      "height": 1250,
+      "width": 800,
+      "height": 500,
       "objective": "clear",
       "join": "between_waves",
       "initial_delay": 1.5,
       "spawn_radius": {
-        "x": 750,
-        "y": 450
+        "x": 300.0,
+        "y": 180.0
       },
       "scaling": {
         "hp_factor": 1,
@@ -3435,11 +4332,58 @@
                   {
                     "item": "base:support",
                     "weight": 1
+                  },
+                  {
+                    "item": "base:route-fold-2",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:ring-ticket",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:ring-pass",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:route-fold-3",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:arrival-envelope",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:entry-kit",
+                    "weight": 1
+                  },
+                  {
+                    "item": "base:entry-metronome",
+                    "weight": 1
                   }
-                ]
+                ],
+                "_comment": "DEVELOPMENT: 30% final reward roll, tier 1/2 consumables only."
               }
             ]
           }
+        }
+      ],
+      "hexes": [
+        {
+          "q": 0,
+          "r": 0
+        },
+        {
+          "q": -1,
+          "r": 0
+        },
+        {
+          "q": 1,
+          "r": 0
+        },
+        {
+          "q": 0,
+          "r": 1
         }
       ]
     }

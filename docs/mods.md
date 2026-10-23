@@ -1,4 +1,4 @@
-# 模组开发与组合（SDK 6）
+# 模组开发与组合（SDK 7）
 
 分发采用 ZIP 容器，开发工具暂用 `.hsmod` 扩展名；整个文件的 SHA-256 是安装、下载和组合锁的身份。包内可以有标准 JSON、JS、资源及纯 Go 源码。下划线开头的 JSON 字段用于注释。SHA-256 校验字节一致性，不等于作者签名。
 
@@ -11,7 +11,7 @@
   "_comment": "Development content",
   "id": "example",
   "version": "1.0.0",
-  "sdk": 6,
+  "sdk": 7,
   "type": "gameplay",
   "definitions": "definitions.json",
   "scripts": ["behavior.js"],
@@ -64,6 +64,10 @@ Go 包还需有 `go.mod` 和入口声明：
 
 材质包 `type` 为 `texture`，只能包含资源与 JSON 元数据，不含玩法定义、JS 或 Go。`assets` 从资源键映射包内文件，例如 `"ui:theme": "theme.json"`；例子见 `examples/texture-demo`。个人材质包不改变玩法摘要。
 
-当前支持 PNG/JPEG、字体、JSON 界面主题/布局及 WAV 音效/音乐。常用键包括 `ui:font`、`ui:theme`、`audio:attack`、`music:adventure`、`player:<机体ID>`、`enemy:<敌人ID>`、`icon:<内容ID>`、`floor:<节点或房间定义ID>` 与 `floor:default`。单幅图像不超过 4096×4096，总解码预算 256 MiB。分发包上限 256 MiB，单文件 16 MiB；路径穿越、符号链接、同名/大小写冲突条目会拒绝。主题和资源在客户端提交后清除相关显示缓存，玩法仍由服务端裁定。
+当前支持 PNG/JPEG、字体、JSON 界面主题/布局及 WAV 音效/音乐。常用键包括 `ui:font`、`ui:theme`、`audio:attack`、`music:adventure`、`player:<机体ID>`、`portrait:<机体ID>`、`weapon:<武器ID>`、`enemy:<敌人ID>`、`icon:<内容ID>`、`floor:<节点或房间定义ID>` 与 `floor:default`。单幅图像不超过 4096×4096，总解码预算 256 MiB。分发包上限 256 MiB，单文件 16 MiB；路径穿越、符号链接、同名/大小写冲突条目会拒绝。主题和资源在客户端提交后清除相关显示缓存，玩法仍由服务端裁定。
+
+世界角色贴图应当不包含固定武器；背包立绘可以使用独立的 `portrait:` 资源。手持武器使用透明 PNG，面向画面右方，默认握点为图像横向22%、纵向中心。角色、立绘、武器、敌人和 `prop:` 设施会在加载时裁去透明边界。可选 `art:layout` 资源指向JSON，例如 `{"weapon_grips":{"example:rifle":{"x":0.42,"y":0.63}}}`；握点相对裁切后的可见内容计算，坐标必须有限且位于0–1。该布局按现有资源覆盖规则整份替换，覆盖时保留仍需使用的其他武器握点。缺省手持外观按近战、枪械、法器分类使用缓存纹理；换装、攻击、技能和翻滚均由同一动作渲染器处理，不要求材质包实现网络逻辑。
+
+物品拥有 `icon:<完整物品ID>` 时在背包、装备、商店、掉落和开发目录中显示独立贴图；空装备槽继续使用槽位轮廓。地面可按 `floor:<节点定义ID>`、`floor:<房间模板ID>`、`floor:<节点类型>` 或 `floor:default` 提供，个人大厅使用 `floor:hall`。设施示例包括 `prop:hall-solo`、`prop:shop`、`prop:revival`、`prop:exit` 和 `prop:obstacle`；家具应使用正交直上俯视顶面。首版完整规格、提示词和预览见 `docs/art-v1/README.md`。
 
 事件注册、操作类型与参数的准确定义在 `sdk/content.go`，数值解释在 `pkg/damage`，内容校验在 `internal/content`。需要新正式玩法时先讨论规则，再扩展这些值契约和宿主实现；不使用脚本直接持有可变世界引用。

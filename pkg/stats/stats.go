@@ -29,10 +29,14 @@ type Result struct {
 	Steps  []Step           `json:"steps"`
 }
 
-var fields = [...]string{"strength", "agility", "constitution", "intelligence", "sense", "mana", "max_hp", "armor", "speed", "attack_speed"}
+var fields = [...]string{"strength", "agility", "constitution", "intelligence", "sense", "mana", "max_hp", "armor", "speed", "attack_speed", "zoom_min", "zoom_max"}
 
 func value(v model.StatValues, stat string) (float64, bool) {
 	switch stat {
+	case "zoom_min":
+		return v.ZoomMin, true
+	case "zoom_max":
+		return v.ZoomMax, true
 	case "attack_speed":
 		return v.AttackSpeed, true
 	case "max_hp":
@@ -47,6 +51,10 @@ func value(v model.StatValues, stat string) (float64, bool) {
 }
 func with(v model.StatValues, stat string, n float64) model.StatValues {
 	switch stat {
+	case "zoom_min":
+		v.ZoomMin = n
+	case "zoom_max":
+		v.ZoomMax = n
 	case "attack_speed":
 		v.AttackSpeed = n
 	case "max_hp":
@@ -112,6 +120,12 @@ func order(a, b model.StatContribution) int {
 // Evaluate always starts from immutable base values. Removing a contribution means
 // evaluating the remaining set, never subtracting a previous rounded result.
 func Evaluate(q Input) (Result, error) {
+	if q.Base.ZoomMin == 0 {
+		q.Base.ZoomMin = model.DefaultZoomMin
+	}
+	if q.Base.ZoomMax == 0 {
+		q.Base.ZoomMax = model.DefaultZoomMax
+	}
 	if err := Validate(q.Contributions); err != nil {
 		return Result{}, err
 	}
@@ -181,11 +195,17 @@ func Evaluate(q Input) (Result, error) {
 		if key == "max_hp" {
 			minimum = 1
 		}
+		if key == "zoom_min" || key == "zoom_max" {
+			minimum = .01
+		}
 		if n < minimum {
 			r.Steps = append(r.Steps, Step{Stat: key, Operation: "minimum", Input: n, Operand: minimum, Output: minimum})
 			n = minimum
 		}
 		r.Values = with(r.Values, key, n)
+	}
+	if r.Values.ZoomMin > r.Values.ZoomMax {
+		return Result{}, fmt.Errorf("zoom_min exceeds zoom_max")
 	}
 	return r, nil
 }

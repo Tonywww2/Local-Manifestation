@@ -9,6 +9,16 @@ import (
 )
 
 func (g *Game) drawIconSized(dst *ebiten.Image, id string, x, y, size float64) {
+	if texture := g.resources.sprites["icon:"+id]; texture != nil {
+		// Long weapons use the diagonal of the slot rather than becoming a thin
+		// horizontal line. Crop/metadata is cached at resource publication.
+		const angle = -math.Pi / 5
+		b := texture.Bounds()
+		w, h := float64(b.Dx()), float64(b.Dy())
+		scale := size / max(w*math.Cos(angle)+h*math.Abs(math.Sin(angle)), w*math.Abs(math.Sin(angle))+h*math.Cos(angle))
+		drawActorTexture(dst, texture, model.Vec{X: x + size/2, Y: y + size/2}, w*scale, h*scale, angle, 1, false)
+		return
+	}
 	if g.drawAsset(dst, "icon:"+id, model.Vec{X: x + size/2, Y: y + size/2}, size, size) {
 		return
 	}
@@ -47,6 +57,16 @@ func renderGlyph(dst *ebiten.Image, id string, size float64) {
 		vector.StrokeRect(dst, float32(p.X), float32(p.Y), float32(w*s), float32(h*s), float32(1.3*s), uiInk, false)
 	}
 	switch id {
+	case "resize":
+		a(6, 17, 17, 6)
+		a(11, 17, 17, 11)
+		a(16, 17, 17, 16)
+	case "projectile-cut":
+		path(3, 16, 14, 2, 17, 1, 17, 5, 7, 14)
+		a(3, 10, 9, 15)
+		circle(4, 3, 1.4)
+		circle(1, 8, 1.1)
+		path(9, 2, 5, 6, 2, 12)
 	case "haste":
 		circle(11, 2, 1.5)
 		path(3, 7, 8, 7, 11, 5, 14, 8, 17, 8)
@@ -126,6 +146,46 @@ func renderGlyph(dst *ebiten.Image, id string, size float64) {
 		path(2, 1, 14, 1, 17, 4, 17, 17, 2, 17, 2, 1)
 		box(5, 1, 8, 6)
 		box(5, 11, 9, 6)
+	case "rotate-camera":
+		for i := 0; i < 12; i++ {
+			start := -math.Pi/2 + float64(i)*math.Pi/8
+			end := start + math.Pi/8
+			a(9+7*math.Cos(start), 9+7*math.Sin(start), 9+7*math.Cos(end), 9+7*math.Sin(end))
+		}
+		path(2, 13, 2, 8, 7, 8)
+	case "movement":
+		path(2, 14, 7, 9, 11, 9, 16, 4)
+		path(10, 4, 16, 4, 16, 10)
+		circle(3, 14, 2)
+	case "passive":
+		path(9, 1, 16, 4, 15, 11, 9, 17, 3, 11, 2, 4, 9, 1)
+		path(5, 9, 8, 12, 13, 6)
+	case "node-combat":
+		path(2, 2, 15, 15, 17, 13, 4, 1)
+		path(16, 2, 3, 15, 1, 13, 14, 1)
+		a(1, 10, 8, 17)
+		a(10, 17, 17, 10)
+	case "node-shop":
+		path(2, 8, 3, 3, 15, 3, 16, 8, 2, 8, 2, 16, 16, 16, 16, 8)
+		box(7, 11, 4, 5)
+	case "node-boss":
+		path(2, 6, 5, 9, 9, 2, 13, 9, 16, 6, 15, 16, 3, 16, 2, 6)
+		a(6, 12, 7, 12)
+		a(11, 12, 12, 12)
+	case "node-passage":
+		p := point(9, 9)
+		vector.DrawFilledCircle(dst, float32(p.X), float32(p.Y), float32(2.6*s), uiInk, true)
+	case "node-unknown":
+		path(5, 5, 7, 2, 11, 2, 14, 5, 14, 7, 9, 11)
+		p := point(9, 15)
+		vector.DrawFilledCircle(dst, float32(p.X), float32(p.Y), float32(1*s), uiInk, true)
+	case "node-start":
+		path(1, 9, 9, 2, 17, 9, 15, 9, 15, 17, 3, 17, 3, 9)
+		box(7, 11, 4, 6)
+	case "node-event":
+		circle(9, 9, 7)
+		path(6, 6, 8, 4, 11, 5, 12, 7, 9, 10, 9, 11)
+		a(9, 14, 9, 15)
 	case "view", "map":
 		path(1, 4, 6, 2, 12, 4, 17, 2, 17, 14, 12, 16, 6, 14, 1, 16, 1, 4)
 		a(6, 2, 6, 14)
@@ -157,6 +217,10 @@ func renderGlyph(dst *ebiten.Image, id string, size float64) {
 		a(4, 7, 6, 7)
 		a(9, 7, 11, 7)
 		a(4, 11, 14, 11)
+	case "scroll-left":
+		path(12, 3, 6, 9, 12, 15)
+	case "scroll-right":
+		path(6, 3, 12, 9, 6, 15)
 	case "scroll-up":
 		path(3, 11, 9, 5, 15, 11)
 	case "scroll-down":

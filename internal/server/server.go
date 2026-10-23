@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"hsmultiplayer/internal/session"
+	"hsmultiplayer/pkg/perf"
 	"hsmultiplayer/pkg/protocol"
 	"net"
 	"sync"
@@ -107,29 +108,36 @@ func handle(ctx context.Context, conn net.Conn, c *session.Coordinator, distribu
 				return
 			case msg := <-out:
 				conn.SetWriteDeadline(time.Now().Add(3 * time.Second))
-				if enc.Encode(msg) != nil || msg.Kind == "replaced" {
+				writeStart := perf.Start()
+				err := enc.Encode(msg)
+				c.ObserveTransport("server.network.encode_write", perf.Elapsed(writeStart))
+				if err != nil || msg.Kind == "replaced" {
 					return
 				}
 			}
 		}
 	}()
-	credits := 120.0
+	// Leave headroom above 60 Hz input for ping and normal UI commands.
+	const requestsPerSecond = 80.0
+	credits := requestsPerSecond * 2
 	updated := time.Now()
 	for scanner.Scan() {
 		now := time.Now()
-		credits += now.Sub(updated).Seconds() * 60
-		if credits > 120 {
-			credits = 120
+		credits += now.Sub(updated).Seconds() * requestsPerSecond
+		if credits > requestsPerSecond*2 {
+			credits = requestsPerSecond * 2
 		}
 		updated = now
 		credits--
 		if credits < 0 {
 			return
 		}
+		decodeStart := perf.Start()
 		var r protocol.Request
 		if json.Unmarshal(scanner.Bytes(), &r) != nil {
 			return
 		}
+		c.ObserveTransport("server.network.decode", perf.Elapsed(decodeStart))
 		if r.Seq == 0 {
 			return
 		}

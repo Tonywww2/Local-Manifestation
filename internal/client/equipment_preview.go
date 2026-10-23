@@ -84,29 +84,4 @@ func (g *Game) equipmentComparison(c *uiControl, item model.ItemInstance, d mode
 			c.Details = append(c.Details, g.tr("ui.compare.stat", "stat", g.localized("attribute."+v.key, v.key), "before", fmt.Sprintf("%.2f", v.a), "after", fmt.Sprintf("%.2f", v.b), "delta", fmt.Sprintf("%+.2f", v.b-v.a)))
 		}
 	}
-	if next.Weapon == "" {
-		return
-	}
-	q, err := content.Attack(g.catalog, next)
-	if err != nil {
-		return
-	}
-	r, err := content.EvaluatePreview(q)
-	if err != nil {
-		return
-	}
-	old := 0.0
-	if q, err := content.Attack(g.catalog, p); err == nil {
-		if r, err := content.EvaluatePreview(q); err == nil {
-			old = r.Total
-		}
-	}
-	if d.Kind != "weapon" && old == r.Total {
-		return
-	}
-	c.Summary = append(c.Summary, g.tr("ui.hover.damage", "damage", fmt.Sprintf("%.2f", r.Total), "type", g.localized("damage."+r.Type, r.Type)))
-	if old != r.Total {
-		c.Summary = append(c.Summary, g.tr("ui.compare.stat", "stat", g.tr("ui.compare.damage"), "before", fmt.Sprintf("%.2f", old), "after", fmt.Sprintf("%.2f", r.Total), "delta", fmt.Sprintf("%+.2f", r.Total-old)))
-	}
-	c.Details = append(c.Details, g.damageLines(r)...)
 }

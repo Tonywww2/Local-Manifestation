@@ -6,7 +6,7 @@ import (
 	"io/fs"
 )
 
-//go:embed base/manifest.json base/definitions.json base/adventure.json base/behavior.js base/assets/*.png
+//go:embed base/manifest.json base/definitions.json base/adventure.json base/behavior.js base/assets/art-v1
 var files embed.FS
 
 var Files = func() fs.FS {

@@ -17,6 +17,7 @@ import (
 	"github.com/dop251/goja"
 	"hsmultiplayer/internal/native"
 	"hsmultiplayer/internal/script"
+	"hsmultiplayer/pkg/geometry"
 	"hsmultiplayer/pkg/life"
 	"hsmultiplayer/pkg/model"
 	"hsmultiplayer/sdk"
@@ -54,7 +55,7 @@ type Definitions struct {
 	Perks             []model.PerkDef             `json:"perks,omitempty"`
 	ClearPoints       int                         `json:"clear_points"`
 	Affixes           []model.AffixDef            `json:"affixes,omitempty"`
-	Skills            []model.SkillDef            `json:"skills,omitempty"`
+	WeaponSkills      []model.WeaponSkillDef      `json:"weapon_skills,omitempty"`
 	Resource          model.ResourceDef           `json:"resource"`
 	Items             []model.ItemDef             `json:"items,omitempty"`
 	Inventory         model.Inventory             `json:"inventory"`
@@ -73,7 +74,7 @@ type Catalog struct {
 	modified       bool
 	perks          map[string]model.PerkDef
 	affixes        map[string]model.AffixDef
-	skills         map[string]model.SkillDef
+	weaponSkills   map[string]model.WeaponSkillDef
 	items          map[string]model.ItemDef
 	Digest         string
 	manifest       Manifest
@@ -86,6 +87,8 @@ type Catalog struct {
 	maps           map[string]model.MapTemplateDef
 	nodes          map[string]model.NodeDef
 	rooms          map[string]model.RoomDef
+	roomArenas     map[string]geometry.Arena
+	nodeArenas     map[string]geometry.Arena
 	statuses       map[string]model.StatusDef
 	programs       []*goja.Program
 	programHashes  []string
@@ -149,12 +152,26 @@ func (c *Catalog) Run() model.RunDef {
 	v.Floors = append([]string(nil), v.Floors...)
 	return v
 }
-func (c *Catalog) Floor(index int) model.FloorDef       { return c.floors[c.definitions.Run.Floors[index-1]] }
-func (c *Catalog) Map(id string) model.MapTemplateDef   { return clone(c.maps[id]) }
-func (c *Catalog) Node(id string) model.NodeDef         { return clone(c.nodes[id]) }
+func (c *Catalog) Floor(index int) model.FloorDef {
+	v := c.floors[c.definitions.Run.Floors[index-1]]
+	v.ExcludedRandomKinds = append([]string(nil), v.ExcludedRandomKinds...)
+	return v
+}
+func (c *Catalog) Map(id string) model.MapTemplateDef { return clone(c.maps[id]) }
+func (c *Catalog) Node(id string) model.NodeDef       { return clone(c.nodes[id]) }
+
+// NodeFacility is a scalar query for HUD rendering; no content tree is cloned.
+func (c *Catalog) NodeFacility(id string) string        { return c.nodes[id].Facility }
+func (c *Catalog) RoomJoin(id string) string            { return c.rooms[id].Join }
 func (c *Catalog) Room(id string) (model.RoomDef, bool) { v, ok := c.rooms[id]; return clone(v), ok }
 func (c *Catalog) Weapon(id string) model.Weapon {
 	return model.CloneWeapon(c.weapons[id])
+}
+
+// WeaponAppearance avoids cloning formula/effect trees in the render hot path.
+func (c *Catalog) WeaponAppearance(id string) (mode, damageType string) {
+	w := c.weapons[id]
+	return w.Mode, w.Type
 }
 func (c *Catalog) Enemy(id string) model.EnemyDef {
 	v := c.enemies[id]
@@ -178,6 +195,15 @@ func (c *Catalog) Enemy(id string) model.EnemyDef {
 
 // EnemyAppearance returns a scalar so rendering never copies simulation data.
 func (c *Catalog) EnemyAppearance(id string) string { return c.enemies[id].Appearance }
+
+// EnemyVisualRadius decouples artwork size from the authoritative body collider.
+// Older content without an explicit art scale retains its previous size.
+func (c *Catalog) EnemyVisualRadius(id string, fallback float64) float64 {
+	if radius := c.enemies[id].VisualRadius; radius > 0 {
+		return radius
+	}
+	return fallback
+}
 func (c *Catalog) NodeDefinitions() []model.NodeDef { return clone(c.adventure.Nodes) }
 func (c *Catalog) BehaviorIDs() []string {
 	var ids []string
@@ -420,7 +446,6 @@ func Player(c *Catalog, id, name, chassis string) (model.Player, error) {
 		p.StatContributions = append(p.StatContributions, model.StatContribution{StatModifier: m, Source: model.SourceRef{Kind: "chassis", Actor: id, Definition: chassis}})
 	}
 	p.Inventory = model.CloneInventory(c.definitions.Inventory)
-	p.Skills = v.Skills
 	p.Energy = c.definitions.Resource.Maximum
 	p.MaxEnergy = p.Energy
 	p.EnergyRegen = c.definitions.Resource.Regeneration

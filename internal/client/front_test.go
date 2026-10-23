@@ -63,15 +63,10 @@ func TestDeviceHoverShowsOnlyNameUntilShiftAndIsReadOnly(t *testing.T) {
 		}
 	}
 }
-func TestLearningDeviceRequiresRangeAndDoesNotSpendOnOpen(t *testing.T) {
+func TestLearningDeviceMouseHasNoRangeAndDoesNotSpendOnOpen(t *testing.T) {
 	g := interfaceGame(t)
 	g.state = nil
 	g.performFront("start")
-	g.useWorldDevice("hall:progression")
-	if slices.Contains(g.u.windows, "progression") {
-		t.Fatal("activated remotely")
-	}
-	g.front.Position = g.front.Devices[2].Position
 	g.useWorldDevice("hall:progression")
 	g.buildInterface()
 	if !slices.Contains(g.u.windows, "progression") || !strings.Contains(labelsFor(g, "progression"), "加成点") || g.pending != nil || g.profiles.Scopes[g.localScope()].Points != 0 {
@@ -155,8 +150,8 @@ func TestWorldDevicePickingUsesSameProjectionAndHUDWins(t *testing.T) {
 	g := interfaceGame(t)
 	g.state = nil
 	g.performFront("start")
-	for _, oblique := range []bool{false, true} {
-		g.oblique = oblique
+	for _, angle := range []float64{0, defaultCameraAngle, 1.17, -2.4} {
+		g.cameraControls.Rotation = angle
 		g.buildInterface()
 		point := g.hallCamera().Project(g.front.Devices[4].Position)
 		c, ok := hitControl(g.u.frame, ui.Point{X: point.X, Y: point.Y})

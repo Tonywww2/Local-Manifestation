@@ -3,6 +3,7 @@ package scene
 
 import (
 	"fmt"
+	"hsmultiplayer/pkg/animation"
 	"math"
 	"math/rand"
 	"sort"
@@ -12,7 +13,9 @@ import (
 	"hsmultiplayer/internal/script"
 	"hsmultiplayer/pkg/damage"
 	"hsmultiplayer/pkg/geometry"
+	"hsmultiplayer/pkg/inventory"
 	"hsmultiplayer/pkg/model"
+	"hsmultiplayer/pkg/perf"
 	"hsmultiplayer/pkg/protocol"
 	"hsmultiplayer/pkg/stats"
 	"hsmultiplayer/pkg/status"
@@ -23,6 +26,7 @@ import (
 const tickRate = timing.DefaultLogicRate
 
 type command struct {
+	admissions    []Admission
 	inventory     protocol.Request
 	actions       PlayerActions
 	transfers     []ProjectileTransfer
@@ -38,6 +42,7 @@ type command struct {
 	reply         chan response
 }
 type response struct {
+	loot      model.Loot
 	departure Departure
 	transfers []ProjectileTransfer
 	players   []model.Player
@@ -49,6 +54,7 @@ type Actor struct {
 	done     chan struct{}
 }
 type fighter struct {
+	visual       model.PlayerActionState
 	attack       *preparedAttack
 	player       model.Player
 	input        model.Input
@@ -90,9 +96,12 @@ type Config struct {
 }
 
 type world struct {
+	performance      perf.Recorder
+	arena            geometry.Arena
 	enemyDefinitions map[string]model.EnemyDef
 	barrierClaimed   map[string]bool
 	enemyAttacks     map[int]enemyAttackState
+	enemyVisuals     map[int]model.EnemyActionState
 	footprint        *geometry.Footprint
 	shotOrigin       string
 	transit          bool
@@ -143,7 +152,8 @@ func New(c *content.Catalog, cfg Config) (*Actor, error) {
 	if err != nil {
 		return nil, err
 	}
-	w := &world{shotOrigin: cfg.ShotOrigin, externalClock: cfg.ExternalClock, adventureTime: cfg.AdventureTime, logicRate: cfg.TickRate, id: cfg.ID, room: room, catalog: c, runtime: vm, rng: rand.New(rand.NewSource(cfg.Seed)), players: map[string]*fighter{}, state: "waiting", waves: len(room.Waves), floor: cfg.Floor}
+	arena, _ := c.RoomArena(cfg.Room)
+	w := &world{arena: arena, shotOrigin: cfg.ShotOrigin, externalClock: cfg.ExternalClock, adventureTime: cfg.AdventureTime, logicRate: cfg.TickRate, id: cfg.ID, room: room, catalog: c, runtime: vm, rng: rand.New(rand.NewSource(cfg.Seed)), players: map[string]*fighter{}, state: "waiting", waves: len(room.Waves), floor: cfg.Floor}
 	a := &Actor{commands: make(chan command, 128), done: make(chan struct{})}
 	go a.run(w)
 	return a, nil
@@ -179,9 +189,6 @@ func (a *Actor) AddAt(p model.Player, position model.Vec) error {
 	return a.call(command{kind: "add", player: model.ClonePlayer(p), arrival: &position}).err
 }
 func (a *Actor) Input(id string, in model.Input) { a.call(command{kind: "input", id: id, input: in}) }
-func (a *Actor) Invest(id, key string) error {
-	return a.call(command{kind: "attribute", id: id, player: model.Player{Node: key}}).err
-}
 func (a *Actor) Online(id string, online bool) {
 	a.call(command{kind: "online", id: id, input: model.Input{Attack: online}})
 }
@@ -198,6 +205,7 @@ func (a *Actor) run(w *world) {
 	for {
 		select {
 		case c := <-a.commands:
+			commandStart := perf.Start()
 			r := response{}
 			switch c.kind {
 			case "projectile_transit":
@@ -234,7 +242,7 @@ func (a *Actor) run(w *world) {
 				}
 			case "inventory_mouse":
 				if p := w.players[c.id]; p != nil {
-					if c.inventory.Kind != "inventory_return" && c.inventory.Area != "bag" && w.catalog.Weapon(p.player.Weapon).RestrictSwap && p.cooldown > 0 {
+					if c.inventory.Kind != "inventory_return" && (c.inventory.Area != "bag" || c.inventory.Kind == "inventory_quick") && w.catalog.Weapon(p.player.Weapon).RestrictSwap && p.cooldown > 0 {
 						r.err = protocol.Reject("error.equipment_cooldown")
 						break
 					}
@@ -243,6 +251,22 @@ func (a *Actor) run(w *world) {
 					if err == nil {
 						p.player = next
 						r.players = []model.Player{model.ClonePlayer(next)}
+					}
+				} else {
+					r.err = protocol.Reject("error.incapacitated")
+				}
+			case "drop_item":
+				if p := w.players[c.id]; p != nil {
+					if inventory.Equipped(p.player.Inventory, c.inventory.Item) && w.catalog.Weapon(p.player.Weapon).RestrictSwap && p.cooldown > 0 {
+						r.err = protocol.Reject("error.equipment_cooldown")
+						break
+					}
+					next, drop, err := w.catalog.DropItem(p.player, c.inventory.Item, c.inventory.Revision)
+					r.err = err
+					if err == nil {
+						p.player = next
+						r.players = []model.Player{model.ClonePlayer(next)}
+						r.loot = drop
 					}
 				} else {
 					r.err = protocol.Reject("error.incapacitated")
@@ -266,6 +290,8 @@ func (a *Actor) run(w *world) {
 				continue
 			case "status_time":
 				w.advanceStatuses(c.adventureTime)
+			case "add_group":
+				r.err = w.admitGroup(c.admissions)
 			case "add", "support":
 				if _, ok := w.players[c.player.ID]; ok {
 					r.err = protocol.Reject("error.already_scene")
@@ -279,7 +305,7 @@ func (a *Actor) run(w *world) {
 						w.advanceStatuses(p.Statuses.Time)
 					}
 					var statusErr error
-					p, statusErr = content.AdvancePlayerStatuses(p, w.adventureTime)
+					p, statusErr = w.catalog.AdvancePlayerStatuses(p, w.adventureTime)
 					if statusErr != nil {
 						r.err = statusErr
 						break
@@ -296,9 +322,9 @@ func (a *Actor) run(w *world) {
 					}
 					p.Scene = w.id
 					p.PositionEpoch++
-					p.Position = geometry.NewArena(w.room.Width, w.room.Height).Spawn(len(w.players), 12)
+					p.Position = w.arenaGeometry().Spawn(len(w.players), 12)
 					if c.arrival != nil {
-						if !geometry.NewArena(w.room.Width, w.room.Height).ContainsDisk(*c.arrival, 12) {
+						if !w.arenaGeometry().ContainsDisk(*c.arrival, 12) {
 							r.err = protocol.Reject("error.invalid_input")
 							break
 						}
@@ -308,6 +334,7 @@ func (a *Actor) run(w *world) {
 					f.player, f.updated, f.contact = p, w.tick, map[int]float64{}
 					if p.Life != "alive" {
 						f.attack, f.dodgeTime, f.invulnerable = nil, 0, 0
+						f.visual = animation.Cancel(f.visual)
 					}
 					w.players[p.ID] = &f
 					w.barrierClaimed[p.ID] = true
@@ -343,17 +370,6 @@ func (a *Actor) run(w *world) {
 				}
 			case "snapshot":
 				r.snapshot = w.snapshot()
-			case "attribute":
-				p := w.players[c.id]
-				if p == nil || p.player.Life != "alive" || p.player.Points < 1 {
-					r.err = protocol.Reject("error.no_points")
-				} else {
-					next, err := content.Invest(p.player, c.player.Node)
-					r.err = err
-					if err == nil {
-						p.player = next
-					}
-				}
 			case "stop":
 				r.snapshot = w.snapshot()
 				r.departure = Departure{Scene: r.snapshot, Actions: map[string]PlayerActions{}, Projectiles: w.outgoing}
@@ -370,6 +386,7 @@ func (a *Actor) run(w *world) {
 				c.reply <- r
 				return
 			}
+			w.performance.Since("scene.command."+c.kind, commandStart)
 			c.reply <- r
 		case <-ticker.C:
 			now := time.Now()
@@ -390,7 +407,17 @@ func (w *world) rate() int {
 }
 
 func (w *world) step(dt float64) {
+	defer w.performance.Since("scene.logic.total", perf.Start())
 	w.tick++
+	// Incapacitation/death transitions may settle during pause. They are only
+	// display facts and advance no movement, status, attack or battle clock.
+	for _, p := range w.players {
+		p.syncVisualLife()
+		if p.player.Life != "alive" {
+			p.visual.Life = animation.AdvanceAction(p.visual.Life, dt)
+		}
+	}
+	w.advanceEnemyVisuals(dt)
 	if !w.externalClock {
 		w.advanceStatuses(w.adventureTime + status.UnitsPerSecond/int64(w.rate()))
 	}
@@ -429,12 +456,14 @@ func (w *world) step(dt float64) {
 			w.state = "fighting"
 		}
 	}
+	playersStart := perf.Start()
 	for _, id := range w.playerIDs() {
 		if err := w.stepPlayer(w.players[id], dt, nil); err != nil {
 			w.state, w.fault = "faulted", err.Error()
 			return
 		}
 	}
+	w.performance.Since("scene.logic.players", playersStart)
 	if err := w.updateEnemies(dt); err != nil {
 		w.state, w.fault = "faulted", err.Error()
 		return
@@ -472,6 +501,11 @@ func (w *world) step(dt float64) {
 	w.waveTime += dt
 	if w.room.Objective == "clear" && len(w.enemies) == 0 || w.room.Objective == "survive" && w.waveTime >= w.room.ObjectiveSeconds {
 		w.enemies = nil
+		for id, v := range w.enemyVisuals {
+			if v.Death.Duration == 0 {
+				delete(w.enemyVisuals, id)
+			}
+		}
 		w.enemyFire = nil
 		w.enemyAttacks = nil
 		w.threat = nil
@@ -487,7 +521,12 @@ func (w *world) step(dt float64) {
 				if reward.CoinsPolicy == "total" {
 					coins /= len(w.players)
 				}
-				p.player.XP += xp
+				grown, err := w.catalog.GrantExperience(p.player, xp)
+				if err != nil {
+					w.state, w.fault = "faulted", err.Error()
+					return
+				}
+				p.player = grown
 				p.player.Coins += coins
 				drops := append([]model.DropDef(nil), reward.Items...)
 				for _, draw := range reward.Draws {
@@ -521,6 +560,7 @@ func (w *world) step(dt float64) {
 	}
 }
 func (w *world) spawn() {
+	defer w.performance.Since("scene.logic.wave_spawn", perf.Start())
 	w.waveTime = 0
 	w.wave++
 	w.breakTime = 0
@@ -530,6 +570,7 @@ func (w *world) spawn() {
 		count += group.Count.Resolve(w.floor, len(w.players))
 	}
 	index := 0
+	cells := w.arenaGeometry().Cells()
 	for _, group := range groups {
 		def := w.catalog.Enemy(group.Enemy)
 		for i := 0; i < group.Count.Resolve(w.floor, len(w.players)); i++ {
@@ -540,7 +581,8 @@ func (w *world) spawn() {
 			hp = damage.Round(hp)
 			w.nextID++
 			angle := 2 * math.Pi * float64(index) / float64(count)
-			pos := model.Vec{X: w.room.Width/2 + math.Cos(angle)*w.room.SpawnRadius.X, Y: w.room.Height/2 + math.Sin(angle)*w.room.SpawnRadius.Y}
+			center := cells[index%len(cells)].Center
+			pos := center.Add(model.Vec{X: math.Cos(angle) * w.room.SpawnRadius.X, Y: math.Sin(angle) * w.room.SpawnRadius.Y})
 			w.enemies = append(w.enemies, model.Enemy{ID: w.nextID, Definition: def.ID, Position: w.clamp(pos, def.Radius), HP: hp, MaxHP: hp, Radius: def.Radius})
 			index++
 		}
@@ -566,6 +608,7 @@ func (w *world) emit(event model.Event) bool {
 	return true
 }
 func (w *world) commitEvents() bool {
+	defer w.performance.Since("scene.logic.events", perf.Start())
 	if len(w.pending) == 0 {
 		return true
 	}
@@ -589,7 +632,7 @@ func (w *world) clamp(p model.Vec, r float64) model.Vec {
 	if w.footprint != nil {
 		return w.footprint.ClampDisk(p, r)
 	}
-	return geometry.NewArena(w.room.Width, w.room.Height).ClampDisk(p, r)
+	return w.arenaGeometry().ClampDisk(p, r)
 }
 func (w *world) playerIDs() []string {
 	ids := make([]string, 0, len(w.players))
@@ -600,7 +643,8 @@ func (w *world) playerIDs() []string {
 	return ids
 }
 func (w *world) snapshot() protocol.Scene {
-	s := protocol.Scene{AdventureTime: w.adventureTime, TickRate: w.rate(), ActualTPS: w.actualTPS.Rate(), DroppedTicks: w.droppedTicks, ID: w.id, Room: w.room.ID, State: w.state, Width: w.room.Width, Height: w.room.Height, Wave: w.wave, Waves: w.waves, Tick: w.tick, Enemies: append([]model.Enemy(nil), w.enemies...), Error: w.fault}
+	defer w.performance.Since("scene.snapshot", perf.Start())
+	s := protocol.Scene{Performance: w.performance.Snapshot(time.Now()), AdventureTime: w.adventureTime, TickRate: w.rate(), ActualTPS: w.actualTPS.Rate(), DroppedTicks: w.droppedTicks, ID: w.id, Room: w.room.ID, State: w.state, Width: w.room.Width, Height: w.room.Height, Hexes: append([]model.HexCell(nil), w.room.Hexes...), Wave: w.wave, Waves: w.waves, Tick: w.tick, Enemies: append([]model.Enemy(nil), w.enemies...), Error: w.fault}
 	s.Obstacles = append([]model.Obstacle(nil), w.room.Obstacles...)
 	if w.room.Objective == "survive" {
 		s.ObjectiveRemaining = max(0, w.room.ObjectiveSeconds-w.waveTime)
@@ -616,6 +660,10 @@ func (w *world) snapshot() protocol.Scene {
 	}
 	for _, id := range w.playerIDs() {
 		s.Players = append(s.Players, model.ClonePlayer(w.players[id].player))
+		s.Actions = append(s.Actions, actionView(w.players[id].visual, id, w.players[id].player.Life))
+	}
+	for _, v := range w.enemyVisuals {
+		s.EnemyActions = append(s.EnemyActions, v)
 	}
 	for _, p := range w.shots {
 		view := p.view

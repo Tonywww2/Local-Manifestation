@@ -35,7 +35,8 @@
       },
       "cooldown": 0.48,
       "projectile_speed": 520,
-      "range": 1000
+      "range": 1000,
+      "weapon_skill": "base:coupler-pulse"
     },
     {
       "id": "base:sword",
@@ -52,7 +53,8 @@
       "windup": 0.1,
       "recovery": 0.32,
       "range": 105,
-      "active_duration": 0.09
+      "active_duration": 0.09,
+      "weapon_skill": "base:projectile-cut"
     },
     {
       "id": "base:wave-sword",
@@ -68,7 +70,8 @@
       "pierce": 3,
       "range": 430,
       "windup": 0.15,
-      "recovery": 0.51
+      "recovery": 0.51,
+      "weapon_skill": "base:projectile-cut"
     },
     {
       "id": "base:seeker",
@@ -218,12 +221,10 @@
       "armor": 3,
       "speed": 190,
       "weapon": "base:carbine",
-      "skills": [
-        "base:barrier-skill",
-        "base:haste-skill",
-        "base:burst-skill",
-        "base:mend-skill"
-      ]
+      "growth_preference": {
+        "agility": 2,
+        "sense": 1
+      }
     },
     {
       "id": "base:arcanist",
@@ -240,12 +241,10 @@
       "armor": 1,
       "speed": 180,
       "weapon": "base:focus",
-      "skills": [
-        "base:barrier-skill",
-        "base:haste-skill",
-        "base:root-skill",
-        "base:mend-skill"
-      ]
+      "growth_preference": {
+        "intelligence": 2,
+        "mana": 1
+      }
     },
     {
       "id": "base:bulwark",
@@ -262,12 +261,10 @@
       "armor": 6,
       "speed": 170,
       "weapon": "base:sword",
-      "skills": [
-        "base:barrier-skill",
-        "base:haste-skill",
-        "base:burst-skill",
-        "base:mend-skill"
-      ]
+      "growth_preference": {
+        "strength": 2,
+        "constitution": 1
+      }
     },
     {
       "id": "base:renewal-frame",
@@ -284,13 +281,11 @@
       "armor": 1,
       "speed": 180,
       "weapon": "base:focus",
-      "skills": [
-        "base:barrier-skill",
-        "base:haste-skill",
-        "base:root-skill",
-        "base:renew-skill"
-      ],
-      "required_perk": "base:renewal-unlock"
+      "required_perk": "base:renewal-unlock",
+      "growth_preference": {
+        "intelligence": 1,
+        "mana": 2
+      }
     }
   ],
   "enemies": [
@@ -301,7 +296,8 @@
       "damage": 12,
       "armor": 1,
       "speed": 65,
-      "radius": 13,
+      "radius": 32,
+      "visual_radius": 13,
       "behavior": "base:chase",
       "armor_per_floor": 0.5,
       "resistance_per_floor": {
@@ -315,7 +311,8 @@
       "damage": 20,
       "armor": 4,
       "speed": 45,
-      "radius": 28,
+      "radius": 54,
+      "visual_radius": 28,
       "behavior": "base:chase",
       "attack_range": 900,
       "fire_interval": 2.4,
@@ -345,7 +342,8 @@
       "damage": 10,
       "armor": 1,
       "speed": 45,
-      "radius": 14,
+      "radius": 24,
+      "visual_radius": 14,
       "behavior": "base:chase",
       "attack_range": 650,
       "fire_interval": 1.7,
@@ -372,7 +370,8 @@
       "damage": 12,
       "armor": 1,
       "speed": 72,
-      "radius": 14,
+      "radius": 30,
+      "visual_radius": 14,
       "appearance": "dragger",
       "behavior": "base:chase",
       "armor_per_floor": 0.5,
@@ -386,7 +385,8 @@
       "damage": 9,
       "armor": 0,
       "speed": 95,
-      "radius": 12,
+      "radius": 24,
+      "visual_radius": 12,
       "appearance": "bag",
       "behavior": "base:chase",
       "armor_per_floor": 0.5,
@@ -411,7 +411,8 @@
       "damage": 18,
       "armor": 5,
       "speed": 42,
-      "radius": 22,
+      "radius": 43,
+      "visual_radius": 22,
       "appearance": "load",
       "behavior": "base:chase",
       "armor_per_floor": 0.5,
@@ -425,7 +426,8 @@
       "damage": 11,
       "armor": 1,
       "speed": 65,
-      "radius": 14,
+      "radius": 26,
+      "visual_radius": 14,
       "appearance": "spitter",
       "behavior": "base:midrange",
       "armor_per_floor": 0.5,
@@ -452,7 +454,8 @@
       "damage": 12,
       "armor": 1,
       "speed": 57,
-      "radius": 16,
+      "radius": 29,
+      "visual_radius": 16,
       "appearance": "leaker",
       "behavior": "base:midrange",
       "armor_per_floor": 0.5,
@@ -482,7 +485,8 @@
       "damage": 18,
       "armor": 0,
       "speed": 68,
-      "radius": 14,
+      "radius": 26,
+      "visual_radius": 14,
       "appearance": "lens",
       "behavior": "base:midrange",
       "armor_per_floor": 0.5,
@@ -509,7 +513,8 @@
       "damage": 18,
       "armor": 7,
       "speed": 37,
-      "radius": 26,
+      "radius": 49,
+      "visual_radius": 26,
       "appearance": "encased",
       "behavior": "base:chase",
       "armor_per_floor": 0.5,
@@ -537,7 +542,8 @@
       "damage": 18,
       "armor": 2,
       "speed": 62,
-      "radius": 23,
+      "radius": 45,
+      "visual_radius": 23,
       "appearance": "array",
       "behavior": "base:midrange",
       "armor_per_floor": 0.5,
@@ -565,7 +571,8 @@
       "damage": 22,
       "armor": 5,
       "speed": 45,
-      "radius": 36,
+      "radius": 68,
+      "visual_radius": 36,
       "appearance": "carrier",
       "behavior": "base:chase",
       "armor_per_floor": 0.5,
@@ -602,7 +609,8 @@
       "damage": 25,
       "armor": 5,
       "speed": 49,
-      "radius": 36,
+      "radius": 69,
+      "visual_radius": 36,
       "appearance": "carrier",
       "behavior": "base:chase",
       "armor_per_floor": 0.5,
@@ -794,79 +802,58 @@
       "shield_max_hp": 0.4,
       "name_key": "content.base:backup-barrier.name",
       "description_key": "content.base:backup-barrier.description"
-    }
-  ],
-  "skills": [
+    },
     {
-      "id": "base:barrier-skill",
-      "name": "Barrier",
-      "description": "Development: 60 shield for 15 seconds.",
-      "cost": 20,
-      "cooldown_ms": 12000,
-      "effects": [
+      "id": "base:fuse-shield",
+      "name": "Emergency Shield",
+      "description": "Absorbs damage equal to 50% of maximum health.",
+      "level": 0,
+      "max_layers": 1,
+      "duration_ms": 10000,
+      "shield_max_hp": 0.5,
+      "modifiers": [],
+      "name_key": "content.base:fuse-shield.name",
+      "description_key": "content.base:fuse-shield.description"
+    },
+    {
+      "id": "base:arrival-haste-20",
+      "name": "Arrival Tempo 20",
+      "description": "Attack speed +20% until leaving the room.",
+      "level": 1,
+      "max_layers": 1,
+      "duration_ms": 0,
+      "clear_on_leave": true,
+      "modifiers": [
         {
-          "kind": "apply_status",
-          "status": "base:barrier"
+          "id": "base:arrival-haste-20-speed",
+          "stat": "attack_speed",
+          "operation": "percent",
+          "group": "consumable",
+          "value": 0.2
         }
-      ]
+      ],
+      "name_key": "content.base:arrival-haste-20.name",
+      "description_key": "content.base:arrival-haste-20.description"
     },
     {
-      "id": "base:haste-skill",
-      "name": "Haste",
-      "description": "Development: +20% movement for 8 seconds.",
-      "cost": 15,
-      "cooldown_ms": 12000,
-      "effects": [
+      "id": "base:arrival-haste-15",
+      "name": "Arrival Tempo 15",
+      "description": "Attack speed +15% until leaving the room.",
+      "level": 1,
+      "max_layers": 1,
+      "duration_ms": 0,
+      "clear_on_leave": true,
+      "modifiers": [
         {
-          "kind": "apply_status",
-          "status": "base:haste"
+          "id": "base:arrival-haste-15-speed",
+          "stat": "attack_speed",
+          "operation": "percent",
+          "group": "consumable",
+          "value": 0.15
         }
-      ]
-    },
-    {
-      "id": "base:burst-skill",
-      "name": "Arcane bolt",
-      "description": "Development: launches an arcane bolt.",
-      "cost": 12,
-      "cooldown_ms": 1500,
-      "weapon": "base:focus"
-    },
-    {
-      "id": "base:mend-skill",
-      "name": "Mend",
-      "description": "Development: restores 20 health.",
-      "cost": 25,
-      "cooldown_ms": 12000,
-      "effects": [
-        {
-          "kind": "heal",
-          "amount": 20,
-          "scaling": {
-            "mana": 0.25
-          }
-        }
-      ]
-    },
-    {
-      "id": "base:root-skill",
-      "name": "Rooting shot",
-      "description": "Development control projectile.",
-      "cost": 15,
-      "cooldown_ms": 5000,
-      "weapon": "base:root-bolt"
-    },
-    {
-      "id": "base:renew-skill",
-      "name": "Renewal",
-      "description": "Development: snapshot healing over time.",
-      "cost": 20,
-      "cooldown_ms": 10000,
-      "effects": [
-        {
-          "kind": "apply_status",
-          "status": "base:renew"
-        }
-      ]
+      ],
+      "name_key": "content.base:arrival-haste-15.name",
+      "description_key": "content.base:arrival-haste-15.description"
     }
   ],
   "items": [
@@ -1005,7 +992,8 @@
             "constitution": 0.2
           }
         }
-      ]
+      ],
+      "tier": 1
     },
     {
       "id": "base:barrier-potion",
@@ -1019,7 +1007,8 @@
           "kind": "apply_status",
           "status": "base:barrier"
         }
-      ]
+      ],
+      "tier": 1
     },
     {
       "id": "base:cleanse",
@@ -1032,7 +1021,8 @@
         {
           "kind": "clear_curse"
         }
-      ]
+      ],
+      "tier": 1
     },
     {
       "id": "base:support",
@@ -1045,7 +1035,8 @@
         {
           "kind": "support"
         }
-      ]
+      ],
+      "tier": 1
     },
     {
       "id": "base:sword-item",
@@ -1827,7 +1818,162 @@
           "kind": "apply_status",
           "status": "base:renew"
         }
-      ]
+      ],
+      "tier": 1
+    },
+    {
+      "id": "base:route-fold-2",
+      "name": "Short Route Fold",
+      "description": "Move up to 2 hexes along a straight hex line. Costs 1 personal AP.",
+      "kind": "movement",
+      "tier": 1,
+      "value": 40,
+      "durability": 1,
+      "movement": {
+        "mode": "line",
+        "range": 2
+      },
+      "_comment": "DEVELOPMENT names, icons, prices and acquisition tuning."
+    },
+    {
+      "id": "base:ring-ticket",
+      "name": "Neighbourhood Ticket",
+      "description": "Move to any node within 1 ring. Costs 1 personal AP.",
+      "kind": "movement",
+      "tier": 1,
+      "value": 40,
+      "durability": 1,
+      "movement": {
+        "mode": "ring",
+        "range": 1
+      },
+      "_comment": "DEVELOPMENT names, icons, prices and acquisition tuning."
+    },
+    {
+      "id": "base:ring-pass",
+      "name": "Neighbourhood Pass",
+      "description": "Move to any node within 1 ring. Costs 1 personal AP per use.",
+      "kind": "movement",
+      "tier": 2,
+      "value": 80,
+      "durability": 3,
+      "movement": {
+        "mode": "ring",
+        "range": 1
+      },
+      "_comment": "DEVELOPMENT names, icons, prices and acquisition tuning."
+    },
+    {
+      "id": "base:route-fold-3",
+      "name": "Long Route Fold",
+      "description": "Move up to 3 hexes along a straight hex line. Costs 1 personal AP per use.",
+      "kind": "movement",
+      "tier": 2,
+      "value": 80,
+      "durability": 2,
+      "movement": {
+        "mode": "line",
+        "range": 3
+      },
+      "_comment": "DEVELOPMENT names, icons, prices and acquisition tuning."
+    },
+    {
+      "id": "base:coordinate-pass",
+      "name": "Coordinate Pass",
+      "description": "Move to any node. Costs 1 personal AP per use.",
+      "kind": "movement",
+      "tier": 3,
+      "value": 120,
+      "durability": 3,
+      "movement": {
+        "mode": "anywhere"
+      },
+      "_comment": "DEVELOPMENT names, icons, prices and acquisition tuning."
+    },
+    {
+      "id": "base:free-coordinate-ticket",
+      "name": "Prepaid Coordinate Ticket",
+      "description": "Move to any node without spending personal AP.",
+      "kind": "movement",
+      "tier": 3,
+      "value": 120,
+      "durability": 1,
+      "movement": {
+        "mode": "anywhere",
+        "free": true
+      },
+      "_comment": "DEVELOPMENT names, icons, prices and acquisition tuning."
+    },
+    {
+      "id": "base:team-coordinate-ticket",
+      "name": "Team Coordinate Ticket",
+      "description": "After a team vote, move all out-of-combat teammates, including downed players, to any node. Costs 1 shared AP.",
+      "kind": "movement",
+      "tier": 3,
+      "value": 120,
+      "durability": 1,
+      "movement": {
+        "mode": "anywhere",
+        "team": true
+      },
+      "_comment": "DEVELOPMENT names, icons, prices and acquisition tuning."
+    },
+    {
+      "id": "base:emergency-fuse",
+      "name": "Emergency Fuse",
+      "description": "Negate a lethal hit and gain a shield equal to 50% of maximum health for 10 seconds.",
+      "kind": "passive",
+      "tier": 3,
+      "value": 120,
+      "durability": 1,
+      "passive": {
+        "trigger": "lethal_damage",
+        "status": "base:fuse-shield"
+      },
+      "_comment": "DEVELOPMENT names, icons, prices and acquisition tuning."
+    },
+    {
+      "id": "base:arrival-envelope",
+      "name": "Arrival Envelope",
+      "description": "After travelling with a movement item, gain a random accessory from the current floor pool.",
+      "kind": "passive",
+      "tier": 1,
+      "value": 40,
+      "durability": 1,
+      "passive": {
+        "trigger": "movement",
+        "accessory": true
+      },
+      "_comment": "DEVELOPMENT names, icons, prices and acquisition tuning."
+    },
+    {
+      "id": "base:entry-kit",
+      "name": "Entry Kit",
+      "description": "After travelling with a movement item to a combat node, gain +20% attack speed until leaving the room and a random floor accessory.",
+      "kind": "passive",
+      "tier": 2,
+      "value": 80,
+      "durability": 1,
+      "passive": {
+        "trigger": "movement_combat",
+        "status": "base:arrival-haste-20",
+        "accessory": true
+      },
+      "_comment": "DEVELOPMENT names, icons, prices and acquisition tuning."
+    },
+    {
+      "id": "base:entry-metronome",
+      "name": "Entry Metronome",
+      "description": "After travelling with a movement item to a combat node, gain +15% attack speed until leaving the room. Unlimited durability.",
+      "kind": "passive",
+      "tier": 2,
+      "value": 80,
+      "durability": -1,
+      "passive": {
+        "trigger": "movement_combat",
+        "status": "base:arrival-haste-15"
+      },
+      "_comment": "DEVELOPMENT names, icons, prices and acquisition tuning."
     }
   ],
   "starting_items": [
@@ -1947,6 +2093,29 @@
       "kind": "challenge",
       "condition": "enhanced_clear",
       "points": 2
+    }
+  ],
+  "weapon_skills": [
+    {
+      "id": "base:projectile-cut",
+      "name": "Projectile Cut",
+      "description": "Development: destroy hostile projectiles in a forward sector.",
+      "icon": "projectile-cut",
+      "cost": 0,
+      "cooldown_ms": 4000,
+      "clear_projectiles": {
+        "range": 180,
+        "arc": 110
+      }
+    },
+    {
+      "id": "base:coupler-pulse",
+      "name": "Binding Pulse",
+      "description": "Development: fire a rooting magic projectile.",
+      "icon": "root",
+      "cost": 15,
+      "cooldown_ms": 5000,
+      "weapon": "base:root-bolt"
     }
   ]
 }

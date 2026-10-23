@@ -9,7 +9,9 @@ import (
 	textv2 "github.com/hajimehoshi/ebiten/v2/text/v2"
 	"hsmultiplayer/internal/client/ui"
 	"hsmultiplayer/internal/content"
+	"hsmultiplayer/pkg/animation"
 	"hsmultiplayer/pkg/model"
+	"hsmultiplayer/pkg/perf"
 	"image"
 	"image/color"
 	_ "image/jpeg"
@@ -30,6 +32,8 @@ type resourceBundle struct {
 	boxes     map[boxStyle]*ebiten.Image
 	sounds    map[string][]byte
 	theme     resourceTheme
+	art       artLayout
+	skeletons skeletonResources
 	audio     *audio.Context
 	music     *audio.Player
 	playing   []*audio.Player
@@ -40,14 +44,28 @@ type resourceBundle struct {
 var defaultFontSource = fontSource
 
 func (g *Game) publishResources(c *content.Catalog) error {
+	defer g.diagnostics.Since("client.load.resources", perf.Start())
 	decoded := map[string]image.Image{}
 	sounds := map[string][]byte{}
 	theme := resourceTheme{}
+	art := artLayout{}
+	rigs := animation.RigLibrary{}
 	font := defaultFontSource
 	decodedBytes := int64(0)
 	for _, id := range c.AssetIDs() {
 		data := c.Asset(id)
 		switch {
+		case id == "animation:rigs":
+			if err := content.Decode(data, &rigs); err != nil {
+				return err
+			}
+		case id == "art:layout":
+			if err := content.Decode(data, &art); err != nil {
+				return err
+			}
+			if err := validateArtLayout(art); err != nil {
+				return err
+			}
 		case id == "ui:theme":
 			if err := content.Decode(data, &theme); err != nil {
 				return err
@@ -91,15 +109,29 @@ func (g *Game) publishResources(c *content.Catalog) error {
 			return fmt.Errorf("decoded resource budget exceeded")
 		}
 	}
-	next := resourceBundle{images: map[string]*ebiten.Image{}, sprites: map[string]*ebiten.Image{}, sounds: sounds, theme: theme, audio: g.resources.audio}
+	next := resourceBundle{images: map[string]*ebiten.Image{}, sprites: map[string]*ebiten.Image{}, sounds: sounds, theme: theme, art: art, audio: g.resources.audio}
 	for id, value := range decoded {
 		next.images[id] = ebiten.NewImageFromImage(value)
-		if strings.HasPrefix(id, "player:") || strings.HasPrefix(id, "portrait:") {
+		weaponIcon := false
+		if strings.HasPrefix(id, "icon:") {
+			if d, ok := c.Item(strings.TrimPrefix(id, "icon:")); ok {
+				weaponIcon = d.Kind == "weapon"
+			}
+		}
+		if weaponIcon || strings.HasPrefix(id, "player:") || strings.HasPrefix(id, "portrait:") || strings.HasPrefix(id, "weapon:") || strings.HasPrefix(id, "enemy:") || strings.HasPrefix(id, "prop:") {
 			r := spriteRegion(value)
 			if !r.Empty() {
 				next.sprites[id] = next.images[id].SubImage(r).(*ebiten.Image)
 			}
 		}
+	}
+	var err error
+	next.skeletons, err = prepareSkeletons(decoded, next.images, rigs)
+	if err != nil {
+		for _, img := range next.images {
+			img.Deallocate()
+		}
+		return err
 	}
 	if g.resources.music != nil {
 		g.resources.music.Close()
@@ -120,6 +152,9 @@ func (g *Game) publishResources(c *content.Catalog) error {
 		next.audio = audio.NewContext(48000)
 	}
 	g.resources = next
+	// Content previews may already exist (including explicit render previews).
+	// Their icons must follow the newly published resource bundle immediately.
+	g.itemViews = nil
 	for id, surface := range g.roomSurfaces {
 		if surface.Image != nil {
 			surface.Image.Deallocate()
@@ -178,7 +213,7 @@ func (g *Game) drawAsset(dst *ebiten.Image, id string, center model.Vec, width, 
 		return false
 	}
 	r := value.Bounds()
-	op := &ebiten.DrawImageOptions{}
+	op := &ebiten.DrawImageOptions{Filter: ebiten.FilterLinear}
 	op.GeoM.Scale(width/float64(r.Dx()), height/float64(r.Dy()))
 	op.GeoM.Translate(center.X-width/2, center.Y-height/2)
 	dst.DrawImage(value, op)
@@ -213,6 +248,7 @@ func (g *Game) playSound(key string) {
 	r.playing = append(r.playing, p)
 }
 func (g *Game) updateAudio() {
+	defer g.diagnostics.Since("client.logic.audio", perf.Start())
 	r := &g.resources
 	active := g.state != nil && g.state.Phase != "won" && g.state.Phase != "lost"
 	if !active {

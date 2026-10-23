@@ -106,8 +106,8 @@ func TestEveryFloatingWindowAndMapSelection(t *testing.T) {
 	before := protocol.CloneState(*g.state)
 	for _, c := range g.u.frame.Controls {
 		if c.ID == "map-node:room" {
-			if c.Action != "select-node" {
-				t.Fatal("map issues travel intent")
+			if c.Action != "map-node" {
+				t.Fatal("map node has no confirmation action")
 			}
 			g.performControl(c)
 		}
@@ -120,26 +120,26 @@ func TestBindingsAreIndependentAndAtomic(t *testing.T) {
 	g := interfaceGame(t)
 	g.openWindow("settings")
 	g.u.settingsPage = "bindings"
-	g.u.capture = "skill1"
+	g.u.capture = "weapon_skill"
 	g.captureBinding("E")
-	if g.u.settingsDraft.Bindings["keyboard"]["skill1"] != "Q" || g.u.bindingError == "" {
+	if g.u.settingsDraft.Bindings["keyboard"]["weapon_skill"] != "Mouse2" || g.u.bindingError == "" {
 		t.Fatal("conflict replaced a binding")
 	}
 	g.captureBinding("J")
-	if g.bound("skill1") != "Q" {
+	if g.bound("weapon_skill") != "Mouse2" {
 		t.Fatal("draft applied before save")
 	}
 	g.performControl(uiControl{Action: "settings-save"})
-	if g.bound("skill1") != "J" {
+	if g.bound("weapon_skill") != "J" {
 		t.Fatal("save did not apply")
 	}
 	restored := New(g.catalog, Config{Profile: g.cfg.Profile})
-	if restored.bound("skill1") != "J" || restored.u.bindings["mouse"]["skill1"] != "Q" {
+	if restored.bound("weapon_skill") != "J" || restored.u.bindings["mouse"]["weapon_skill"] != "Mouse1" {
 		t.Fatal("binding restore/mode isolation failed")
 	}
-	g.u.settingsDraft.Bindings["keyboard"]["skill1"] = "K"
+	g.u.settingsDraft.Bindings["keyboard"]["weapon_skill"] = "K"
 	g.performControl(uiControl{Action: "settings-cancel"})
-	if g.u.settingsDraft.Bindings["keyboard"]["skill1"] != "J" {
+	if g.u.settingsDraft.Bindings["keyboard"]["weapon_skill"] != "J" {
 		t.Fatal("cancel kept draft")
 	}
 }
@@ -234,7 +234,7 @@ func TestActionPointsAndDodgeIndicatorsUseRequestedHudRegions(t *testing.T) {
 	}
 	for _, d := range g.u.frame.Dots {
 		m := g.u.frame.Meters[0]
-		if d.Owner != m.Owner || d.Center.X <= m.Bounds.X+m.Bounds.W || d.Center.Y < m.Bounds.Y || d.Center.Y > m.Bounds.Y+m.Bounds.H {
+		if d.Owner != "dodges" || m.Owner != "health" || d.Center.X <= m.Bounds.X+m.Bounds.W || d.Center.Y < m.Bounds.Y || d.Center.Y > m.Bounds.Y+m.Bounds.H {
 			t.Fatal("dodge dot is not to the right of the health bar")
 		}
 	}

@@ -3,6 +3,7 @@ package client
 import (
 	"encoding/json"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 
@@ -11,23 +12,27 @@ import (
 )
 
 type settings struct {
-	ClickDirect bool          `json:"click_direct"`
-	Version     int           `json:"version,omitempty"`
-	FrameLimit  *int          `json:"frame_limit,omitempty"`
-	VSync       *bool         `json:"vsync,omitempty"`
-	Language    string        `json:"language"`
-	InputMode   string        `json:"input_mode,omitempty"`
-	Layout      ui.Layout     `json:"layout,omitempty"`
-	Bindings    bindings      `json:"bindings,omitempty"`
-	Room        *lobby.Config `json:"room,omitempty"`
-	PlayerName  string        `json:"player_name,omitempty"`
-	Chassis     string        `json:"chassis,omitempty"`
+	ShowFPS         bool          `json:"show_fps"`
+	ShowLatency     bool          `json:"show_latency"`
+	ShowDiagnostics bool          `json:"show_diagnostics"`
+	ClickDirect     bool          `json:"click_direct"`
+	Version         int           `json:"version,omitempty"`
+	FrameLimit      *int          `json:"frame_limit,omitempty"`
+	VSync           *bool         `json:"vsync,omitempty"`
+	Language        string        `json:"language"`
+	InputMode       string        `json:"input_mode,omitempty"`
+	Layout          ui.Layout     `json:"layout,omitempty"`
+	WindowSizes     windowSizes   `json:"window_sizes,omitempty"`
+	Bindings        bindings      `json:"bindings,omitempty"`
+	Room            *lobby.Config `json:"room,omitempty"`
+	PlayerName      string        `json:"player_name,omitempty"`
+	Chassis         string        `json:"chassis,omitempty"`
 }
 
 func (g *Game) preferences() settings {
 	fps, vsync := g.frameLimit, g.vsync
 	room := lobby.CloneConfig(g.front.Config)
-	return settings{ClickDirect: g.clickDirect, Version: 1, FrameLimit: &fps, VSync: &vsync, Language: g.language, InputMode: g.inputMode(), Layout: ui.Clone(g.u.layout), Bindings: cloneBindings(g.u.bindings), Room: &room, PlayerName: g.name, Chassis: g.catalog.ChassisList()[g.chassis].ID}
+	return settings{ShowFPS: g.showFPS, ShowLatency: g.showLatency, ShowDiagnostics: g.performanceVisible, ClickDirect: g.clickDirect, Version: 1, FrameLimit: &fps, VSync: &vsync, Language: g.language, InputMode: g.inputMode(), Layout: ui.Clone(g.u.layout), WindowSizes: maps.Clone(g.u.windowSizes), Bindings: cloneBindings(g.u.bindings), Room: &room, PlayerName: g.name, Chassis: g.catalog.ChassisList()[g.chassis].ID}
 }
 func validateSettings(s settings) error {
 	if len([]rune(s.PlayerName)) > 24 {
@@ -45,6 +50,9 @@ func validateSettings(s settings) error {
 		return fmt.Errorf("invalid input mode")
 	}
 	if err := ui.Validate(s.Layout); err != nil {
+		return err
+	}
+	if err := validateWindowSizes(s.WindowSizes); err != nil {
 		return err
 	}
 	return validateBindings(s.Bindings)
@@ -81,6 +89,9 @@ func writeSettings(path string, s settings) error {
 	if len(s.Layout) == 0 {
 		delete(values, "layout")
 	}
+	if len(s.WindowSizes) == 0 {
+		delete(values, "window_sizes")
+	}
 	b, err = json.MarshalIndent(values, "", "  ")
 	if err != nil {
 		return err
@@ -116,12 +127,14 @@ func (g *Game) commitPreferences(s settings) error {
 	if err := writeSettings(settingsPath(g.cfg.Profile), s); err != nil {
 		return err
 	}
+	g.showFPS, g.showLatency, g.performanceVisible = s.ShowFPS, s.ShowLatency, s.ShowDiagnostics
 	g.language = s.Language
 	g.frameLimit = *s.FrameLimit
 	g.vsync = *s.VSync
 	g.mouseMode = s.InputMode == "mouse"
 	g.clickDirect = s.ClickDirect
 	g.u.layout = ui.Clone(s.Layout)
+	g.u.windowSizes = maps.Clone(s.WindowSizes)
 	g.u.bindings = cloneBindings(s.Bindings)
 	if s.Room != nil {
 		g.front.Config = lobby.CloneConfig(*s.Room)

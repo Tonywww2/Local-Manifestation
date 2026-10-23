@@ -16,12 +16,12 @@ func (g *Game) drawInventoryStatus(dst *ebiten.Image, c uiControl) {
 	icon := ui.Rect{X: r.X + 12, Y: r.Y + 12, W: 40, H: 40}
 	g.drawBox(dst, icon, color.RGBA{29, 38, 41, 255}, uiEdge)
 	g.drawIconSized(dst, c.Icon, icon.X+6, icon.Y+6, 28)
-	fitText(dst, c.Caption, r.X+62, r.Y+10, r.W-100, 14, false)
+	g.fitText(dst, c.Caption, r.X+62, r.Y+10, r.W-100, 14, false)
 	g.drawIconSized(dst, "backpack", r.X+r.W-30, r.Y+10, 20)
 	g.drawIconSized(dst, "coins", r.X+62, r.Y+35, 15)
-	fitText(dst, info.Coins, r.X+82, r.Y+33, r.W-92, 13, false)
-	fitText(dst, info.Level, r.X+12, r.Y+61, 64, 12, false)
-	fitText(dst, "EXP  "+info.Experience, r.X+76, r.Y+61, r.W-88, 11, true)
+	g.fitText(dst, info.Coins, r.X+82, r.Y+33, r.W-92, 13, false)
+	g.fitText(dst, info.Level, r.X+12, r.Y+61, 64, 12, false)
+	g.fitText(dst, "EXP  "+info.Experience, r.X+76, r.Y+61, r.W-88, 11, true)
 	drawMeterSkin(dst, uiMeter{Bounds: ui.Rect{X: r.X + 13, Y: r.Y + r.H - 12, W: r.W - 26, H: 4}, Fraction: info.Fraction, Kind: "xp"})
 }
 
@@ -35,7 +35,7 @@ func (g *Game) drawCharacterPortrait(dst *ebiten.Image, c uiControl) {
 	if !g.drawSprite(dst, "portrait:"+c.Icon, center, r.W-12, r.H-38) && !g.drawSprite(dst, "player:"+c.Icon, center, r.W-12, r.H-38) {
 		drawExplorerSilhouette(dst, center, min(r.W*.68, (r.H-48)*.46))
 	}
-	fitText(dst, c.Caption, r.X+5, r.Y+r.H-26, r.W-10, 11, true)
+	g.fitText(dst, c.Caption, r.X+5, r.Y+r.H-26, r.W-10, 11, true)
 }
 
 // Until a chassis supplies portrait:<id>, use a neutral contemporary explorer.

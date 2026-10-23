@@ -3,7 +3,7 @@ package sdk
 
 import "hsmultiplayer/pkg/model"
 
-const Version = 6
+const Version = 7
 
 type Context struct {
 	Self     model.Vec `json:"self"`

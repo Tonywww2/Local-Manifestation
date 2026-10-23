@@ -75,7 +75,11 @@ func ApplyCommands(c *Catalog, players map[string]model.Player, commands []sdk.C
 			}
 		case "grant_xp":
 			if p.Life != "dead" {
-				p.XP += int(cmd.Amount)
+				var err error
+				p, err = c.GrantExperience(p, int(cmd.Amount))
+				if err != nil {
+					return nil, err
+				}
 			}
 		case "grant_coins":
 			if p.Life != "dead" {

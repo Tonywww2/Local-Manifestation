@@ -443,7 +443,7 @@ func mergeDefinitions(d *Definitions, p Definitions, overrides []string) error {
 	if err != nil {
 		return err
 	}
-	d.Skills, err = mergeValues(d.Skills, p.Skills, overrides)
+	d.WeaponSkills, err = mergeValues(d.WeaponSkills, p.WeaponSkills, overrides)
 	if err != nil {
 		return err
 	}

@@ -6,13 +6,13 @@ import (
 	"hsmultiplayer/internal/scene"
 	"hsmultiplayer/pkg/geometry"
 	"hsmultiplayer/pkg/model"
+	"hsmultiplayer/pkg/perf"
 	"hsmultiplayer/pkg/protocol"
 	"hsmultiplayer/pkg/timing"
 )
 
 func (t *team) spaceArena(node string) geometry.Arena {
-	w, h := t.catalog.SpaceSize(t.nodes[node])
-	return geometry.NewArena(w, h)
+	return t.catalog.SpaceArena(t.nodes[node])
 }
 func (t *team) spawnAt(node, except string) model.Vec {
 	a := t.spaceArena(node)
@@ -43,13 +43,11 @@ func (t *team) freeSpace(node string) (*scene.FreeSpace, error) {
 		return s, nil
 	}
 	definition := t.nodes[node]
-	room, _ := t.catalog.Room(definition.Room)
-	room.Width, room.Height = t.catalog.SpaceSize(definition)
+	room := t.catalog.SpaceRoom(definition)
 	s, err := scene.NewFreeSpace(t.catalog, scene.Config{ShotOrigin: t.projectileOrigin("space:" + node), AdventureTime: t.adventureTime, ID: "space:" + node, Floor: max(1, t.floor), Seed: content.Seed(t.config.Seed, t.floor, "space:"+node), TickRate: t.config.TickRate}, room)
 	if err != nil {
 		return nil, err
 	}
-	s.EnableProjectileTransit()
 	s.SetRuntime(t.runtime)
 	if t.spaces == nil {
 		t.spaces = map[string]*scene.FreeSpace{}
@@ -70,6 +68,7 @@ func (t *team) projectileOrigin(id string) string {
 // The coordinator owns non-battle actions; rendering and input-send frequency
 // do not determine simulation speed. Stale input stops intent, not recharge.
 func (t *team) stepSpaces() {
+	defer t.performance.Since("server.logic.free_spaces", perf.Start())
 	rate := t.config.TickRate
 	if !timing.LogicRate(rate) {
 		rate = timing.DefaultLogicRate
@@ -85,25 +84,18 @@ func (t *team) stepSpaces() {
 		if t.serverTick-m.walkUpdated > uint64(rate/2) {
 			m.walk = model.Input{}
 		}
-		open := t.walkingSides(p.Node)
-		if t.phase != "exploring" {
-			open = nil
-		}
 		s, err := t.freeSpace(p.Node)
 		if err != nil {
 			t.send(m, protocol.ErrorMessage(err))
 			continue
 		}
-		next, err := s.StepPlayer(&m.actions, p, m.walk, dt, open)
+		next, err := s.StepPlayer(&m.actions, p, m.walk, dt, nil)
 		m.walk.Dodge = false // an edge is consumed once, even if no charge was available
 		if err != nil {
 			t.send(m, protocol.ErrorMessage(err))
 			continue
 		}
 		m.player = next
-		if t.phase == "exploring" {
-			t.passFreeDoor(m, next.Position.Sub(p.Position))
-		}
 	}
 	for _, node := range t.spaceIDs() {
 		s := t.spaces[node]
@@ -116,6 +108,5 @@ func (t *team) stepSpaces() {
 			}
 		}
 	}
-	t.exchangeProjectiles()
 	t.withdrawDepartedVotes()
 }

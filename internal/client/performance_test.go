@@ -21,12 +21,21 @@ func TestRenderingSettingsPreserveLanguageAndCLIOverride(t *testing.T) {
 		t.Fatal(err)
 	}
 	g := New(c, Config{Profile: profile, Language: "en", FrameLimit: 144, FPSOverride: true, VSync: false, VSyncOverride: true})
+	g.showFPS, g.showLatency, g.performanceVisible = true, true, true
 	if err = g.saveSettings(); err != nil {
 		t.Fatal(err)
 	}
 	loaded := New(c, Config{Profile: profile})
-	if loaded.frameLimit != 144 || loaded.vsync || loaded.language != "en" {
+	if loaded.frameLimit != 144 || loaded.vsync || loaded.language != "en" || !loaded.showFPS || !loaded.showLatency || !loaded.performanceVisible {
 		t.Fatal("settings not restored")
+	}
+	loaded.showFPS, loaded.showLatency, loaded.performanceVisible = false, false, false
+	if err = loaded.saveSettings(); err != nil {
+		t.Fatal(err)
+	}
+	disabled := New(c, Config{Profile: profile})
+	if disabled.showFPS || disabled.showLatency || disabled.performanceVisible {
+		t.Fatal("disabled overlays retained previous true settings")
 	}
 	override := New(c, Config{Profile: profile, FrameLimit: 0, FPSOverride: true, VSync: true, VSyncOverride: true})
 	if override.frameLimit != 0 || !override.vsync || override.language != "en" {

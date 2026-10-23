@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"hsmultiplayer/pkg/perf"
 	"image/color"
 	"os"
 	"slices"
@@ -15,6 +16,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"hsmultiplayer/internal/client/ui"
+	"hsmultiplayer/pkg/animation"
 	"hsmultiplayer/pkg/device"
 	"hsmultiplayer/pkg/lobby"
 	"hsmultiplayer/pkg/model"
@@ -59,7 +61,16 @@ func (g *Game) initializeFront() {
 }
 
 func (g *Game) hallCamera() Camera {
-	if g.front.CameraSize == g.uiBounds() && g.front.Camera.Oblique == g.oblique && g.front.Camera.Scale > 0 {
+	c := g.hallBaseCamera()
+	c.Angle = g.cameraAngle()
+	c.Scale *= g.cameraZoom("world")
+	c.Origin = model.Vec{}
+	c.Origin = model.Vec{X: float64(g.width) / 2, Y: float64(g.height)/2 + 20}.Sub(c.Project(g.front.Position))
+	return c
+}
+
+func (g *Game) hallBaseCamera() Camera {
+	if g.front.CameraSize == g.uiBounds() && g.front.Camera.Scale > 0 {
 		return g.front.Camera
 	}
 	var points []model.Vec
@@ -67,28 +78,35 @@ func (g *Game) hallCamera() Camera {
 		vertices := cell.Vertices()
 		points = append(points, vertices[:]...)
 	}
-	g.front.Camera = fitPoints(points, g.oblique, ui.Rect{X: 24, Y: 105, W: float64(g.width - 48), H: float64(g.height - 180)})
+	g.front.Camera = fitPoints(points, defaultCameraAngle, ui.Rect{X: 24, Y: 105, W: float64(g.width - 48), H: float64(g.height - 180)})
+	// The larger base remains walkable at a useful local scale; the follow
+	// camera reveals the outer stations as the player explores or zooms out.
+	g.front.Camera.Scale = max(g.front.Camera.Scale, .7*min(float64(g.width)/1280, float64(g.height)/800))
 	g.front.CameraSize = g.uiBounds()
 	return g.front.Camera
 }
 
 func (g *Game) drawFront(dst *ebiten.Image) {
+	defer g.diagnostics.Since("client.render.front", perf.Start())
 	if g.front.Page != "lobby" {
 		g.drawMainBackdrop(dst)
 		return
 	}
 	c := g.hallCamera()
+	cacheCamera := Camera{Scale: g.hallBaseCamera().Scale}
 	s := protocol.Scene{Width: lobby.Width, Height: lobby.Height}
-	if !matchingSurface(g.front.Surface, s, c) {
+	if !matchingSurface(g.front.Surface, s, cacheCamera) {
 		if g.front.Surface.Image != nil {
 			g.front.Surface.Image.Deallocate()
 		}
-		g.front.Surface = buildHallSurface(c, g.resources.images["floor:default"])
+		texture := g.resources.images["floor:hall"]
+		if texture == nil {
+			texture = g.resources.images["floor:default"]
+		}
+		g.front.Surface = buildHallSurface(cacheCamera, texture)
 		g.decorateWorkshop(g.front.Surface.Image, g.front.Surface.Camera)
 	}
-	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(c.Origin.X-g.front.Surface.Camera.Origin.X, c.Origin.Y-g.front.Surface.Camera.Origin.Y)
-	dst.DrawImage(g.front.Surface.Image, op)
+	drawRoomSurface(dst, g.front.Surface, c)
 	for _, d := range g.front.Devices {
 		g.drawDevice(dst, c, d)
 	}
@@ -98,9 +116,15 @@ func (g *Game) drawFront(dst *ebiten.Image) {
 	v := c.Project(g.front.Position)
 	g.drawSelfMarker(dst, v, max(7, 12*c.Scale))
 	if chassis := g.catalog.ChassisList(); g.chassis >= 0 && g.chassis < len(chassis) {
-		g.drawPlayerBody(dst, chassis[g.chassis].ID, "alive", v, max(7, 12*c.Scale), color.RGBA{118, 166, 247, 255})
+		p := g.front.Actions.player
+		p.Chassis, p.Life = chassis[g.chassis].ID, "alive"
+		action := g.front.Actions.controls.View(p.ID, p.Life)
+		if !g.front.Actions.updated.IsZero() {
+			action = animation.Advance(action, max(0, min(1.0/60, g.lastFrameAt.Sub(g.front.Actions.updated).Seconds())))
+		}
+		g.drawAnimatedPlayer(dst, p, action, c, v, max(7, 12*c.Scale), color.RGBA{118, 166, 247, 255})
 	}
-	fitText(dst, g.name, v.X-100, v.Y+20, 200, 13, true)
+	g.fitText(dst, g.name, v.X-100, v.Y+20, 200, 13, true)
 }
 
 func (g *Game) caption(f *uiFrame, owner, id, value, title string, r ui.Rect) {
@@ -113,10 +137,11 @@ func (g *Game) buildFrontInterface(f *uiFrame, layout ui.Layout) {
 	}
 	g.addDeviceControls(f, g.front.Devices, g.hallCamera())
 	g.buildHallHeading(f)
+	g.buildCameraControl(f, layout)
 }
 
 func (g *Game) frontCapturesKeys() bool {
-	for _, id := range []string{"settings", "entrance", "join", "room-settings", "room-capacity", "room-meta", "mods", "progression", "warehouse", "chassis-select"} {
+	for _, id := range []string{"settings", "entrance", "join", "room-settings", "room-capacity", "room-meta", "mods", "progression", "warehouse", "chassis-select", developerItemsWindow} {
 		if slices.Contains(g.u.windows, id) {
 			return true
 		}
@@ -131,6 +156,7 @@ func (g *Game) performFront(action string) {
 	case "start":
 		g.front.Page = "lobby"
 		g.u.windows = nil
+		g.clearInspections()
 		g.u.hover = ""
 	case "settings":
 		g.openWindow("settings")
@@ -140,6 +166,7 @@ func (g *Game) performFront(action string) {
 		if g.pending == nil {
 			g.front.Page = "main"
 			g.u.windows = nil
+			g.clearInspections()
 			g.u.hover = ""
 		}
 	case "return":
@@ -169,6 +196,7 @@ func (g *Game) returnPersonalHall() {
 	g.mouseFrames = 0
 	g.front.Page = "lobby"
 	g.u.windows = nil
+	g.clearInspections()
 	g.u.hover = ""
 	g.u.phase = ""
 }
@@ -280,8 +308,15 @@ func (g *Game) connectWithRetry(retry bool, start func() error) {
 }
 
 func (g *Game) updateFront(mouseConsumed, keysConsumed bool) {
+	defer g.diagnostics.Since("client.logic.front", perf.Start())
 	intent := model.Input{}
-	defer func() { g.stepHall(intent) }()
+	weaponSkill := false
+	defer func() {
+		g.stepHall(intent)
+		if weaponSkill {
+			g.useHallWeaponSkill(intent.Aim)
+		}
+	}()
 	if slices.Contains(g.u.windows, "mods") {
 		g.updateModFields()
 		return
@@ -321,9 +356,6 @@ func (g *Game) updateFront(mouseConsumed, keysConsumed bool) {
 	if g.front.Page != "lobby" || keysConsumed || g.pending != nil {
 		return
 	}
-	if bindingAvailable(g.bound("view"), mouseConsumed) && bindingPressed(g.bound("view")) {
-		g.oblique = !g.oblique
-	}
 	if bindingAvailable(g.bound("interact"), mouseConsumed) && bindingPressed(g.bound("interact")) {
 		if d, ok := device.Nearest(g.front.Devices, g.front.Position); ok {
 			g.useHallDevice(d.Action)
@@ -332,6 +364,7 @@ func (g *Game) updateFront(mouseConsumed, keysConsumed bool) {
 	in := model.Vec{}
 	mx, my := ebiten.CursorPosition()
 	intent.Aim = g.hallCamera().Unproject(model.Vec{X: float64(mx), Y: float64(my)})
+	weaponSkill = bindingAvailable(g.bound("weapon_skill"), mouseConsumed) && bindingPressed(g.bound("weapon_skill"))
 	intent.Attack = !mouseConsumed && bindingDown(g.bound("attack"))
 	intent.Dodge = bindingAvailable(g.bound("dodge"), mouseConsumed) && bindingPressed(g.bound("dodge"))
 	if g.mouseMode {
@@ -349,6 +382,7 @@ func (g *Game) updateFront(mouseConsumed, keysConsumed bool) {
 				in = in.Add(v.vec)
 			}
 		}
+		in = g.hallCamera().WorldDirection(in)
 	}
 	intent.Move = in
 }

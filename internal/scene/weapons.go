@@ -6,6 +6,7 @@ import (
 	"hsmultiplayer/pkg/damage"
 	"hsmultiplayer/pkg/geometry"
 	"hsmultiplayer/pkg/model"
+	"hsmultiplayer/pkg/perf"
 	"hsmultiplayer/pkg/stats"
 	"math"
 )
@@ -37,6 +38,7 @@ func (w *world) beginAttack(p *fighter) error {
 		duration = q.Weapon.Windup + q.Weapon.Recovery
 	}
 	p.cooldown = duration / speed
+	p.visual.Attack = model.ActionAnimation{Sequence: p.visual.Attack.Sequence + 1, Weapon: q.Weapon.ID, Direction: dir, Windup: q.Weapon.Windup / speed, Active: q.Weapon.ActiveDuration, Duration: max(.06, p.cooldown, q.Weapon.Windup/speed+q.Weapon.ActiveDuration)}
 	return nil
 }
 func (w *world) releaseAttack(p *fighter, dt float64) {
@@ -90,11 +92,16 @@ func steer(velocity, target model.Vec, rate, dt float64) model.Vec {
 	return model.Vec{X: math.Cos(a) * velocity.Length(), Y: math.Sin(a) * velocity.Length()}
 }
 func (w *world) updateShots(dt float64) error {
+	defer w.performance.Since("scene.logic.projectiles", perf.Start())
 	kept := w.shots[:0]
 	for _, s := range w.shots {
 		s.view.Age += dt
 		s.view.TTL -= dt
 		if s.view.TTL <= 0 {
+			continue
+		}
+		if s.view.Kind == "projectile-clear" {
+			kept = append(kept, s)
 			continue
 		}
 		if s.identity == "" {
@@ -213,7 +220,7 @@ func (w *world) inside(v model.Vec) bool {
 	if w.footprint != nil {
 		return w.footprint.ContainsDisk(v, 0)
 	}
-	return geometry.NewArena(w.room.Width, w.room.Height).ContainsDisk(v, 0)
+	return w.arenaGeometry().ContainsDisk(v, 0)
 }
 
 func (w *world) clipShot(segment geometry.Segment) (geometry.Segment, bool) {
@@ -221,5 +228,6 @@ func (w *world) clipShot(segment geometry.Segment) (geometry.Segment, bool) {
 		clipped, ok := w.footprint.ClipSegment(segment)
 		return clipped, ok && clipped.B.Sub(segment.B).Length() < 1e-7
 	}
-	return geometry.NewArena(w.room.Width, w.room.Height).ClipSegment(segment)
+	clipped, ok := w.arenaGeometry().ClipSegment(segment)
+	return clipped, ok && clipped.A.Sub(segment.A).Length() < 1e-7 && clipped.B.Sub(segment.B).Length() < 1e-7
 }

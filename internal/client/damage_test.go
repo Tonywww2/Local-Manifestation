@@ -18,8 +18,7 @@ func TestDamageExplanationLocalizesSourcesAndKeepsAllRows(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	p.Points = 1
-	p, err = content.Invest(p, "strength")
+	p, err = c.GrantExperience(p, 20)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -37,7 +36,7 @@ func TestDamageExplanationLocalizesSourcesAndKeepsAllRows(t *testing.T) {
 		g.language = lang
 		lines := g.damageLines(r)
 		joined := strings.Join(lines, "\n")
-		if len(lines) <= 13 || !strings.Contains(joined, "engine:allocation:strength") || !strings.Contains(joined, "+1.00") {
+		if len(lines) <= 13 || !strings.Contains(joined, "engine:level:strength") || !strings.Contains(joined, "+1.00") {
 			t.Fatal("source rows omitted", lang, joined)
 		}
 		want := "Weapon upgrade"

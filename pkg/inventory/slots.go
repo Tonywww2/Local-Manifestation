@@ -26,7 +26,7 @@ func StackLimit(d model.ItemDef) int {
 // CanStack compares every currently supported item component, except identity/count.
 func CanStack(a, b model.ItemInstance, resolve Resolve) bool {
 	d, ok := resolve(a.Definition)
-	return ok && StackLimit(d) > 1 && a.Definition == b.Definition && a.Affix == b.Affix && a.Upgrade == b.Upgrade && a.WeaponBonus == b.WeaponBonus
+	return ok && StackLimit(d) > 1 && a.Definition == b.Definition && a.Affix == b.Affix && a.Upgrade == b.Upgrade && a.WeaponBonus == b.WeaponBonus && a.SkillReady == b.SkillReady && a.Durability == b.Durability
 }
 
 // layout migrates legacy lists once, in their existing order. Explicit slots are
@@ -160,7 +160,7 @@ func placeBag(v *model.Inventory, id string, resolve Resolve) (string, error) {
 			return id, nil
 		}
 	}
-	return "", fmt.Errorf("backpack full")
+	return "", ErrFull
 }
 
 // Insert is the common all-or-nothing pickup, reward and trade receiving rule.
@@ -284,20 +284,12 @@ func Click(v model.Inventory, owner string, s Slot, right bool, resolve Resolve)
 	held, hasHeld := Find(n, n.Cursor)
 	it, occupied := Find(n, target)
 	if !hasHeld {
-		if !occupied {
+		// Empty-handed right clicks are inspection intents, never item movement.
+		if right || !occupied {
 			return n, nil
 		}
-		amount := Count(it)
-		if right {
-			amount = (amount + 1) / 2
-		}
-		if amount == Count(it) {
-			assign(&n, s, "")
-			n.Cursor = it.ID
-		} else {
-			setCount(&n, it.ID, Count(it)-amount)
-			n.Cursor = newSplit(&n, owner, it, amount).ID
-		}
+		assign(&n, s, "")
+		n.Cursor = it.ID
 	} else if !occupied || CanStack(held, it, resolve) {
 		d, _ := resolve(held.Definition)
 		amount := Count(held)

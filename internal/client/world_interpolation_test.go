@@ -3,6 +3,7 @@ package client
 import (
 	"math"
 	"testing"
+	"time"
 
 	"hsmultiplayer/internal/content"
 	"hsmultiplayer/pkg/model"
@@ -52,5 +53,25 @@ func TestProjectilePresentationContinuousFromBirth(t *testing.T) {
 	frames = append(frames, frame(1.2, 0, 0, b, false))
 	if len(interpolateWorld(frames, 1.1)[b.ID].Projectiles) != 0 {
 		t.Fatal("removed shot resurrected")
+	}
+}
+
+func TestWorldHistoryReleasesOldSnapshotsAndKeepsDelayBracket(t *testing.T) {
+	var h worldHistory
+	now := time.Now()
+	for i := 0; i <= 200; i++ {
+		h.Push(worldFrame{Seconds: float64(i) / 20, Scenes: map[string]protocol.Scene{"room": {ID: "room"}}}, 1, 30, now.Add(time.Duration(i)*50*time.Millisecond), 20)
+	}
+	if len(h.frames) < 42 || len(h.frames) > 45 || h.frames[0].Seconds > 7.9 || h.frames[1].Seconds < 7.9 {
+		t.Fatal("lost interpolation bracket or retained excessive history", len(h.frames), h.frames[0].Seconds)
+	}
+	for _, f := range h.frames[len(h.frames):cap(h.frames)] {
+		if f.Scenes != nil {
+			t.Fatal("discarded scene tree retained in backing array")
+		}
+	}
+	h.Push(worldFrame{Seconds: 10.05}, 2, 30, now.Add(201*50*time.Millisecond), 20)
+	if len(h.frames) != 1 {
+		t.Fatal("floor transition retained old history")
 	}
 }

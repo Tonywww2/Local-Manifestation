@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"hsmultiplayer/pkg/damage"
 	"hsmultiplayer/pkg/model"
+	"hsmultiplayer/pkg/perf"
 	"hsmultiplayer/pkg/stats"
 	"hsmultiplayer/pkg/status"
 	"strings"
@@ -13,16 +14,24 @@ import (
 func TestNestedSnapshotAndDamageCopies(t *testing.T) {
 	p := model.Player{StatContributions: []model.StatContribution{{StatModifier: model.StatModifier{Value: 2}}}}
 	r := damage.Result{Steps: []damage.Step{{Members: []model.Modifier{{Percent: .2}}, AttributeSteps: []stats.Step{{Contributions: p.StatContributions}}}}}
-	s := State{Players: []model.Player{p}, Nodes: []model.Node{{Edges: []string{"a"}}}, Scenes: []Scene{{Players: []model.Player{p}, LastDamage: &r}}, Vote: &Vote{Yes: []string{"p"}}}
+	s := State{Players: []model.Player{p}, Nodes: []model.Node{{Edges: []string{"a"}}}, Scenes: []Scene{{Hexes: []model.HexCell{{Q: 1}}, Players: []model.Player{p}, LastDamage: &r}}, Vote: &Vote{Yes: []string{"p"}}}
+	s.Performance = perf.Snapshot{Stages: []perf.Stage{{Name: "server"}}}
+	s.Scenes[0].Performance = perf.Snapshot{Stages: []perf.Stage{{Name: "scene"}}}
 	c := CloneState(s)
+	c.Performance.Stages[0].Name = "changed"
+	c.Scenes[0].Performance.Stages[0].Name = "changed"
 	c.Players[0].StatContributions[0].Value = 99
 	c.Nodes[0].Edges[0] = "changed"
 	c.Scenes[0].Players[0].StatContributions[0].Value = 99
+	c.Scenes[0].Hexes[0].Q = 99
 	c.Scenes[0].LastDamage.Steps[0].Members[0].Percent = 99
 	c.Scenes[0].LastDamage.Steps[0].AttributeSteps[0].Contributions[0].Value = 99
 	c.Vote.Yes[0] = "changed"
-	if p.StatContributions[0].Value != 2 || r.Steps[0].Members[0].Percent != .2 || s.Nodes[0].Edges[0] != "a" || s.Vote.Yes[0] != "p" {
+	if p.StatContributions[0].Value != 2 || r.Steps[0].Members[0].Percent != .2 || s.Nodes[0].Edges[0] != "a" || s.Vote.Yes[0] != "p" || s.Scenes[0].Hexes[0].Q != 1 {
 		t.Fatal("mutable snapshot escaped")
+	}
+	if s.Performance.Stages[0].Name != "server" || s.Scenes[0].Performance.Stages[0].Name != "scene" {
+		t.Fatal("diagnostics slices alias published snapshots")
 	}
 }
 

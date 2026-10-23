@@ -23,7 +23,7 @@ func (g *Game) sourceName(s model.SourceRef) string {
 	if v, ok := g.catalog.Item(s.Definition); ok {
 		name = g.contentName(v.ID, v.Name)
 	}
-	if v, ok := g.catalog.Skill(s.Definition); ok {
+	if v, ok := g.catalog.WeaponSkill(s.Definition); ok {
 		name = g.contentName(v.ID, v.Name)
 	}
 	name = g.localized("source.kind."+s.Kind, s.Kind) + ": " + name

@@ -15,20 +15,17 @@ func ValidatePlayerStats(c *Catalog, p model.Player, floor int) error {
 	if p.Energy < 0 || p.Energy > p.MaxEnergy || p.MaxEnergy != c.definitions.Resource.Maximum || p.EnergyRegen != c.definitions.Resource.Regeneration || math.IsNaN(p.Energy) || math.IsInf(p.Energy, 0) || p.ResourceTime != p.Statuses.Time {
 		return fmt.Errorf("invalid resource snapshot")
 	}
-	ch, _ := c.Chassis(p.Chassis)
-	if p.Skills != ch.Skills {
-		return fmt.Errorf("invalid skill loadout")
-	}
-	for _, time := range p.SkillReady {
-		if time < 0 || time > p.Statuses.Time+86400000*60 {
-			return fmt.Errorf("invalid cooldown")
-		}
-	}
 	if err := ValidatePlayerStatuses(c, p); err != nil {
 		return err
 	}
 	if err := inventory.Validate(p.Inventory, c.Item); err != nil {
 		return err
+	}
+	for _, it := range p.Inventory.Items {
+		d, _ := c.Item(it.Definition)
+		if it.SkillReady < 0 || it.SkillReady > p.Statuses.Time+86400000*60 || it.SkillReady != 0 && c.weapons[d.Weapon].Skill == "" {
+			return fmt.Errorf("invalid weapon skill cooldown")
+		}
 	}
 	seenLoot := map[string]bool{}
 	for _, it := range p.Inventory.Items {
@@ -38,23 +35,11 @@ func ValidatePlayerStats(c *Catalog, p model.Player, floor int) error {
 		return fmt.Errorf("loot budget")
 	}
 	for _, drop := range p.Loot {
-		d, ok := c.Item(drop.Item.Definition)
-		if inventory.Count(drop.Item) < 1 || inventory.Count(drop.Item) > inventory.StackLimit(d) {
-			return fmt.Errorf("invalid loot stack")
-		}
-		if !ok || seenLoot[drop.Item.ID] || drop.Item.ID == "" || !drop.Position.Finite() || drop.Node == "" || drop.Item.Upgrade < 0 || drop.Item.Upgrade > 100000 || math.IsNaN(drop.Item.WeaponBonus) || math.IsInf(drop.Item.WeaponBonus, 0) || drop.Item.WeaponBonus < 0 || drop.Item.WeaponBonus > 1e9 {
+		if seenLoot[drop.Item.ID] {
 			return fmt.Errorf("invalid loot")
 		}
-		if drop.Item.Affix != "" {
-			found := false
-			for _, id := range d.Affixes {
-				if id == drop.Item.Affix {
-					found = true
-				}
-			}
-			if !found {
-				return fmt.Errorf("invalid loot affix")
-			}
+		if err := ValidateLoot(c, drop, p.Statuses.Time); err != nil {
+			return err
 		}
 		seenLoot[drop.Item.ID] = true
 	}
@@ -83,7 +68,11 @@ func ValidatePlayerStats(c *Catalog, p model.Player, floor int) error {
 		expected[m.ID] = m
 	}
 	seen := map[string]bool{}
-	allocated := 0.0
+	expectedGrowth := map[string]model.StatContribution{}
+	for _, contribution := range LevelContributions(p, chassis) {
+		expectedGrowth[contribution.ID] = contribution
+	}
+	growthSeen := map[string]bool{}
 	for _, s := range p.StatContributions {
 		if s.Source.Actor != p.ID || s.Source.Kind != "equipment" && s.Source.Instance != "" {
 			return fmt.Errorf("invalid contribution owner")
@@ -118,11 +107,11 @@ func ValidatePlayerStats(c *Catalog, p model.Player, floor int) error {
 			seen[s.ID] = true
 		case "growth":
 			switch s.Source.Definition {
-			case "engine:level":
-				if _, ok := p.Attributes.Value(s.Stat); !ok || s.ID != "engine:allocation:"+s.Stat || s.Operation != "add" || s.Group != "" || s.Value < 0 || s.Value != math.Trunc(s.Value) {
-					return fmt.Errorf("invalid allocation contribution")
+			case "engine:level", "engine:chassis_growth":
+				if expected, ok := expectedGrowth[s.ID]; !ok || expected != s || growthSeen[s.ID] {
+					return fmt.Errorf("invalid level growth contribution")
 				}
-				allocated += s.Value
+				growthSeen[s.ID] = true
 			case "engine:floor_join":
 				if s.ID != "engine:floor_join" || s.Stat != "max_hp" || s.Operation != "add" || s.Group != "" || s.Value < 0 || s.Value > float64(floor-1)*10 || s.Value/10 != math.Trunc(s.Value/10) {
 					return fmt.Errorf("invalid floor join contribution")
@@ -140,8 +129,8 @@ func ValidatePlayerStats(c *Catalog, p model.Player, floor int) error {
 			chassisSeen++
 		}
 	}
-	if chassisSeen != len(expected) || p.Points < 0 || allocated+float64(p.Points) > float64(p.Level-1) {
-		return fmt.Errorf("missing source or invalid allocation budget")
+	if chassisSeen != len(expected) || len(growthSeen) != len(expectedGrowth) {
+		return fmt.Errorf("missing stat growth source")
 	}
 	derived, err := RefreshPlayer(p)
 	if err != nil {

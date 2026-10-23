@@ -1,11 +1,13 @@
 package session
 
 import (
+	"hsmultiplayer/pkg/perf"
 	"hsmultiplayer/pkg/status"
 	"hsmultiplayer/pkg/timing"
 )
 
 func (t *team) advanceAdventure() {
+	defer t.performance.Since("server.logic.statuses", perf.Start())
 	if t.floor == 0 || t.phase == "lobby" || t.phase == "won" || t.phase == "lost" {
 		return
 	}

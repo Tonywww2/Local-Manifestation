@@ -162,12 +162,15 @@ func PreMultiplierBasis(q damage.Request) (model.DamageBasis, error) {
 	}
 	return basis, nil
 }
+
+// EvaluatePreview includes unconditional weapon-hit effects and appended damage,
+// but has no target defenses or target-specific conditional bonuses.
 func EvaluatePreview(q damage.Request) (damage.Result, error) {
 	q, err := PrepareHit(q, model.Enemy{MaxHP: 1}, true)
 	if err != nil {
 		return damage.Result{}, err
 	}
-	return damage.Evaluate(q)
+	return damage.EvaluateOutgoing(q)
 }
 
 func (c *Catalog) validateCombat(effects []model.CombatEffect, statusOwner bool) error {

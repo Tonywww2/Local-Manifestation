@@ -3,17 +3,20 @@ package client
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"hsmultiplayer/internal/client/ui"
-	"hsmultiplayer/internal/content"
-	"hsmultiplayer/pkg/geometry"
 	"hsmultiplayer/pkg/model"
+	"hsmultiplayer/pkg/perf"
 	"hsmultiplayer/pkg/protocol"
 	"math"
+	"slices"
 )
 
 type roomSurface struct {
 	Image         *ebiten.Image
 	Camera        Camera
 	Width, Height float64
+	Hexes         []model.HexCell
+	Room, Art     string
+	Obstacles     []model.Obstacle
 }
 
 func inFirstRing(a, b model.Node) bool {
@@ -38,33 +41,23 @@ func (g *Game) currentNode() model.Node {
 }
 
 func (g *Game) worldCamera() Camera {
-	a := geometry.NewArena(content.DefaultSpaceWidth, content.DefaultSpaceHeight)
-	// Keep the previous viewing scale: larger rooms extend beyond the viewport.
-	c := FitArenaCameraIn(800, 500, g.oblique, ui.Rect{X: 24, Y: 24, W: float64(g.width - 48), H: float64(g.height - 48)})
+	c := g.worldBaseCamera()
+	c.Angle = g.cameraAngle()
+	c.Scale *= g.cameraZoom("world")
 	c.Origin = model.Vec{}
 	if p := g.self(); p != nil {
-		n := g.currentNode()
-		w, h := g.catalog.SpaceSize(n)
-		if s := g.currentScene(); s != nil {
-			w, h = s.Width, s.Height
-		}
-		room := geometry.NewArena(w, h)
 		position := p.Position
 		if g.prediction.Valid && g.prediction.Node == p.Node && g.prediction.Epoch == p.PositionEpoch {
 			position = g.prediction.Position
 		}
-		world := room.WorldPoint(n, position, a.Radius)
-		c.Origin = model.Vec{X: float64(g.width) / 2, Y: float64(g.height) / 2}.Sub(c.Project(world))
+		c.Origin = model.Vec{X: float64(g.width) / 2, Y: float64(g.height) / 2}.Sub(c.Project(position))
 	}
 	return c
 }
-func (g *Game) roomCamera(n model.Node, s protocol.Scene, world Camera) Camera {
-	a := geometry.NewArena(s.Width, s.Height)
-	factor := geometry.NewArena(content.DefaultSpaceWidth, content.DefaultSpaceHeight).Radius / a.Radius
-	origin := geometry.AxialPoint(n.Q, n.R).Scale(a.Radius * factor).Sub(a.Center.Scale(factor))
-	return Camera{Origin: world.Project(origin), Scale: world.Scale * factor, Oblique: world.Oblique}
-}
 
+func (g *Game) worldBaseCamera() Camera {
+	return FitArenaCameraIn(800, 500, defaultCameraAngle, ui.Rect{X: 24, Y: 24, W: float64(g.width - 48), H: float64(g.height - 48)})
+}
 func (g *Game) sceneForNode(n model.Node) protocol.Scene {
 	for _, s := range g.state.Scenes {
 		if s.ID == n.ID {
@@ -72,10 +65,12 @@ func (g *Game) sceneForNode(n model.Node) protocol.Scene {
 		}
 	}
 	w, h := g.catalog.SpaceSize(n)
-	s := protocol.Scene{ID: "space:" + n.ID, State: "idle", Room: n.Room, Width: w, Height: h, Tick: g.state.ServerTick, TickRate: g.state.TickRate}
+	s := protocol.Scene{ID: "space:" + n.ID, State: "idle", Room: n.Room, Width: w, Height: h, Hexes: g.catalog.SpaceHexes(n), Tick: g.state.ServerTick, TickRate: g.state.TickRate}
 	for _, view := range g.state.Scenes {
 		if view.ID == s.ID {
 			s.Projectiles = view.Projectiles
+			s.Actions = view.Actions
+			s.EnemyActions = view.EnemyActions
 			break
 		}
 	}
@@ -90,34 +85,37 @@ func (g *Game) sceneForNode(n model.Node) protocol.Scene {
 	return s
 }
 
-func buildRoomSurface(s protocol.Scene, c Camera, texture *ebiten.Image) roomSurface {
+func buildRoomSurface(s protocol.Scene, c Camera, texture, obstacle *ebiten.Image) roomSurface {
 	// Cache room-local pixels, not a full-screen image whose origin changes with
 	// the camera. Movement needs only a translated DrawImage.
-	local := Camera{Scale: c.Scale, Oblique: c.Oblique}
+	local := Camera{Scale: c.Scale, Angle: c.Angle}
 	minX, minY, maxX, maxY := math.Inf(1), math.Inf(1), math.Inf(-1), math.Inf(-1)
-	for _, p := range geometry.NewArena(s.Width, s.Height).Vertices() {
-		v := local.Project(p)
-		minX = min(minX, v.X)
-		maxX = max(maxX, v.X)
-		minY = min(minY, v.Y)
-		maxY = max(maxY, v.Y)
+	a := compileSceneArena(s)
+	for _, edge := range a.Boundary() {
+		for _, p := range []model.Vec{edge.A, edge.B} {
+			v := local.Project(p)
+			minX = min(minX, v.X)
+			maxX = max(maxX, v.X)
+			minY = min(minY, v.Y)
+			maxY = max(maxY, v.Y)
+		}
 	}
 	local.Origin = model.Vec{X: 43 - minX, Y: 43 - minY}
 	image := ebiten.NewImage(int(math.Ceil(maxX-minX))+86, int(math.Ceil(maxY-minY))+86)
-	drawing := buildArenaDrawing(s.Width, s.Height, local)
+	drawing := buildRoomDrawing(a, s.Width, s.Height, local)
 	if texture != nil {
 		image.DrawTriangles32(drawing.Floor.Vertices, drawing.Floor.Indices, whiteImage, nil)
-		points := geometry.NewArena(s.Width, s.Height).Vertices()
 		mesh := drawing.Floor
-		for i, p := range points {
+		for i, vertex := range mesh.Vertices {
+			p := local.Unproject(model.Vec{X: float64(vertex.DstX), Y: float64(vertex.DstY)})
 			mesh.Vertices[i].SrcX = float32(p.X / s.Width * float64(texture.Bounds().Dx()))
 			mesh.Vertices[i].SrcY = float32(p.Y / s.Height * float64(texture.Bounds().Dy()))
-			mesh.Vertices[i].ColorR = .82
-			mesh.Vertices[i].ColorG = .84
-			mesh.Vertices[i].ColorB = .82
-			mesh.Vertices[i].ColorA = .22
+			mesh.Vertices[i].ColorR = 1
+			mesh.Vertices[i].ColorG = 1
+			mesh.Vertices[i].ColorB = 1
+			mesh.Vertices[i].ColorA = .7
 		}
-		image.DrawTriangles32(mesh.Vertices, mesh.Indices, texture, &ebiten.DrawTrianglesOptions{Filter: ebiten.FilterLinear})
+		image.DrawTriangles32(mesh.Vertices, mesh.Indices, texture, &ebiten.DrawTrianglesOptions{Filter: ebiten.FilterLinear, Address: ebiten.AddressRepeat})
 	} else {
 		image.DrawTriangles32(drawing.Floor.Vertices, drawing.Floor.Indices, whiteImage, nil)
 	}
@@ -125,25 +123,49 @@ func buildRoomSurface(s protocol.Scene, c Camera, texture *ebiten.Image) roomSur
 		image.DrawTriangles32(m.Vertices, m.Indices, whiteImage, nil)
 	}
 	for _, o := range s.Obstacles {
-		worldBox(image, local, o.Position, o.Radius*1.6, o.Radius*1.6, 24, workshopMetal)
+		if !drawWorldArt(image, obstacle, local, o.Position, o.Radius*1.6, o.Radius*1.6) {
+			worldBox(image, local, o.Position, o.Radius*1.6, o.Radius*1.6, 24, workshopMetal)
+		}
 	}
-	return roomSurface{Image: image, Camera: local, Width: s.Width, Height: s.Height}
+	return roomSurface{Image: image, Camera: local, Width: s.Width, Height: s.Height, Hexes: slices.Clone(s.Hexes), Room: s.Room, Obstacles: slices.Clone(s.Obstacles)}
 }
 func matchingSurface(surface roomSurface, s protocol.Scene, c Camera) bool {
-	return surface.Image != nil && surface.Width == s.Width && surface.Height == s.Height && surface.Camera.Scale == c.Scale && surface.Camera.Oblique == c.Oblique
+	return surface.Image != nil && surface.Width == s.Width && surface.Height == s.Height && surface.Room == s.Room && slices.Equal(surface.Hexes, s.Hexes) && slices.Equal(surface.Obstacles, s.Obstacles) && surface.Camera.Scale == c.Scale && surface.Camera.Angle == c.Angle
 }
 
+func (g *Game) roomFloorArt(n model.Node, s protocol.Scene) string {
+	for _, key := range [...]string{"floor:" + n.Definition, "floor:" + s.Room, "floor:" + n.Kind, "floor:default"} {
+		if g.resources.images[key] != nil {
+			return key
+		}
+	}
+	return ""
+}
+
+// Rotation/zoom transform cached pixels on the GPU. They never regenerate the
+// hex grid or allocate a new room texture on every mouse/key sample.
+func drawRoomSurface(dst *ebiten.Image, surface roomSurface, c Camera) {
+	op := &ebiten.DrawImageOptions{Filter: ebiten.FilterLinear}
+	op.GeoM.Translate(-surface.Camera.Origin.X, -surface.Camera.Origin.Y)
+	ratio := c.Scale / surface.Camera.Scale
+	op.GeoM.Scale(ratio, ratio)
+	op.GeoM.Rotate(c.Angle - surface.Camera.Angle)
+	op.GeoM.Translate(c.Origin.X, c.Origin.Y)
+	dst.DrawImage(surface.Image, op)
+}
+
+// Room surfaces may be prepared ahead of entry, but each room is an isolated scene.
 func (g *Game) drawNeighborhood(dst *ebiten.Image, current protocol.Scene) {
+	defer g.diagnostics.Since("client.render.rooms", perf.Start())
 	from := g.currentNode()
-	world := g.worldCamera()
 	if g.roomSurfaces == nil {
 		g.roomSurfaces = map[string]roomSurface{}
 	}
-	visible := []model.Node{from}
+	nodes := []model.Node{from}
 	keep := map[string]bool{from.ID: true}
 	for _, n := range g.state.Nodes {
 		if n.ID != from.ID && inFirstRing(from, n) {
-			visible = append(visible, n)
+			nodes = append(nodes, n)
 			keep[n.ID] = true
 		}
 	}
@@ -153,53 +175,37 @@ func (g *Game) drawNeighborhood(dst *ebiten.Image, current protocol.Scene) {
 			delete(g.roomSurfaces, id)
 		}
 	}
-	loadedNeighbor := false
-	for _, n := range visible {
+	preparedNeighbor := false
+	cacheCamera := Camera{Scale: g.worldBaseCamera().Scale}
+	for _, n := range nodes {
 		s := current
 		if n.ID != from.ID {
 			s = g.sceneForNode(n)
-			if view, ok := g.renderRooms[n.ID]; ok {
-				s = view
-			}
 		}
-		c := g.roomCamera(n, s, world)
 		surface := g.roomSurfaces[n.ID]
-		if !matchingSurface(surface, s, c) {
-			// Prioritize the current room and prepare one neighbor per frame. Rooms
-			// are loaded before walking reaches them; no enemy actors start early.
-			if n.ID != from.ID && loadedNeighbor {
+		art := g.roomFloorArt(n, s)
+		if !matchingSurface(surface, s, cacheCamera) || surface.Art != art {
+			if n.ID != from.ID && preparedNeighbor {
 				continue
 			}
 			if surface.Image != nil {
 				surface.Image.Dispose()
 			}
-			texture := g.resources.images["floor:"+n.Definition]
-			if texture == nil {
-				texture = g.resources.images["floor:"+s.Room]
-			}
-			if texture == nil {
-				texture = g.resources.images["floor:default"]
-			}
-			surface = buildRoomSurface(s, c, texture)
+			texture := g.resources.images[art]
+			loadStart := perf.Start()
+			surface = buildRoomSurface(s, cacheCamera, texture, g.resources.sprites["prop:obstacle"])
+			surface.Art = art
+			g.diagnostics.Since("client.load.room_surface", loadStart)
 			g.roomSurfaces[n.ID] = surface
-			if n.ID != from.ID {
-				loadedNeighbor = true
-			}
+			preparedNeighbor = preparedNeighbor || n.ID != from.ID
 		}
-		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Translate(c.Origin.X-surface.Camera.Origin.X, c.Origin.Y-surface.Camera.Origin.Y)
-		dst.DrawImage(surface.Image, op)
-		g.drawDoorsForNode(dst, n, s, c)
-		g.drawRoomEntities(dst, s, c)
-		g.drawDevices(dst, n, s, c)
-	}
-	// Terrain is a visible cell, never a preloaded room or movement destination.
-	for _, t := range g.state.Terrain {
-		n := model.Node{Q: t.Q, R: t.R}
-		if !inFirstRing(from, n) {
-			continue
+		if n.ID == from.ID {
+			c := g.camera(s)
+			floorStart := perf.Start()
+			drawRoomSurface(dst, surface, c)
+			g.diagnostics.Since("client.render.terrain", floorStart)
+			g.drawRoomEntities(dst, s, c)
+			g.drawDevices(dst, n, s, c)
 		}
-		center := world.Project(geometry.AxialPoint(t.Q, t.R).Scale(geometry.NewArena(content.DefaultSpaceWidth, content.DefaultSpaceHeight).Radius))
-		fitText(dst, g.localized(t.NameKey, t.Name), center.X-80, center.Y-10, 160, 16, true)
 	}
 }

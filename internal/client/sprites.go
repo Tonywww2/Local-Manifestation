@@ -26,17 +26,3 @@ func (g *Game) drawSelfMarker(dst *ebiten.Image, position model.Vec, bodyRadius 
 	op.GeoM.Translate(position.X-size/2, position.Y-size/2)
 	dst.DrawImage(g.selfMarker, op)
 }
-
-// Sprites stand above the ground point in both camera projections. Their visual
-// size is independent of the server's collision disk; a portrait has no physics.
-func (g *Game) drawPlayerBody(dst *ebiten.Image, chassis, life string, v model.Vec, radius float64, fallback color.RGBA) float64 {
-	height := radius * 4
-	if life == "alive" {
-		center := model.Vec{X: v.X, Y: v.Y + radius*.6 - height/2}
-		if g.drawSprite(dst, "player:"+chassis, center, radius*3.4, height) {
-			return height - radius*.6
-		}
-	}
-	vector.DrawFilledCircle(dst, float32(v.X), float32(v.Y), float32(radius), fallback, true)
-	return radius
-}

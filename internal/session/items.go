@@ -14,13 +14,13 @@ import (
 
 func (t *team) inventoryRequest(m *member, r protocol.Request) (bool, error) {
 	switch r.Kind {
-	case "inventory_click", "inventory_return":
+	case "inventory_click", "inventory_quick", "inventory_return":
 		var n model.Player
 		var err error
 		if a := t.actors[m.player.Scene]; a != nil {
 			n, err = a.InventoryMouse(m.player.ID, r)
 		} else {
-			if r.Kind != "inventory_return" && r.Area != "bag" && m.actions.EquipmentLocked(t.catalog.Weapon(m.player.Weapon).RestrictSwap) {
+			if r.Kind != "inventory_return" && (r.Area != "bag" || r.Kind == "inventory_quick") && m.actions.EquipmentLocked(t.catalog.Weapon(m.player.Weapon).RestrictSwap) {
 				return true, protocol.Reject("error.equipment_cooldown")
 			}
 			n, err = t.catalog.InventoryMouse(m.player, r)
@@ -32,14 +32,9 @@ func (t *team) inventoryRequest(m *member, r protocol.Request) (bool, error) {
 	case "revive":
 		return true, t.revive(m, r.Peer)
 	case "pickup":
-		if a := t.actors[m.player.Scene]; a != nil {
-			return true, a.Pickup(m.player.ID, r.Item)
-		}
-		n, err := t.catalog.Pickup(m.player, r.Item)
-		if err == nil {
-			m.player = n
-		}
-		return true, err
+		return true, t.pickup(m, r.Item)
+	case "drop_item":
+		return true, t.dropItem(m, r)
 	case "buy":
 		if !t.atShop(m) {
 			return true, protocol.Reject("error.shop_required")
@@ -60,7 +55,7 @@ func (t *team) inventoryRequest(m *member, r protocol.Request) (bool, error) {
 			}
 		}
 		return true, fmt.Errorf("shop offer unavailable")
-	case "skill", "use_item":
+	case "weapon_skill", "use_item":
 		if a := t.actors[m.player.Scene]; a != nil {
 			if r.Kind == "use_item" && r.Slot >= 0 && r.Slot < 4 {
 				item, ok := inventory.Find(m.player.Inventory, m.player.Inventory.Equipment[5+r.Slot])
@@ -91,8 +86,8 @@ func (t *team) inventoryRequest(m *member, r protocol.Request) (bool, error) {
 		}
 		var plan content.ActionPlan
 		var err error
-		if r.Kind == "skill" {
-			plan, err = t.catalog.UseSkill(m.player, r.Slot)
+		if r.Kind == "weapon_skill" {
+			plan, err = t.catalog.UseWeaponSkill(m.player)
 		} else {
 			plan, err = t.catalog.UseItem(m.player, r.Slot)
 		}
@@ -102,12 +97,12 @@ func (t *team) inventoryRequest(m *member, r protocol.Request) (bool, error) {
 		if plan.Support && plan.Projectile != nil {
 			return true, fmt.Errorf("support and projectile effects require separate actions")
 		}
-		if plan.Projectile != nil {
+		if plan.Projectile != nil || plan.ClearProjectiles != nil {
 			space, err := t.freeSpace(m.player.Node)
 			if err != nil {
 				return true, err
 			}
-			if err := space.Launch(m.player, r.Input.Aim, *plan.Projectile); err != nil {
+			if err := space.ApplyAction(m.player, r.Input.Aim, plan); err != nil {
 				return true, err
 			}
 		}
@@ -128,6 +123,9 @@ func (t *team) inventoryRequest(m *member, r protocol.Request) (bool, error) {
 			m.actions = scene.PlayerActions{}
 		}
 		m.player = plan.Player
+		if r.Kind == "weapon_skill" {
+			m.actions.PlaySkill(m.player, r.Input.Aim, plan.ClearProjectiles != nil)
+		}
 		if plan.ClearCurse {
 			t.cursed = false
 		}

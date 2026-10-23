@@ -19,7 +19,6 @@ func TestGrowthDamageSnapshotAndHealthRatio(t *testing.T) {
 		t.Fatal(err)
 	}
 	p.HP = p.MaxHP / 2
-	p.Points = 1
 	before := model.ClonePlayer(p)
 	q, err := content.Attack(c, p)
 	if err != nil {
@@ -29,8 +28,8 @@ func TestGrowthDamageSnapshotAndHealthRatio(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	next, err := content.Invest(p, "strength")
-	if err != nil || next.Points != 0 || next.Attributes.Strength != (p.BaseStats.Attributes.Strength+1)*1.2 || !reflect.DeepEqual(before, p) {
+	next, err := c.GrantExperience(p, 20)
+	if err != nil || next.Level != 2 || next.Attributes.Strength != (p.BaseStats.Attributes.Strength+1)*1.2 || !reflect.DeepEqual(before, p) {
 		t.Fatal(next, err)
 	}
 	after, _ := damage.Evaluate(q)
@@ -46,8 +45,8 @@ func TestGrowthDamageSnapshotAndHealthRatio(t *testing.T) {
 			t.Fatal("missing attribute sources")
 		}
 	}
-	if bad, err := content.Invest(p, "unknown"); err == nil || bad.ID != "" || !reflect.DeepEqual(before, p) {
-		t.Fatal("failed allocation committed")
+	if bad, err := c.GrantExperience(p, -1); err == nil || bad.ID != "" || !reflect.DeepEqual(before, p) {
+		t.Fatal("failed experience grant committed")
 	}
 	next.StatContributions[0].Value = 99
 	if p.StatContributions[0].Value != .2 {

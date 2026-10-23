@@ -1,4 +1,11 @@
 # Assemble Windows programs, SDK sources and docs without personal data.
+[CmdletBinding()]
+param(
+    [ValidatePattern('^(dev|[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?)$')]
+    [string]$Version = 'dev',
+    [string]$OutputDirectory = 'bin'
+)
+
 $ErrorActionPreference = 'Stop'
 $taskRoot = Split-Path -Parent $PSScriptRoot
 $env:GOMODCACHE = Join-Path $taskRoot '.cache/modules'
@@ -9,6 +16,8 @@ $env:CGO_ENABLED = '0'
 Push-Location $taskRoot
 $taskStage = $null
 try {
+    $taskOutput = [IO.Path]::GetFullPath((Join-Path $taskRoot $OutputDirectory))
+    New-Item -ItemType Directory -Force -Path $taskOutput | Out-Null
     $taskStage = Join-Path $taskRoot ('.cache/package-' + [guid]::NewGuid().ToString('N'))
     New-Item -ItemType Directory -Path $taskStage | Out-Null
     foreach ($taskBinary in @('client.exe','server.exe','modtool.exe')) {
@@ -16,7 +25,15 @@ try {
     }
     Copy-Item -LiteralPath (Join-Path $taskRoot 'README.md') -Destination (Join-Path $taskStage 'README.md')
     Copy-Item -LiteralPath (Join-Path $taskRoot 'AGENTS.md') -Destination $taskStage
-    Copy-Item -LiteralPath (Join-Path $taskRoot 'docs') -Destination $taskStage -Recurse
+    $taskDocsRoot = Join-Path $taskRoot 'docs'
+    foreach ($taskDoc in (Get-ChildItem -LiteralPath $taskDocsRoot -Recurse -File)) {
+        $taskDocRelative = $taskDoc.FullName.Substring($taskDocsRoot.Length).TrimStart('\','/').Replace('\','/')
+        # Generated source artwork remains in Git, not in the playable download.
+        if ($taskDocRelative.StartsWith('art-v1/sources/')) { continue }
+        $taskDocDestination = Join-Path $taskStage ('docs/' + $taskDocRelative)
+        New-Item -ItemType Directory -Force -Path (Split-Path -Parent $taskDocDestination) | Out-Null
+        Copy-Item -LiteralPath $taskDoc.FullName -Destination $taskDocDestination
+    }
     Copy-Item -LiteralPath (Join-Path $taskRoot 'docs/player-guide.md') -Destination (Join-Path $taskStage 'PLAY.txt')
     Copy-Item -LiteralPath (Join-Path $taskRoot 'docs/art-assets.json') -Destination (Join-Path $taskStage 'art-assets.json')
     New-Item -ItemType Directory -Force -Path (Join-Path $taskStage 'locales'),(Join-Path $taskStage 'third-party/noto-cjk') | Out-Null
@@ -55,10 +72,14 @@ try {
     $taskGoRoot = (& go env GOROOT).Trim()
     New-Item -ItemType Directory -Force -Path (Join-Path $taskStage 'third-party/go') | Out-Null
     Copy-Item -LiteralPath (Join-Path $taskGoRoot 'LICENSE') -Destination (Join-Path $taskStage 'third-party/go/LICENSE')
-    $taskArchive = Join-Path $taskRoot 'bin/LocalManifestation-dev-windows-amd64.zip'
+    $taskRevision = (& git rev-parse HEAD).Trim()
+    if ($LASTEXITCODE -ne 0) { throw 'Cannot identify source commit' }
+    @{ product = 'Local Manifestation'; version = $Version; commit = $taskRevision; platform = 'windows-amd64'; go = (& go env GOVERSION).Trim() } |
+        ConvertTo-Json | Set-Content -LiteralPath (Join-Path $taskStage 'BUILDINFO.json') -Encoding utf8
+    $taskArchive = Join-Path $taskOutput "LocalManifestation-$Version-windows-amd64.zip"
     Compress-Archive -Path (Join-Path $taskStage '*') -DestinationPath $taskArchive -Force
     $taskHash = (Get-FileHash -LiteralPath $taskArchive -Algorithm SHA256).Hash.ToLowerInvariant()
-    Set-Content -LiteralPath ($taskArchive + '.sha256') -Value $taskHash -Encoding ascii
+    Set-Content -LiteralPath ($taskArchive + '.sha256') -Value ($taskHash + '  ' + [IO.Path]::GetFileName($taskArchive)) -Encoding ascii
     Get-Item -LiteralPath $taskArchive | Select-Object FullName,Length
     $taskHash
 } finally {

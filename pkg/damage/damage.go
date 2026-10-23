@@ -69,8 +69,20 @@ type Result struct {
 
 func Round(n float64) float64 { return math.Round(n*100) / 100 }
 func Evaluate(q Request) (Result, error) {
+	return evaluate(q, true)
+}
+
+// EvaluateOutgoing shares the attack calculation with Evaluate, but stops before
+// target armor, resistance, reductions, the minimum damage floor and immunity.
+// Each damage segment is still rounded independently, with its sources intact.
+func EvaluateOutgoing(q Request) (Result, error) {
+	q.Defense, q.TypedDefense = Defense{}, nil
+	return evaluate(q, false)
+}
+
+func evaluate(q Request, defended bool) (Result, error) {
 	if len(q.Weapon.AdditionalDamage) > 0 {
-		return evaluateParts(q)
+		return evaluateParts(q, defended)
 	}
 	q.Defense.IgnoreArmor = q.Defense.IgnoreArmor || q.Weapon.Type == "magic" || q.Weapon.Type == "electromagnetic"
 	if d, ok := q.TypedDefense[q.Weapon.Type]; ok {
@@ -188,22 +200,24 @@ func Evaluate(q Request) (Result, error) {
 	apply("multiply", "final damage", q.FinalMultiplier)
 	r.Steps[len(r.Steps)-1].Origin = q.FinalSource
 	offense := r.Raw
-	if !q.Defense.IgnoreArmor {
-		apply("subtract", "armor", q.Defense.Armor)
-	}
-	if q.Defense.Resistance < 0 || q.Defense.Resistance > 1 {
-		return r, fmt.Errorf("resistance outside [0,1]")
-	}
-	apply("multiply", "resistance", 1-q.Defense.Resistance)
-	for i, v := range q.Defense.Reductions {
-		if v < 0 || v > 1 {
-			return r, fmt.Errorf("reduction outside [0,1]")
+	if defended {
+		if !q.Defense.IgnoreArmor {
+			apply("subtract", "armor", q.Defense.Armor)
 		}
-		apply("multiply", fmt.Sprintf("reduction %d", i+1), 1-v)
-	}
-	apply("minimum", "minimum damage", 1)
-	if q.Defense.Immune {
-		apply("override", "immunity", 0)
+		if q.Defense.Resistance < 0 || q.Defense.Resistance > 1 {
+			return r, fmt.Errorf("resistance outside [0,1]")
+		}
+		apply("multiply", "resistance", 1-q.Defense.Resistance)
+		for i, v := range q.Defense.Reductions {
+			if v < 0 || v > 1 {
+				return r, fmt.Errorf("reduction outside [0,1]")
+			}
+			apply("multiply", fmt.Sprintf("reduction %d", i+1), 1-v)
+		}
+		apply("minimum", "minimum damage", 1)
+		if q.Defense.Immune {
+			apply("override", "immunity", 0)
+		}
 	}
 	if math.IsNaN(r.Raw) || math.IsInf(r.Raw, 0) || math.Abs(r.Raw) > 1e100 {
 		return Result{}, fmt.Errorf("damage overflow")

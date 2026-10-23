@@ -2,7 +2,7 @@ package scene
 
 import (
 	"hsmultiplayer/internal/content"
-	"hsmultiplayer/pkg/geometry"
+	"hsmultiplayer/pkg/animation"
 	"hsmultiplayer/pkg/model"
 	"hsmultiplayer/pkg/status"
 	"math"
@@ -10,8 +10,10 @@ import (
 
 // Both battle actors and coordinator-owned spaces use the same fixed-step actions.
 func (w *world) stepPlayer(p *fighter, dt float64, open []int) error {
+	p.syncVisualLife()
 	if p.player.Life != "alive" {
 		p.attack, p.dodgeTime, p.invulnerable = nil, 0, 0
+		p.visual = animation.Cancel(p.visual)
 		return nil
 	}
 	p.cooldown = math.Max(0, p.cooldown-dt)
@@ -48,6 +50,7 @@ func (w *world) stepPlayer(p *fighter, dt float64, open []int) error {
 		if move.Length() == 0 {
 			p.dodgeDir = p.input.Aim.Sub(p.player.Position).Unit()
 		}
+		p.visual.Dodge = model.ActionAnimation{Sequence: p.visual.Dodge.Sequence + 1, Direction: p.dodgeDir, Duration: p.dodgeTime}
 		p.input.Dodge = false
 	}
 	if p.dodgeTime > 0 {
@@ -57,12 +60,17 @@ func (w *world) stepPlayer(p *fighter, dt float64, open []int) error {
 	if status.Controlled(p.player.Statuses, "root") || status.Controlled(p.player.Statuses, "stun") {
 		move = model.Vec{}
 	}
+	before := p.player.Position
 	candidate := w.clamp(p.player.Position.Add(move.Scale(p.player.Speed*dt)), 12)
 	if len(open) > 0 {
-		candidate = geometry.NewArena(w.room.Width, w.room.Height).ClampWalk(p.player.Position.Add(move.Scale(p.player.Speed*dt)), 12, open, p.player.Speed*dt*move.Length())
+		candidate = w.arenaGeometry().ClampWalk(p.player.Position.Add(move.Scale(p.player.Speed*dt)), 12, open, p.player.Speed*dt*move.Length())
 	}
-	if w.clearObstacles(p.player.Position, candidate, 12) && (p.dodgeTime > 0 || w.canMove(p.player.Position, candidate)) {
+	if w.clearMove(p.player.Position, candidate, 12) && (p.dodgeTime > 0 || w.canMove(p.player.Position, candidate)) {
 		p.player.Position = candidate
+	}
+	p.visual.Move = model.Vec{}
+	if dt > 0 {
+		p.visual.Move = p.player.Position.Sub(before).Scale(1 / dt)
 	}
 	// Exact multiples of a fixed step can leave a tiny positive float remainder.
 	if p.input.Attack && !status.Controlled(p.player.Statuses, "stun") && p.player.Weapon != "" && p.cooldown <= 1e-9 && p.attack == nil {
@@ -71,5 +79,11 @@ func (w *world) stepPlayer(p *fighter, dt float64, open []int) error {
 		}
 	}
 	w.releaseAttack(p, dt)
+	p.visual = animation.Advance(p.visual, dt)
+	aim := model.Vec{}
+	if p.input.Aim != (model.Vec{}) && p.input.Aim.Finite() {
+		aim = p.input.Aim.Sub(p.player.Position)
+	}
+	p.visual.Facing = animation.PlayerFacing(p.visual, p.visual.Move, aim, p.input.Attack && p.player.Weapon != "" && !status.Controlled(p.player.Statuses, "stun"))
 	return nil
 }

@@ -1,0 +1,1364 @@
+{
+  "DecodedBytes": 148344832,
+  "Assets": [
+    {
+      "ID": "animation:rigs",
+      "File": "content/base/assets/art-v1/animation/rigs.json",
+      "SHA256": "6f53567b7aade127acabbb5a196ca6937156879e566e6e28b3a11bbc481f26ba",
+      "Width": 0,
+      "Height": 0,
+      "Bytes": 8516,
+      "Transparent": false
+    },
+    {
+      "ID": "art:layout",
+      "File": "content/base/assets/art-v1/art-layout.json",
+      "SHA256": "b86c53556009a729af10f02162b9a23ef9a44d23986bda44f91b985f852d6621",
+      "Width": 0,
+      "Height": 0,
+      "Bytes": 673,
+      "Transparent": false
+    },
+    {
+      "ID": "enemy:base:bagbound",
+      "File": "content/base/assets/art-v1/world/enemy-bagbound.png",
+      "SHA256": "c21998a8681d1949fd5271f2531e861a412e45e1fdfc2eb4e9cef6aa807d01d3",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 44781,
+      "Transparent": true
+    },
+    {
+      "ID": "enemy:base:burdened",
+      "File": "content/base/assets/art-v1/world/enemy-burdened.png",
+      "SHA256": "3a3026f281e85651b270b6e8a7e378ffa187e5e660cb0727c0398661c2991b35",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 54731,
+      "Transparent": true
+    },
+    {
+      "ID": "enemy:base:carrier",
+      "File": "content/base/assets/art-v1/world/enemy-carrier.png",
+      "SHA256": "c093d72d251522dddd8e166e4540133624d30ea8e415649a9c9a03db70c01fcb",
+      "Width": 384,
+      "Height": 384,
+      "Bytes": 103398,
+      "Transparent": true
+    },
+    {
+      "ID": "enemy:base:carrier-enhanced",
+      "File": "content/base/assets/art-v1/world/enemy-carrier-enhanced.png",
+      "SHA256": "c1a4fe0754079338dc62a56b62ff9af0e1047651a828e9fd37765acc8f08290a",
+      "Width": 384,
+      "Height": 384,
+      "Bytes": 113395,
+      "Transparent": true
+    },
+    {
+      "ID": "enemy:base:dragger",
+      "File": "content/base/assets/art-v1/world/enemy-dragger.png",
+      "SHA256": "d1b22ec97e4eaa927c9e79d7b35e6f242f73ff74624dcf0ebf3c9e96789f6df4",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 40801,
+      "Transparent": true
+    },
+    {
+      "ID": "enemy:base:encased",
+      "File": "content/base/assets/art-v1/world/enemy-encased.png",
+      "SHA256": "8f5a91cc0298028c0cbc43f386a70b85a638bd9595301251615796201bbcc237",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 40828,
+      "Transparent": true
+    },
+    {
+      "ID": "enemy:base:leaker",
+      "File": "content/base/assets/art-v1/world/enemy-leaker.png",
+      "SHA256": "76a48f71b058cc9add795d62b5053e878c7fb2d0769fee6f016bab4c47b00a2e",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 38219,
+      "Transparent": true
+    },
+    {
+      "ID": "enemy:base:lens-array",
+      "File": "content/base/assets/art-v1/world/enemy-lens-array.png",
+      "SHA256": "c79e024f19b5a7906ac645fdc641549fc2697ba05bb2e4ff93435ae1b57315e6",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 34160,
+      "Transparent": true
+    },
+    {
+      "ID": "enemy:base:lensform",
+      "File": "content/base/assets/art-v1/world/enemy-lensform.png",
+      "SHA256": "7ed689569372a72966935e788ad053b037d22b372d13c646fdeb448d649137b0",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 40762,
+      "Transparent": true
+    },
+    {
+      "ID": "enemy:base:shard-spitter",
+      "File": "content/base/assets/art-v1/world/enemy-shard-spitter.png",
+      "SHA256": "c0076bfb3e626015d25572efaaacab75b219deb69c419432bb9ba2627aa208f2",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 50191,
+      "Transparent": true
+    },
+    {
+      "ID": "enemy:base:spitter",
+      "File": "content/base/assets/art-v1/world/enemy-spitter.png",
+      "SHA256": "0dfe11e97f320206172cef297572129dd5530a58f30ca410e8fa1ccf53aac40a",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 50824,
+      "Transparent": true
+    },
+    {
+      "ID": "enemy:base:stalker",
+      "File": "content/base/assets/art-v1/world/enemy-stalker.png",
+      "SHA256": "e426424b7dce02315b11d3add59a21a7485eff969b7b7d4a43f31d2e8afc1279",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 27997,
+      "Transparent": true
+    },
+    {
+      "ID": "enemy:base:warden",
+      "File": "content/base/assets/art-v1/world/enemy-warden.png",
+      "SHA256": "8fd94511e1b484981c9209eeed792308478f3e40c32394f327d686b5f3844818",
+      "Width": 384,
+      "Height": 384,
+      "Bytes": 100179,
+      "Transparent": true
+    },
+    {
+      "ID": "floor:base:behind-cover",
+      "File": "content/base/assets/art-v1/world/floor-behind-cover.png",
+      "SHA256": "f0b2e8ae4ec2ada5cd19046f1a90788d42812a2d98a579f3e947a27cc136e33c",
+      "Width": 512,
+      "Height": 512,
+      "Bytes": 334676,
+      "Transparent": false
+    },
+    {
+      "ID": "floor:base:grouped-forms",
+      "File": "content/base/assets/art-v1/world/floor-grouped-forms.png",
+      "SHA256": "4c728caf451aba001bae64269e6ea5b8e7449fc18e99a40ef1c6603b5046725a",
+      "Width": 512,
+      "Height": 512,
+      "Bytes": 367396,
+      "Transparent": false
+    },
+    {
+      "ID": "floor:base:guardian",
+      "File": "content/base/assets/art-v1/world/floor-guardian.png",
+      "SHA256": "75fafad50611dffd1a44a86d069aad049fd5163e2773545b4914631178b23c9b",
+      "Width": 512,
+      "Height": 512,
+      "Bytes": 362529,
+      "Transparent": false
+    },
+    {
+      "ID": "floor:base:guardian-enhanced",
+      "File": "content/base/assets/art-v1/world/floor-guardian-enhanced.png",
+      "SHA256": "2637eac197b775c856d3e037c77dcb6d4d43dd3b89c1e5e06baaf7c7a773e74c",
+      "Width": 512,
+      "Height": 512,
+      "Bytes": 399877,
+      "Transparent": false
+    },
+    {
+      "ID": "floor:base:heavy-pile",
+      "File": "content/base/assets/art-v1/world/floor-heavy-pile.png",
+      "SHA256": "940c8671f3fc808fda8d72cbe18b9eeb00b414228bf33c8259101423fef994df",
+      "Width": 512,
+      "Height": 512,
+      "Bytes": 422835,
+      "Transparent": false
+    },
+    {
+      "ID": "floor:base:leak-zone",
+      "File": "content/base/assets/art-v1/world/floor-leak-zone.png",
+      "SHA256": "0da78dc01670ce0cc273fa4f851bdfc62fd9f2d720e1c01175b5ed5f34c78d1d",
+      "Width": 512,
+      "Height": 512,
+      "Bytes": 416161,
+      "Transparent": false
+    },
+    {
+      "ID": "floor:base:ranged-room",
+      "File": "content/base/assets/art-v1/world/floor-ranged-room.png",
+      "SHA256": "ad7c43a613871da2e3ce623d7a106549bae2e1fa014cc16d605a5fde1eede74c",
+      "Width": 512,
+      "Height": 512,
+      "Bytes": 342324,
+      "Transparent": false
+    },
+    {
+      "ID": "floor:base:skirmish",
+      "File": "content/base/assets/art-v1/world/floor-skirmish.png",
+      "SHA256": "ff3bdbb4b1b5ba48d84160fdb33537a55eaa5a54b010d11df40b7f798e9754b1",
+      "Width": 512,
+      "Height": 512,
+      "Bytes": 411436,
+      "Transparent": false
+    },
+    {
+      "ID": "floor:base:survival-room",
+      "File": "content/base/assets/art-v1/world/floor-survival-room.png",
+      "SHA256": "9835a7a29cfedd78eceac209cec3f6e86bd6103dfd0b5631168c039ea647e9ea",
+      "Width": 512,
+      "Height": 512,
+      "Bytes": 410465,
+      "Transparent": false
+    },
+    {
+      "ID": "floor:default",
+      "File": "content/base/assets/art-v1/world/floor-start.png",
+      "SHA256": "5d1bc1a1615bd9016dba1b5f3dd75ffddd94056172689438c22e4ab837d49da1",
+      "Width": 512,
+      "Height": 512,
+      "Bytes": 406793,
+      "Transparent": false
+    },
+    {
+      "ID": "floor:event",
+      "File": "content/base/assets/art-v1/world/floor-event.png",
+      "SHA256": "9d669b41bd6279dce075fb47977378adfb39c0b24dc62a48463005ade59b36e3",
+      "Width": 512,
+      "Height": 512,
+      "Bytes": 371095,
+      "Transparent": false
+    },
+    {
+      "ID": "floor:hall",
+      "File": "content/base/assets/art-v1/world/floor-hall.png",
+      "SHA256": "1f8071d38c6724bd51a124f439ae2da8db2b8d17aa2ba898a7bd1bafb28abbfc",
+      "Width": 512,
+      "Height": 512,
+      "Bytes": 363224,
+      "Transparent": false
+    },
+    {
+      "ID": "floor:passage",
+      "File": "content/base/assets/art-v1/world/floor-passage.png",
+      "SHA256": "077f1d998bb8500732b641975c870944e5ad469934227af70b0fff88e8c5acbe",
+      "Width": 512,
+      "Height": 512,
+      "Bytes": 421241,
+      "Transparent": false
+    },
+    {
+      "ID": "floor:revival",
+      "File": "content/base/assets/art-v1/world/floor-revival.png",
+      "SHA256": "ebfd63af07504d561b479b6e2510f977760c795fe97b8e404299036697889869",
+      "Width": 512,
+      "Height": 512,
+      "Bytes": 345443,
+      "Transparent": false
+    },
+    {
+      "ID": "floor:shop",
+      "File": "content/base/assets/art-v1/world/floor-shop.png",
+      "SHA256": "c8978e6f927079649ab5dee44c1f523d9a5ed1f0f4eee01060e7049e60b02bdc",
+      "Width": 512,
+      "Height": 512,
+      "Bytes": 389258,
+      "Transparent": false
+    },
+    {
+      "ID": "floor:shrine",
+      "File": "content/base/assets/art-v1/world/floor-shrine.png",
+      "SHA256": "7d2b0edf537e62817a33b27ee47f1929627e5003225fee991081012ad1127763",
+      "Width": 512,
+      "Height": 512,
+      "Bytes": 416013,
+      "Transparent": false
+    },
+    {
+      "ID": "floor:start",
+      "File": "content/base/assets/art-v1/world/floor-start.png",
+      "SHA256": "5d1bc1a1615bd9016dba1b5f3dd75ffddd94056172689438c22e4ab837d49da1",
+      "Width": 512,
+      "Height": 512,
+      "Bytes": 406793,
+      "Transparent": false
+    },
+    {
+      "ID": "icon:base:armor-body",
+      "File": "content/base/assets/art-v1/equipment/armor-body.png",
+      "SHA256": "1adbfdeddc8e9d465f19fcba8bdf06fda2a6c00a9083803ea73db572e7320a43",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 14365,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:armor-feet",
+      "File": "content/base/assets/art-v1/equipment/armor-feet.png",
+      "SHA256": "95e428318376409421e8c2cf28a48ed38f2ee67ac2e217b44527f8594088dbc5",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 12733,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:armor-head",
+      "File": "content/base/assets/art-v1/equipment/armor-head.png",
+      "SHA256": "51a08d4546df4fdbcd444f4e829d2ac774a3fce1fe6a0caa059fa044991326dc",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 13535,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:armor-legs",
+      "File": "content/base/assets/art-v1/equipment/armor-legs.png",
+      "SHA256": "7e67c8d8ee27b9928fe841d38d58e754c28ef1152f8956f7545d89037cb9781a",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 13648,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:arrival-envelope",
+      "File": "content/base/assets/art-v1/equipment/arrival-envelope.png",
+      "SHA256": "0291accdf7a8228482808509c7a42c621c7f41f2168a916d108ee0698741e7b0",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 16689,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:backup-barrier-unit",
+      "File": "content/base/assets/art-v1/accessories/backup-barrier-unit.png",
+      "SHA256": "7c1456bc0e5de01f2040dec7bff7ee2400bcbfecde0d3982517d62e7e1da5db7",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 13424,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:balance-weight",
+      "File": "content/base/assets/art-v1/accessories/balance-weight.png",
+      "SHA256": "e8a96ef0239bfbef8e41be7340e818164926e5a0665494843dca311bfe6d168a",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 8239,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:barrier-potion",
+      "File": "content/base/assets/art-v1/equipment/barrier-potion.png",
+      "SHA256": "2335b5b9581fc5159967d43433149f654c326d994d6264066e0e63511b521f6b",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 14810,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:bidirectional-coupler",
+      "File": "content/base/assets/art-v1/accessories/bidirectional-coupler.png",
+      "SHA256": "8ba8859f3538efccdca7b51c31a99076ec0ecc1337399e7251849f92cc4d8f5e",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 9385,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:buffer-pad",
+      "File": "content/base/assets/art-v1/accessories/buffer-pad.png",
+      "SHA256": "f1391c5a36dc890526583bcc277d9c1fbf000cb341a6162b3e702e9062de7f37",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 15495,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:calibration-pendant",
+      "File": "content/base/assets/art-v1/accessories/calibration-pendant.png",
+      "SHA256": "ebe6bc81fe9c9d47521d2d6255ae05a9cb2bd3991f16ddde9a2af12e27abdf7b",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 11966,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:carbine-item",
+      "File": "content/base/assets/art-v1/weapons/carbine-icon.png",
+      "SHA256": "013923916fd794700880749df22aaab39bc5377dbe826b1cd919ecc5f71bd839",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 5590,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:cleanse",
+      "File": "content/base/assets/art-v1/equipment/cleanse.png",
+      "SHA256": "0d9f773377e571d67c99ca42dc71dbb925af97bcf889774be8afbb1d3a3aa864",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 17583,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:cold-contact",
+      "File": "content/base/assets/art-v1/accessories/cold-contact.png",
+      "SHA256": "d11510c5f7b61d82261d2c2777faa6eaf927ba498dd4fc91d096586b0ed1177a",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 11474,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:condensing-projector-item",
+      "File": "content/base/assets/art-v1/weapons/condensing-projector-icon.png",
+      "SHA256": "4eede88f336bb0935b46b2fc4395493e5ef9ce6120aa10a646b953f9bd4d7102",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 5384,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:coordinate-pass",
+      "File": "content/base/assets/art-v1/equipment/coordinate-pass.png",
+      "SHA256": "a3a77df9dce7675de0943e4780a71928d270e99eb4739e564453f54351b9b5a1",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 17853,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:coupling-contact",
+      "File": "content/base/assets/art-v1/accessories/coupling-contact.png",
+      "SHA256": "7b05376735d13141999d37f3ec35e060504419388fd4b0cbc7a5e5d4a666d8e3",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 16675,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:drain-charm",
+      "File": "content/base/assets/art-v1/accessories/drain-charm.png",
+      "SHA256": "ba35e667cd0d3b35a2e187f1952193b80acd2bc318708a1c429825294aabec86",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 12749,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:dual-focus-item",
+      "File": "content/base/assets/art-v1/weapons/dual-focus-icon.png",
+      "SHA256": "fe9b79af626c3dae002e2c2a7c0bd830f4203a33bea35f056af0424aac0c9a55",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 6099,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:ember-charm",
+      "File": "content/base/assets/art-v1/accessories/ember-charm.png",
+      "SHA256": "23b68b18d934c770a15eb295167e9dd7bd4cceb3e0c5cf90aebe9d09e9e3bd8d",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 12017,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:emergency-fuse",
+      "File": "content/base/assets/art-v1/equipment/emergency-fuse.png",
+      "SHA256": "93357be25029c68c61f60949eeae476b179d4ea5836964cc6ab3a7e2f9b8975d",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 8999,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:entry-kit",
+      "File": "content/base/assets/art-v1/equipment/entry-kit.png",
+      "SHA256": "fc619f35a8e36034f3b1357912796001eb0336d43ea78c4868ea300b2f33a890",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 12238,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:entry-metronome",
+      "File": "content/base/assets/art-v1/equipment/entry-metronome.png",
+      "SHA256": "ba782f9922d0b72274331d86b5d9dda6eabd8888363d72c353b58629a5acdb72",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 9757,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:etched-weight",
+      "File": "content/base/assets/art-v1/accessories/etched-weight.png",
+      "SHA256": "19ba239a609f1fc8d689bfa8bf037a27d6e199a81c1aef88bc616874aae7cf2b",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 15038,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:feedback-clip",
+      "File": "content/base/assets/art-v1/accessories/feedback-clip.png",
+      "SHA256": "e391797ea98b9f83c92732fcaf3ea6a30ef39887838a74619195ed1a41107ea3",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 11978,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:fiber-bundle",
+      "File": "content/base/assets/art-v1/accessories/fiber-bundle.png",
+      "SHA256": "b0b978fc84a92d80ad17e55cb07da39fba4a4552883f4ee1f56716363d8b547a",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 10769,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:filter-mask",
+      "File": "content/base/assets/art-v1/equipment/filter-mask.png",
+      "SHA256": "c325243102a0d876824f37c4c4095fd32a05eade7e7500d07dbe828d9d3f8b17",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 15723,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:filter-sample",
+      "File": "content/base/assets/art-v1/accessories/filter-sample.png",
+      "SHA256": "34d5498a71fb283ac4d0fbb85368a149841e768333e3f159fe3322cde3d22d9d",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 16785,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:first-aid-kit",
+      "File": "content/base/assets/art-v1/accessories/first-aid-kit.png",
+      "SHA256": "59b61996b9d607a12603ad93f1f4cf8fa0745172b7b4f9e57a0036c133ce7bc0",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 15969,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:fixed-focus-lens",
+      "File": "content/base/assets/art-v1/accessories/fixed-focus-lens.png",
+      "SHA256": "225e39ec6198364e31c0a667ee9ceba5f00283f1157f573c4af4fcce542e4393",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 16404,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:focus-item",
+      "File": "content/base/assets/art-v1/weapons/focus-icon.png",
+      "SHA256": "5107dc6f823d159595e452ba54b6c1ded4b0e629509ca15ece058d552906f6f4",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 4239,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:free-coordinate-ticket",
+      "File": "content/base/assets/art-v1/equipment/free-coordinate-ticket.png",
+      "SHA256": "029f4fd9b588bdbfa42b1c864d2f34089bd5d449c9f1662fa74101ceb479ba0b",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 13350,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:grip-ring",
+      "File": "content/base/assets/art-v1/accessories/grip-ring.png",
+      "SHA256": "78eecc59b0eeb6e03855292aa2ffb7e6d05e7f6d63220b6fa8bd3dd13f98fc64",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 13890,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:grounding-braid",
+      "File": "content/base/assets/art-v1/accessories/grounding-braid.png",
+      "SHA256": "99f23e950db62ff26bd87d0acc977740838a86c3bb7c7bbcce3137b696995e18",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 14457,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:healing-potion",
+      "File": "content/base/assets/art-v1/equipment/healing-potion.png",
+      "SHA256": "530ab47048f68adf11deb67cdc1db1447c6539eb2e1e09d29131b38d69128643",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 11307,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:heat-sink",
+      "File": "content/base/assets/art-v1/accessories/heat-sink.png",
+      "SHA256": "827116b82d8c98d1ae977e1edbf93bdbdd8a0066f30477da94f6ff80cbb1ddee",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 14010,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:hot-contact",
+      "File": "content/base/assets/art-v1/accessories/hot-contact.png",
+      "SHA256": "14a5cd5d5115de7c4325d5960d2e31193a69d89eea79ce8d1ff5cb967ec82bf0",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 8707,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:injector-item",
+      "File": "content/base/assets/art-v1/weapons/injector-icon.png",
+      "SHA256": "2c7eacc2be5292101888a9d36c19a9afd95fe494d2f2eebf3fb9b29aa6c04d84",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 4821,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:insulated-guards",
+      "File": "content/base/assets/art-v1/equipment/insulated-guards.png",
+      "SHA256": "9ff59f8d37c6e21422120be798c84d7fec517a83f3398fe041bd467286d94407",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 16391,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:isolation-box",
+      "File": "content/base/assets/art-v1/accessories/isolation-box.png",
+      "SHA256": "cba26aadc33aec16caae6d05b939a35fdf3f8e14313829bb11d84b131e5b4ab5",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 14344,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:isolation-coat",
+      "File": "content/base/assets/art-v1/equipment/isolation-coat.png",
+      "SHA256": "52e27e731fb776cbbbb0a09b8f60e7b1fe6e77a09c1f696d09d80a98981b0013",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 14202,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:light-foot-clip",
+      "File": "content/base/assets/art-v1/accessories/light-foot-clip.png",
+      "SHA256": "d0fb21edfef9fbffdbb63bfc4ea5d447a6d132a1e66e7a1b28b661d173b9e13b",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 10867,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:light-goggles",
+      "File": "content/base/assets/art-v1/equipment/light-goggles.png",
+      "SHA256": "827f1380d2a140741c43497113a963ad4d89a94749ca2a595421cc08f05fca88",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 11662,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:light-jacket",
+      "File": "content/base/assets/art-v1/equipment/light-jacket.png",
+      "SHA256": "596c186ed4dd354a999bfc338abfbb3cb572a01ec9d56e14d5e30e040edba5b7",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 16569,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:metronome",
+      "File": "content/base/assets/art-v1/accessories/metronome.png",
+      "SHA256": "abc7463886367f7eb1d40c97d0dca13907817c0d7bee895c106fbe69071ff419",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 14316,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:model-700-item",
+      "File": "content/base/assets/art-v1/weapons/model-700-icon.png",
+      "SHA256": "c781116a1c03b22e05c0c1208fc6b01f8dd365d83f28711e53b1210eaa0cc85b",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 3467,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:note-clip",
+      "File": "content/base/assets/art-v1/accessories/note-clip.png",
+      "SHA256": "55d584df6860d586f9d3729d387bc72cfe471de739b99dcdff2e18c5d1143b4d",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 13909,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:parallel-reserve",
+      "File": "content/base/assets/art-v1/accessories/parallel-reserve.png",
+      "SHA256": "5292da2521412bf6abf2da6a1c08f1948b67c152bc510bc105d0031fa18274b2",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 13601,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:physical-charm",
+      "File": "content/base/assets/art-v1/accessories/physical-charm.png",
+      "SHA256": "6160bf8a35751ea17f73a2b68aa3ee961b00e407b8099ff0988f9a79b865b59b",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 10927,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:pry-bar-item",
+      "File": "content/base/assets/art-v1/weapons/pry-bar-icon.png",
+      "SHA256": "5688120280f2ad61e380472297795cba5343169a10f51a8dfe541d7846156d35",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 3501,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:range-tag",
+      "File": "content/base/assets/art-v1/accessories/range-tag.png",
+      "SHA256": "83a2f247dca93263c36b5cf4409b98cc2c9498f253496170f34090184d31733a",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 12241,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:recovery-patch",
+      "File": "content/base/assets/art-v1/equipment/recovery-patch.png",
+      "SHA256": "19cc155d16c11f434afba49c93f661b4666503c834d6c4af7686e22c84dba791",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 16444,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:reinforcement-plate",
+      "File": "content/base/assets/art-v1/accessories/reinforcement-plate.png",
+      "SHA256": "bc4b512814c1b92da56e8a7ebebbd6f85543794ff2e76d7fc101618563795aa8",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 9957,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:residual-heat-tag",
+      "File": "content/base/assets/art-v1/accessories/residual-heat-tag.png",
+      "SHA256": "195696ad32028261971f6dc9c39e47b53864e1bbd2e5b865a81dc6a12f87cd35",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 12681,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:ring-pass",
+      "File": "content/base/assets/art-v1/equipment/ring-pass.png",
+      "SHA256": "8e825a80964886b9d62112616daa816033d6232030680b5d01c4cb92c77051ec",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 12999,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:ring-ticket",
+      "File": "content/base/assets/art-v1/equipment/ring-ticket.png",
+      "SHA256": "9f582ae98d8d336056e4580859067d99e2aef5db328b77b5cdc85cc9318c14db",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 12786,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:route-fold-2",
+      "File": "content/base/assets/art-v1/equipment/route-fold-2.png",
+      "SHA256": "7468e1ded83870bcfe393f30be9569875c734e1375b53cafbbf905ff3d4b41bc",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 10886,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:route-fold-3",
+      "File": "content/base/assets/art-v1/equipment/route-fold-3.png",
+      "SHA256": "af5d42f6017ada5e502339360b8f14b7b0765bacfc81188da4a160ead5a88f0f",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 9375,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:seeker-item",
+      "File": "content/base/assets/art-v1/weapons/seeker-icon.png",
+      "SHA256": "854d1b5c4258ade0e87e9bc7240d48df08e888ba618a73bf6e665316258bc31a",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 7129,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:shielded-boots",
+      "File": "content/base/assets/art-v1/equipment/shielded-boots.png",
+      "SHA256": "b203122bf098cb3d10700e4547f81bba69a0d5b484288622a787630e2ab0f504",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 15782,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:soft-shoes",
+      "File": "content/base/assets/art-v1/equipment/soft-shoes.png",
+      "SHA256": "8a394a987bf465a9ecef229238f27d6000cee37c7fe6906e85cfe67062ba9266",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 12733,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:spare-capacitor",
+      "File": "content/base/assets/art-v1/accessories/spare-capacitor.png",
+      "SHA256": "280b705d6475bdc2387f31aa5eacb5b6a4e137eb3156f0fa9490a4e34c6139d2",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 12493,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:stress-bypass",
+      "File": "content/base/assets/art-v1/accessories/stress-bypass.png",
+      "SHA256": "a3b52cda03553a08f98d491ac0dc865f230903ac7f55e293d9f6fe6d29e0cecd",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 14407,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:stretch-trousers",
+      "File": "content/base/assets/art-v1/equipment/stretch-trousers.png",
+      "SHA256": "49368f8c55a2a5b2b680cb3b0e4d9b37b52076d05d26d0ee31d4b0880ccb6e0b",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 10400,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:support",
+      "File": "content/base/assets/art-v1/equipment/support.png",
+      "SHA256": "b5fbdb41890c9bed2d17fe7a2437c9349c56316a8aa96d6497bf9b629a9696f6",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 14095,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:support-liner",
+      "File": "content/base/assets/art-v1/accessories/support-liner.png",
+      "SHA256": "22fffdf643a46bc456efa6585ad19673f87aab20df9a34d638e4ddd46ba22504",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 13237,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:sword-item",
+      "File": "content/base/assets/art-v1/weapons/sword-icon.png",
+      "SHA256": "e645d94692f0285a293e1c742aec8349938fa226c61d68d3df2aedee93e09207",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 3716,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:team-coordinate-ticket",
+      "File": "content/base/assets/art-v1/equipment/team-coordinate-ticket.png",
+      "SHA256": "8970db7d6f3355ac67bf2f436ea27cf8b523428db40b9752d9197095894b8b08",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 11942,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:thermal-emitter-item",
+      "File": "content/base/assets/art-v1/weapons/thermal-emitter-icon.png",
+      "SHA256": "eaacb963842cd0a505c4c1b42ebac1933897e72ff9d894be7ded0ec9e4ac250a",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 7173,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:timing-relay",
+      "File": "content/base/assets/art-v1/accessories/timing-relay.png",
+      "SHA256": "c397330e3f3fd45df3d227c122d1623240a70c52486ae8e8d8bb7302699b5f3c",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 15425,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:wave-sword-item",
+      "File": "content/base/assets/art-v1/weapons/wave-sword-icon.png",
+      "SHA256": "f209a60d50121379af569fec652d5c9b4b8a3cd9613648c30f64cce222b1d5c8",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 4032,
+      "Transparent": true
+    },
+    {
+      "ID": "icon:base:weighted-sleeve",
+      "File": "content/base/assets/art-v1/accessories/weighted-sleeve.png",
+      "SHA256": "3c4439046abfa7f4810c9ff625e9b466ec5f912d6b5fa889bd5f26129000591f",
+      "Width": 128,
+      "Height": 128,
+      "Bytes": 13927,
+      "Transparent": true
+    },
+    {
+      "ID": "player:base:arcanist",
+      "File": "content/base/assets/art-v1/players/arcanist.png",
+      "SHA256": "9d6d652f538dcdf1fd0dd62b71a0ad2096f47bb315d7e40e46e07ae245c3545e",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 30376,
+      "Transparent": true
+    },
+    {
+      "ID": "player:base:bulwark",
+      "File": "content/base/assets/art-v1/players/bulwark.png",
+      "SHA256": "d948f824b6a7cf1ddd34a4f52023bb29116fa2d4e3423f6a070942b2d8773117",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 36967,
+      "Transparent": true
+    },
+    {
+      "ID": "player:base:renewal-frame",
+      "File": "content/base/assets/art-v1/players/renewal-frame.png",
+      "SHA256": "717f76fbc43ff6e594c8adfbf7ddd9a08e7df7dc7a10d13b5431b228ef9a46be",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 26726,
+      "Transparent": true
+    },
+    {
+      "ID": "player:base:scout",
+      "File": "content/base/assets/art-v1/players/scout.png",
+      "SHA256": "1a132d9e1b81c2d3b8abb9a0bb35601d661ea2949894f6e256bb09db67175070",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 30032,
+      "Transparent": true
+    },
+    {
+      "ID": "portrait:base:arcanist",
+      "File": "content/base/assets/art-v1/players/arcanist.png",
+      "SHA256": "9d6d652f538dcdf1fd0dd62b71a0ad2096f47bb315d7e40e46e07ae245c3545e",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 30376,
+      "Transparent": true
+    },
+    {
+      "ID": "portrait:base:bulwark",
+      "File": "content/base/assets/art-v1/players/bulwark.png",
+      "SHA256": "d948f824b6a7cf1ddd34a4f52023bb29116fa2d4e3423f6a070942b2d8773117",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 36967,
+      "Transparent": true
+    },
+    {
+      "ID": "portrait:base:renewal-frame",
+      "File": "content/base/assets/art-v1/players/renewal-frame.png",
+      "SHA256": "717f76fbc43ff6e594c8adfbf7ddd9a08e7df7dc7a10d13b5431b228ef9a46be",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 26726,
+      "Transparent": true
+    },
+    {
+      "ID": "portrait:base:scout",
+      "File": "content/base/assets/art-v1/players/scout.png",
+      "SHA256": "1a132d9e1b81c2d3b8abb9a0bb35601d661ea2949894f6e256bb09db67175070",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 30032,
+      "Transparent": true
+    },
+    {
+      "ID": "prop:exit",
+      "File": "content/base/assets/art-v1/fixtures/exit.png",
+      "SHA256": "ef5f80387014a2d65cea107d7433829be58740131edf81df0801c49a61b580ec",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 86567,
+      "Transparent": true
+    },
+    {
+      "ID": "prop:hall-host",
+      "File": "content/base/assets/art-v1/fixtures/hall-host.png",
+      "SHA256": "a705f9f63a2ee33ed735cba05dbccf9918ea74e44375a238747618c8dae1d040",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 34859,
+      "Transparent": true
+    },
+    {
+      "ID": "prop:hall-join",
+      "File": "content/base/assets/art-v1/fixtures/hall-join.png",
+      "SHA256": "f59ec2989835995f639dc4c7ed5b6174cf315c8464a2c0b30b071f35945c2c88",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 37563,
+      "Transparent": true
+    },
+    {
+      "ID": "prop:hall-progression",
+      "File": "content/base/assets/art-v1/fixtures/hall-progression.png",
+      "SHA256": "8efa3b3178b6f97dfd890bb920cc9c9ee2dc8f106195c377d7f01c0e9b4ebeaf",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 37418,
+      "Transparent": true
+    },
+    {
+      "ID": "prop:hall-room-settings",
+      "File": "content/base/assets/art-v1/props/hall-room-settings.png",
+      "SHA256": "981144c4231279d98ff6fe403e71c4943f32ed8787fef61ca43d25f5e122813f",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 37480,
+      "Transparent": true
+    },
+    {
+      "ID": "prop:hall-solo",
+      "File": "content/base/assets/art-v1/props/hall-solo.png",
+      "SHA256": "0d04cf5d5020a56897d0708ffc3a45886515990c836fdb293c34d6dda1b2c57e",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 32715,
+      "Transparent": true
+    },
+    {
+      "ID": "prop:hall-warehouse",
+      "File": "content/base/assets/art-v1/fixtures/hall-warehouse.png",
+      "SHA256": "331a8bc8cebe320c2427798e958b8d06194fe6c374020387ef5789037d5df6d5",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 47173,
+      "Transparent": true
+    },
+    {
+      "ID": "prop:obstacle",
+      "File": "content/base/assets/art-v1/fixtures/obstacle.png",
+      "SHA256": "64c284a175b9e022607e0fb163631d6e643cb64abdd57a7f0b29d1c24bf00074",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 79376,
+      "Transparent": true
+    },
+    {
+      "ID": "prop:revival",
+      "File": "content/base/assets/art-v1/fixtures/revival.png",
+      "SHA256": "3403b7958537ebcebffb507e48a7226f71620ed0dc997851af1ae7db2a350336",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 36015,
+      "Transparent": true
+    },
+    {
+      "ID": "prop:shop",
+      "File": "content/base/assets/art-v1/fixtures/shop.png",
+      "SHA256": "8a12371037886ae6453e43fe801f04328153c570408e45aef724be803a89be35",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 74954,
+      "Transparent": true
+    },
+    {
+      "ID": "rig:base:arcanist",
+      "File": "content/base/assets/art-v1/animation/player-arcanist.png",
+      "SHA256": "553ce175be9a47bd2ea0805ec0f1f576eb9bca45afe956d7249b52aca71d3cae",
+      "Width": 1536,
+      "Height": 1024,
+      "Bytes": 1276677,
+      "Transparent": true
+    },
+    {
+      "ID": "rig:base:bagbound",
+      "File": "content/base/assets/art-v1/animation/bagbound.png",
+      "SHA256": "6fc7babc9235c5bf464d1bb03e411fe2cb0d86fb3d3eb48c074fbf48474b6e89",
+      "Width": 1536,
+      "Height": 1024,
+      "Bytes": 1720709,
+      "Transparent": true
+    },
+    {
+      "ID": "rig:base:bulwark",
+      "File": "content/base/assets/art-v1/animation/player-bulwark.png",
+      "SHA256": "b0919444c15cd6e466dd89e92fa3aee1842604a2f6a006f1801a0ef9401c51ac",
+      "Width": 1536,
+      "Height": 1024,
+      "Bytes": 1312903,
+      "Transparent": true
+    },
+    {
+      "ID": "rig:base:burdened",
+      "File": "content/base/assets/art-v1/animation/burdened.png",
+      "SHA256": "cd87dbd042d71352e0d424fe703ccd6e4f51064873d43ab56f443eb362f736ce",
+      "Width": 1536,
+      "Height": 1024,
+      "Bytes": 1482341,
+      "Transparent": true
+    },
+    {
+      "ID": "rig:base:carrier",
+      "File": "content/base/assets/art-v1/animation/carrier.png",
+      "SHA256": "215c741d7559f25f1adee987fa998eb1bcd1c935d004d13ef853a59e446a0414",
+      "Width": 1536,
+      "Height": 1024,
+      "Bytes": 1372804,
+      "Transparent": true
+    },
+    {
+      "ID": "rig:base:carrier-enhanced",
+      "File": "content/base/assets/art-v1/animation/carrier-enhanced.png",
+      "SHA256": "f9cdfb82f6b13b7ae1fd10bd2aa5846f55e5e09ad4c2bf11c8a0b7e2a6b406cb",
+      "Width": 1536,
+      "Height": 1024,
+      "Bytes": 1467667,
+      "Transparent": true
+    },
+    {
+      "ID": "rig:base:dragger",
+      "File": "content/base/assets/art-v1/animation/enemy-dragger.png",
+      "SHA256": "3d4c90657e5abef7b38138266df931167fdfe86578eb7fc4f113ba17b4a23b5a",
+      "Width": 1536,
+      "Height": 1024,
+      "Bytes": 1172355,
+      "Transparent": true
+    },
+    {
+      "ID": "rig:base:encased",
+      "File": "content/base/assets/art-v1/animation/encased.png",
+      "SHA256": "4341f1e9c373c0da1fdf92d3af53974c544af602d40050b91c2fc4f0d552c770",
+      "Width": 1536,
+      "Height": 1024,
+      "Bytes": 1042292,
+      "Transparent": true
+    },
+    {
+      "ID": "rig:base:leaker",
+      "File": "content/base/assets/art-v1/animation/leaker.png",
+      "SHA256": "93c54589b461b12740fa4d7f1b1446cbc497808d47b01c072183ae0fdd43b87a",
+      "Width": 1536,
+      "Height": 1024,
+      "Bytes": 1615448,
+      "Transparent": true
+    },
+    {
+      "ID": "rig:base:lens-array",
+      "File": "content/base/assets/art-v1/animation/lens-array.png",
+      "SHA256": "7ce0b966630823014b3048c971265a96fff40c4b15600ae095baf48aee7721db",
+      "Width": 1536,
+      "Height": 1024,
+      "Bytes": 1080132,
+      "Transparent": true
+    },
+    {
+      "ID": "rig:base:lensform",
+      "File": "content/base/assets/art-v1/animation/lensform.png",
+      "SHA256": "aac9f5dc5db170ad12b13b616eec1ecba3bc600d2d2422ba72d55ffc606f11a9",
+      "Width": 1536,
+      "Height": 1024,
+      "Bytes": 1270084,
+      "Transparent": true
+    },
+    {
+      "ID": "rig:base:renewal-frame",
+      "File": "content/base/assets/art-v1/animation/player-renewal-frame.png",
+      "SHA256": "2505df49625e714931002f419a7f8f1ef1ed30debb1085910d1405c85ae51549",
+      "Width": 1536,
+      "Height": 1024,
+      "Bytes": 1224453,
+      "Transparent": true
+    },
+    {
+      "ID": "rig:base:scout",
+      "File": "content/base/assets/art-v1/animation/player-scout.png",
+      "SHA256": "bdf268d52505bdd978256fa7f436ecb3924dd474dffe6673bb1d54323d08a8ad",
+      "Width": 1536,
+      "Height": 1024,
+      "Bytes": 1173941,
+      "Transparent": true
+    },
+    {
+      "ID": "rig:base:shard-spitter",
+      "File": "content/base/assets/art-v1/animation/shard-spitter.png",
+      "SHA256": "62acbd0834cfd29c7d22e040d12bc3e46c69ac455c570e45165192ab653a4a31",
+      "Width": 1536,
+      "Height": 1024,
+      "Bytes": 1486141,
+      "Transparent": true
+    },
+    {
+      "ID": "rig:base:spitter",
+      "File": "content/base/assets/art-v1/animation/enemy-spitter.png",
+      "SHA256": "76591665179068178920707c2031782b4e72821795d61f665b7e2854a09748cb",
+      "Width": 1536,
+      "Height": 1024,
+      "Bytes": 1482246,
+      "Transparent": true
+    },
+    {
+      "ID": "rig:base:stalker",
+      "File": "content/base/assets/art-v1/animation/enemy-stalker.png",
+      "SHA256": "8ca51b192b1d929968f2e9831c499aaee472240e5723c14281d86d82331aa4b4",
+      "Width": 1536,
+      "Height": 1024,
+      "Bytes": 1051890,
+      "Transparent": true
+    },
+    {
+      "ID": "rig:base:warden",
+      "File": "content/base/assets/art-v1/animation/enemy-warden.png",
+      "SHA256": "2295f121bbd44ac9aa2e444936ac73616af4fa1a91939b1ca481eb90220c33f7",
+      "Width": 1536,
+      "Height": 1024,
+      "Bytes": 1413956,
+      "Transparent": true
+    },
+    {
+      "ID": "ui:main-background",
+      "File": "content/base/assets/art-v1/ui/main-menu.png",
+      "SHA256": "9d5d5941a7cdba3bfee585ad4d0aa73bc79d873e57465a87a1454b959324ca40",
+      "Width": 1920,
+      "Height": 1080,
+      "Bytes": 2228723,
+      "Transparent": false
+    },
+    {
+      "ID": "weapon:base:carbine",
+      "File": "content/base/assets/art-v1/weapons/carbine.png",
+      "SHA256": "776e49bcc8aa5cfca211ff10c8331dfd79d68817d162d569df63d31554a5c0cc",
+      "Width": 256,
+      "Height": 128,
+      "Bytes": 17477,
+      "Transparent": true
+    },
+    {
+      "ID": "weapon:base:condensing-projector",
+      "File": "content/base/assets/art-v1/weapons/condensing-projector.png",
+      "SHA256": "19d0c7def4710a554fa8c06cc4bad831e267de9d7b3c99033aef7879d960d2da",
+      "Width": 256,
+      "Height": 128,
+      "Bytes": 18407,
+      "Transparent": true
+    },
+    {
+      "ID": "weapon:base:dual-focus",
+      "File": "content/base/assets/art-v1/weapons/dual-focus.png",
+      "SHA256": "82b0744859f2bb4f52b432e52763cafa2632fd6f596c01f64b1b8136f43e864c",
+      "Width": 256,
+      "Height": 128,
+      "Bytes": 19929,
+      "Transparent": true
+    },
+    {
+      "ID": "weapon:base:focus",
+      "File": "content/base/assets/art-v1/weapons/focus.png",
+      "SHA256": "ac05d79c691b17ae02de74ef926580471c04c2042b8f8a293d448d13b1a65fa8",
+      "Width": 256,
+      "Height": 128,
+      "Bytes": 14405,
+      "Transparent": true
+    },
+    {
+      "ID": "weapon:base:injector",
+      "File": "content/base/assets/art-v1/weapons/injector.png",
+      "SHA256": "9a80de38552150b5fcccf8aff0c91c4b76ba3655a90a1218466b87702c73881f",
+      "Width": 256,
+      "Height": 128,
+      "Bytes": 15976,
+      "Transparent": true
+    },
+    {
+      "ID": "weapon:base:model-700",
+      "File": "content/base/assets/art-v1/weapons/model-700.png",
+      "SHA256": "5c79824f40f7bd79080c8e5eccfeb09f880a8b0a5d6f2ef1fc9fb669153a6d6b",
+      "Width": 256,
+      "Height": 128,
+      "Bytes": 10264,
+      "Transparent": true
+    },
+    {
+      "ID": "weapon:base:pry-bar",
+      "File": "content/base/assets/art-v1/weapons/pry-bar.png",
+      "SHA256": "911723974e2d5d88de1bd991ae04804df2b57ef3ae0de59d0e538480e51c2c0b",
+      "Width": 256,
+      "Height": 128,
+      "Bytes": 11431,
+      "Transparent": true
+    },
+    {
+      "ID": "weapon:base:seeker",
+      "File": "content/base/assets/art-v1/weapons/seeker.png",
+      "SHA256": "8e39fc20f614b464326b939b750207b2712b95b5fdf7bd0300777ed4c2f3bd49",
+      "Width": 256,
+      "Height": 128,
+      "Bytes": 21682,
+      "Transparent": true
+    },
+    {
+      "ID": "weapon:base:sword",
+      "File": "content/base/assets/art-v1/weapons/sword.png",
+      "SHA256": "d33f8bcc11479836b95604aed85f34c082ebcfab62defd26c9540ec880d19d4b",
+      "Width": 256,
+      "Height": 128,
+      "Bytes": 11539,
+      "Transparent": true
+    },
+    {
+      "ID": "weapon:base:thermal-emitter",
+      "File": "content/base/assets/art-v1/weapons/thermal-emitter.png",
+      "SHA256": "a4683d382faf82373f1f2f17f9379804fe63853d1aa1e0afd9ecd33f1eadb2a6",
+      "Width": 256,
+      "Height": 128,
+      "Bytes": 24787,
+      "Transparent": true
+    },
+    {
+      "ID": "weapon:base:wave-sword",
+      "File": "content/base/assets/art-v1/weapons/wave-sword.png",
+      "SHA256": "c2d12b828afe38a674e03f9d3ab5c95cc4c728f7d671debec69f71c58dfd254a",
+      "Width": 256,
+      "Height": 128,
+      "Bytes": 12961,
+      "Transparent": true
+    }
+  ]
+}

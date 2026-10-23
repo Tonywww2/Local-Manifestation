@@ -47,7 +47,13 @@ func (g *Game) initializeRendering() {
 	}
 	g.pacer.Set(g.frameLimit)
 	ebiten.SetVsyncEnabled(g.vsync)
-	g.performanceVisible = g.cfg.ShowPerformance
+	if b, err := os.ReadFile(settingsPath(g.cfg.Profile)); err == nil {
+		var saved settings
+		if json.Unmarshal(b, &saved) == nil {
+			g.showFPS, g.showLatency, g.performanceVisible = saved.ShowFPS, saved.ShowLatency, saved.ShowDiagnostics
+		}
+	}
+	g.performanceVisible = g.performanceVisible || g.cfg.ShowPerformance
 }
 
 func (g *Game) cycleFPS() {

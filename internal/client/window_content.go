@@ -56,13 +56,26 @@ func (g *Game) finishWindowContent(f *uiFrame, id string) {
 	for i := range f.Controls {
 		c := &f.Controls[i]
 		if c.Owner == id {
+			originalClip := c.Clip
 			c.Bounds, c.Clip = transform(c.Bounds)
+			if isFormulaToken(c.ID) {
+				originalClip.Y -= offset
+				c.Clip = intersectUI(originalClip, clip)
+			}
 		}
 	}
 	for i := range f.Labels {
 		l := &f.Labels[i]
 		if l.Owner == id {
 			l.Bounds, l.Clip = transform(l.Bounds)
+		}
+	}
+	for i := range f.Formulas {
+		formula := &f.Formulas[i]
+		if formula.Owner == id {
+			formula.Bounds.Y -= offset
+			formula.Clip.Y -= offset
+			formula.Clip = intersectUI(formula.Clip, clip)
 		}
 	}
 	f.Viewports[id] = v
@@ -79,4 +92,9 @@ func clippedUI(dst *ebiten.Image, clip ui.Rect) *ebiten.Image {
 	}
 	r := image.Rect(int(math.Ceil(clip.X)), int(math.Ceil(clip.Y)), int(math.Floor(clip.X+clip.W)), int(math.Floor(clip.Y+clip.H))).Intersect(dst.Bounds())
 	return dst.SubImage(r).(*ebiten.Image)
+}
+
+func intersectUI(a, b ui.Rect) ui.Rect {
+	x, y := max(a.X, b.X), max(a.Y, b.Y)
+	return ui.Rect{X: x, Y: y, W: max(0, min(a.X+a.W, b.X+b.W)-x), H: max(0, min(a.Y+a.H, b.Y+b.H)-y)}
 }

@@ -23,16 +23,13 @@ var fontSource = func() *textv2.GoTextFaceSource {
 	return source
 }()
 
-func text(dst *ebiten.Image, value string, x, y int) {
-	drawText(dst, value, float64(x), float64(y), 14)
-}
 func labelFits(value string, width, size float64) bool {
 	measured, _ := textv2.Measure(value, &textv2.GoTextFace{Source: fontSource, Size: size}, 18)
 	return measured <= width
 }
 
 // Wrap uses the same embedded glyph metrics as rendering; it never shrinks text.
-func wrapLines(values []string, width, size float64) []string {
+func wrapLines(values []string, width, size float64, terms []textTerm) []string {
 	face := &textv2.GoTextFace{Source: fontSource, Size: size}
 	out := []string{}
 	for _, value := range values {
@@ -62,6 +59,7 @@ func wrapLines(values []string, width, size float64) []string {
 						}
 					}
 				}
+				n = termBoundary(runes, n, terms)
 				out = append(out, strings.TrimSpace(string(runes[:n])))
 				runes = runes[n:]
 			}
@@ -70,14 +68,14 @@ func wrapLines(values []string, width, size float64) []string {
 	return out
 }
 
-func drawText(dst *ebiten.Image, value string, x, y, size float64) {
-	drawColoredText(dst, value, x, y, size, color.RGBA{235, 240, 249, 255})
+func (g *Game) drawText(dst *ebiten.Image, value string, x, y, size float64) {
+	g.drawColoredText(dst, value, x, y, size, color.RGBA{235, 240, 249, 255})
 }
 func measuredText(value string, size float64) float64 {
 	w, _ := textv2.Measure(value, &textv2.GoTextFace{Source: fontSource, Size: size}, 18)
 	return w
 }
-func drawColoredText(dst *ebiten.Image, value string, x, y, size float64, col color.Color) {
+func drawTextSpan(dst *ebiten.Image, value string, x, y, size float64, col color.Color) {
 	face := &textv2.GoTextFace{Source: fontSource, Size: size}
 	op := &textv2.DrawOptions{}
 	op.GeoM.Translate(x, y)
@@ -87,7 +85,7 @@ func drawColoredText(dst *ebiten.Image, value string, x, y, size float64, col co
 }
 
 // Fit labels using glyph metrics, including Chinese, instead of byte lengths.
-func fitText(dst *ebiten.Image, value string, x, y, width, size float64, centered bool) {
+func (g *Game) fitText(dst *ebiten.Image, value string, x, y, width, size float64, centered bool) {
 	face := &textv2.GoTextFace{Source: fontSource, Size: size}
 	w, _ := textv2.Measure(value, face, 18)
 	if w > width {
@@ -102,11 +100,13 @@ func fitText(dst *ebiten.Image, value string, x, y, width, size float64, centere
 				hi = mid - 1
 			}
 		}
+		g.ensureTextTerms()
+		lo = termBoundary(runes, lo, g.u.textTerms)
 		value = string(runes[:lo]) + "…"
 		w, _ = textv2.Measure(value, face, 18)
 	}
 	if centered {
 		x += (width - w) / 2
 	}
-	drawText(dst, value, x, y, size)
+	g.drawText(dst, value, x, y, size)
 }

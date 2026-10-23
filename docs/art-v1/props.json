@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-15",
+  "tool": "image_gen.imagegen",
+  "assets": [
+    {
+      "key": "prop:hall-solo",
+      "id": "hall:solo",
+      "slug": "hall-solo",
+      "category": "props",
+      "subject": "A contemporary expedition planning workstation: one compact graphite metal desk with a warm-gray flat field map plate, three small inset muted teal status pads, and one closed rugged carry case. One integrated isolated piece of base/workshop furniture. No legible writing or map labels.",
+      "camera": "STRICT straight-down orthographic TOP VIEW, not perspective or isometric. Only visible top surfaces, no front elevation. A rectangular footprint around3:2, centered.",
+      "source": "docs/art-v1/sources/props/hall-solo.png",
+      "file": "content/base/assets/art-v1/props/hall-solo.png",
+      "prompt": "A contemporary expedition planning workstation: one compact graphite metal desk with a warm-gray flat field map plate, three small inset muted teal status pads, and one closed rugged carry case. One integrated isolated piece of base/workshop furniture. No legible writing or map labels.\nCamera: STRICT straight-down orthographic TOP VIEW, not perspective or isometric. Only visible top surfaces, no front elevation. A rectangular footprint around3:2, centered.\nUse case: stylized-concept\nAsset type: production transparent 2D game sprite for Local Manifestation.\nInput: knife is STYLE REFERENCE ONLY, create the different subject. Match minimal contemporary hand-painted indie game art, matte polymer/cloth/steel, clean dark contour, broad opaque desaturated graphite/warm-gray/off-white blocks and very small muted teal functional accents. Calm everyday workshop aesthetic, readable at small game size. No photorealism, no 3D render, no fantasy runes, medieval details, steampunk ornaments or neon.\nOne subject on1024square canvas, whole silhouette centered with15% transparent padding. True transparent alpha; no scene, scenery, ground, cast shadow, text, numbers, logos, frame, border, UI or watermark.",
+      "transparent_background": true,
+      "sha256": "0d04cf5d5020a56897d0708ffc3a45886515990c836fdb293c34d6dda1b2c57e",
+      "source_sha256": "fec84d4cac877d29969e7bf45b2304b211a4a149af6c767a6f41a1ab5b77a1a3"
+    },
+    {
+      "key": "prop:hall-room-settings",
+      "id": "hall:room-settings",
+      "slug": "hall-room-settings",
+      "category": "props",
+      "subject": "A contemporary settings workbench: one compact gray industrial desk containing a square panel with three large rotary dials, a slider strip and a small inset muted teal screen, all unlabeled, a closed slim tool tray on the side. One integrated isolated workshop workstation, no extra detached props.",
+      "camera": "STRICT straight-down orthographic TOP VIEW, not perspective or isometric. Only visible top surfaces, no front elevation. A rectangular footprint around3:2, centered.",
+      "source": "docs/art-v1/sources/props/hall-room-settings.png",
+      "file": "content/base/assets/art-v1/props/hall-room-settings.png",
+      "prompt": "A contemporary settings workbench: one compact gray industrial desk containing a square panel with three large rotary dials, a slider strip and a small inset muted teal screen, all unlabeled, a closed slim tool tray on the side. One integrated isolated workshop workstation, no extra detached props.\nCamera: STRICT straight-down orthographic TOP VIEW, not perspective or isometric. Only visible top surfaces, no front elevation. A rectangular footprint around3:2, centered.\nUse case: stylized-concept\nAsset type: production transparent 2D game sprite for Local Manifestation.\nInput: knife is STYLE REFERENCE ONLY, create the different subject. Match minimal contemporary hand-painted indie game art, matte polymer/cloth/steel, clean dark contour, broad opaque desaturated graphite/warm-gray/off-white blocks and very small muted teal functional accents. Calm everyday workshop aesthetic, readable at small game size. No photorealism, no 3D render, no fantasy runes, medieval details, steampunk ornaments or neon.\nOne subject on1024square canvas, whole silhouette centered with15% transparent padding. True transparent alpha; no scene, scenery, ground, cast shadow, text, numbers, logos, frame, border, UI or watermark.",
+      "transparent_background": true,
+      "sha256": "981144c4231279d98ff6fe403e71c4943f32ed8787fef61ca43d25f5e122813f",
+      "source_sha256": "bc11c185d921b94b46da4cc17b225dd7892f6269e4733588bee49c163a65dafe"
+    }
+  ]
+}

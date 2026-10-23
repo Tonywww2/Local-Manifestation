@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"hsmultiplayer/internal/content"
+	"hsmultiplayer/pkg/animation"
 	"hsmultiplayer/pkg/geometry"
 	"hsmultiplayer/pkg/model"
 	"hsmultiplayer/pkg/protocol"
@@ -21,11 +22,12 @@ type worldShotPose struct {
 	Age                float64
 }
 type worldFrame struct {
-	Seconds float64
-	Scenes  map[string]protocol.Scene
-	Nodes   map[string]model.Node
-	Players map[string]worldPlayerPose
-	Shots   map[string]worldShotPose
+	Seconds      float64
+	Scenes       map[string]protocol.Scene
+	Nodes        map[string]model.Node
+	Players      map[string]worldPlayerPose
+	Shots        map[string]worldShotPose
+	EnemyActions map[int]model.EnemyActionState
 }
 type worldHistory struct {
 	frames      []worldFrame
@@ -52,21 +54,24 @@ func projectileDisplayID(s protocol.Scene, p model.Projectile) string {
 	return fmt.Sprintf("%s:shot:%d", s.ID, p.ID)
 }
 
-// Capture only the visible ring. Received scene/player trees remain immutable;
+// Capture only the current independent room. Received scene/player trees remain immutable;
 // interpolation owns positions and never copies the entire mutable game world.
 func (g *Game) captureWorldFrame() worldFrame {
 	rate := g.state.TickRate
 	if !timing.LogicRate(rate) {
 		rate = timing.DefaultLogicRate
 	}
-	f := worldFrame{Seconds: float64(g.state.ServerTick) / float64(rate), Scenes: map[string]protocol.Scene{}, Nodes: map[string]model.Node{}, Players: map[string]worldPlayerPose{}, Shots: map[string]worldShotPose{}}
+	f := worldFrame{Seconds: float64(g.state.ServerTick) / float64(rate), Scenes: map[string]protocol.Scene{}, Nodes: map[string]model.Node{}, Players: map[string]worldPlayerPose{}, Shots: map[string]worldShotPose{}, EnemyActions: map[int]model.EnemyActionState{}}
 	from := g.currentNode()
 	for _, n := range g.state.Nodes {
-		if !inFirstRing(from, n) {
+		if n.ID != from.ID {
 			continue
 		}
 		s := g.sceneForNode(n)
 		f.Scenes[n.ID], f.Nodes[n.ID] = s, n
+		for _, action := range s.EnemyActions {
+			f.EnemyActions[action.ID] = action
+		}
 		for _, p := range s.Players {
 			f.Players[p.ID] = worldPlayerPose{worldPosition(n, s, p.Position), p.PositionEpoch, p.Life}
 		}
@@ -94,6 +99,18 @@ func (h *worldHistory) Push(f worldFrame, floor, rate int, at time.Time, snapsho
 	}
 	h.floor, h.rate, h.arrival = floor, rate, at
 	h.frames = append(h.frames, f)
+	// Two seconds covers the configured maximum display delay. Keep one older
+	// bracket and release discarded snapshots rather than retaining projectile trees.
+	cutoff := f.Seconds - 2.1
+	discard := 0
+	for discard+2 < len(h.frames) && h.frames[discard+1].Seconds < cutoff {
+		discard++
+	}
+	if discard > 0 {
+		copy(h.frames, h.frames[discard:])
+		clear(h.frames[len(h.frames)-discard:])
+		h.frames = h.frames[:len(h.frames)-discard]
+	}
 	if len(h.frames) > 128 {
 		copy(h.frames, h.frames[len(h.frames)-128:])
 		h.frames = h.frames[:128]
@@ -109,7 +126,31 @@ func (h *worldHistory) View(at time.Time, delay time.Duration) map[string]protoc
 		target = min(last.Seconds, max(h.frames[0].Seconds, max(h.renderTime, last.Seconds+at.Sub(h.arrival).Seconds()-delay.Seconds())))
 	}
 	h.renderTime = target
-	return interpolateWorld(h.frames, target)
+	view := interpolateWorld(h.frames, target)
+	if target >= last.Seconds {
+		// Only cosmetic timelines can advance between the newest samples.
+		// Bound stalls and freeze paused rooms; never extrapolate game outcomes.
+		dt := max(0, min(.1, at.Sub(h.arrival).Seconds()))
+		for id, s := range view {
+			if s.State != "paused" && s.State != "faulted" && s.State != "cleared" {
+				for i := range s.Actions {
+					s.Actions[i] = animation.Advance(s.Actions[i], dt)
+				}
+				for i := range s.EnemyActions {
+					s.EnemyActions[i] = animation.AdvanceEnemy(s.EnemyActions[i], dt)
+				}
+			} else {
+				for i := range s.Actions {
+					s.Actions[i].Life = animation.AdvanceAction(s.Actions[i].Life, dt)
+				}
+				for i := range s.EnemyActions {
+					s.EnemyActions[i].Death = animation.AdvanceAction(s.EnemyActions[i].Death, dt)
+				}
+			}
+			view[id] = s
+		}
+	}
+	return view
 }
 
 // A shared sample time and world coordinates preserve motion even when the
@@ -131,6 +172,26 @@ func interpolateWorld(frames []worldFrame, target float64) map[string]protocol.S
 	for id, s := range latest.Scenes {
 		n := latest.Nodes[id]
 		result := copyScenePositions(s)
+		sa, okA := a.Scenes[id]
+		sb, okB := b.Scenes[id]
+		if okA && okB {
+			for i, action := range result.Actions {
+				pa, foundA := sceneAction(sa.Actions, action.Player)
+				pb, foundB := sceneAction(sb.Actions, action.Player)
+				if foundA && foundB {
+					result.Actions[i] = animation.Sample(pa, pb, target-a.Seconds, b.Seconds-a.Seconds)
+				}
+			}
+		}
+		if okA && okB {
+			for i, action := range result.EnemyActions {
+				pa, foundA := a.EnemyActions[action.ID]
+				pb, foundB := b.EnemyActions[action.ID]
+				if foundA && foundB {
+					result.EnemyActions[i] = animation.SampleEnemy(pa, pb, target-a.Seconds, b.Seconds-a.Seconds)
+				}
+			}
+		}
 		for i, p := range result.Players {
 			pa, okA := a.Players[p.ID]
 			pb, okB := b.Players[p.ID]
@@ -155,8 +216,6 @@ func interpolateWorld(frames []worldFrame, target float64) map[string]protocol.S
 			shots = append(shots, p)
 		}
 		result.Projectiles = shots
-		sa, okA := a.Scenes[id]
-		sb, okB := b.Scenes[id]
 		if okA && okB && sa.ID == s.ID && sb.ID == s.ID && sa.State == sb.State && sb.State == s.State && sa.Wave == sb.Wave && sb.Wave == s.Wave {
 			ea, eb := map[int]model.Enemy{}, map[int]model.Enemy{}
 			for _, e := range sa.Enemies {

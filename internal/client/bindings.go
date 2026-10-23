@@ -10,11 +10,10 @@ import (
 
 type bindings map[string]map[string]string
 
-var bindingGroups = [][]string{{"up", "down", "left", "right", "move", "attack", "dodge"}, {"skill1", "skill2", "skill3", "skill4"}, {"item1", "item2", "item3", "item4"}, {"map", "view", "detail", "settings", "interact"}}
+var bindingGroups = [][]string{{"up", "down", "left", "right", "move", "attack", "dodge"}, {"weapon_skill"}, {"item1", "item2", "item3", "item4"}, {"map", "view_left", "view_right", "detail", "settings", "interact"}}
 
 func defaultBindings() bindings {
-	keyboard := map[string]string{"up": "W", "down": "S", "left": "A", "right": "D", "attack": "Mouse0", "dodge": "Space", "skill1": "Q", "skill2": "E", "skill3": "R", "skill4": "F", "item1": "Digit1", "item2": "Digit2", "item3": "Digit3", "item4": "Digit4", "map": "M", "view": "Tab", "detail": "Shift", "settings": "Escape"}
-	keyboard["interact"] = "G"
+	keyboard := map[string]string{"up": "W", "down": "S", "left": "A", "right": "D", "attack": "Mouse0", "dodge": "Space", "weapon_skill": "Mouse2", "item1": "Digit1", "item2": "Digit2", "item3": "Digit3", "item4": "Digit4", "map": "M", "view_left": "Q", "view_right": "E", "detail": "Shift", "settings": "Escape", "interact": "F"}
 	mouse := map[string]string{}
 	for k, v := range keyboard {
 		mouse[k] = v
@@ -23,31 +22,56 @@ func defaultBindings() bindings {
 		delete(mouse, k)
 	}
 	mouse["move"] = "Mouse2"
-	mouse["skill2"] = "W"
-	mouse["skill3"] = "E"
-	mouse["skill4"] = "R"
+	mouse["weapon_skill"] = "Mouse1"
 	return bindings{"keyboard": keyboard, "mouse": mouse}
 }
 
 func migrateBindings(saved bindings) bindings {
 	out := cloneBindings(saved)
+	defaults := defaultBindings()
 	for _, mode := range []string{"keyboard", "mouse"} {
-		if out[mode] == nil || out[mode]["interact"] != "" {
+		items := out[mode]
+		if items == nil {
+			out[mode] = cloneBindings(defaults)[mode]
 			continue
 		}
-		for _, key := range []string{"G", "T", "V", "H", "B", "N", "J", "K", "L"} {
-			used := false
-			for _, code := range out[mode] {
-				used = used || code == key
+		for _, key := range []string{"skill1", "skill2", "skill3", "skill4"} {
+			delete(items, key)
+		}
+		if oldView, legacy := items["view"]; legacy {
+			delete(items, "view")
+			if items["interact"] == "G" {
+				delete(items, "interact")
 			}
-			if !used {
-				out[mode]["interact"] = key
-				break
+			if oldView != "" && oldView != "Tab" && items["view_right"] == "" {
+				items["view_right"] = oldView
 			}
+		}
+		for _, action := range []string{"weapon_skill", "interact", "view_left", "view_right"} {
+			assignAvailableBinding(items, action, defaults[mode][action])
 		}
 	}
 	return out
 }
+
+// Existing custom bindings take precedence over newly introduced defaults.
+func assignAvailableBinding(items map[string]string, action string, preferred ...string) {
+	if items[action] != "" {
+		return
+	}
+	candidates := append(preferred, "T", "G", "R", "H", "B", "N", "J", "K", "L", "U", "I", "O", "P", "Y", "Z", "X", "C", "V", "Q", "E", "F", "Tab")
+	for _, key := range candidates {
+		used := false
+		for _, code := range items {
+			used = used || code == key
+		}
+		if !used {
+			items[action] = key
+			return
+		}
+	}
+}
+
 func cloneBindings(b bindings) bindings {
 	out := bindings{}
 	for mode, items := range b {

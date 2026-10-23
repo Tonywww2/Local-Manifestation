@@ -13,9 +13,11 @@ import (
 	"hsmultiplayer/locales"
 	"hsmultiplayer/pkg/lobby"
 	"hsmultiplayer/pkg/localization"
+	"hsmultiplayer/pkg/perf"
 	"hsmultiplayer/pkg/protocol"
 	"io/fs"
 	"log"
+	"math"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -42,25 +44,40 @@ func main() {
 	vsync := flag.Bool("vsync", true, "synchronize rendering with display refresh")
 	inputRate := flag.Int("input-rate", 30, "input sends per second: 30 or 60")
 	interpolation := flag.Int("interpolation-ms", 100, "display interpolation buffer in milliseconds; 0 disables interpolation")
-	performance := flag.Bool("performance", false, "show measured FPS, TPS and network rates (F6)")
-	metrics := flag.String("metrics", "", "write performance JSON on exit")
+	projectileRenderer := flag.String("projectile-renderer", "batch", "developer comparison: batch (GPU shader) or sprites (cached images)")
+	performance := flag.Bool("performance", false, "show measured FPS and RTT (F6); detailed timings in Settings")
+	metrics := flag.String("metrics", "", "write bounded performance JSON every second and on exit")
 	autoplay := flag.Bool("smoke-autoplay", false, "connect, start and exercise combat input during smoke validation only")
-	smokeNode := flag.String("smoke-node", "", "combat node for smoke validation (optional)")
+	smokeNode := flag.String("smoke-node", "", "combat node for smoke validation, or movement item ID/definition with -smoke-map (optional)")
 	hostTPS := flag.Int("host-tps", 30, "local host simulation ticks per second: 30 or 60")
 	hostSnapshots := flag.Int("host-snapshot-rate", 20, "local host snapshots per second (1..60)")
 	smoke := flag.Int("smoke-frames", 0, "exit after N updates (render smoke check)")
+	smokeSeconds := flag.Duration("smoke-duration", 0, "optional wall-clock bound for explicit smoke runs, e.g. 20s")
 	shot := flag.String("screenshot", "", "save a render smoke PNG")
 	state := flag.String("smoke-state", "", "snapshot file for render validation")
 	mapView := flag.Bool("smoke-map", false, "render snapshot map")
-	oblique := flag.Bool("smoke-oblique", false, "render snapshot oblique camera")
+	rotation := flag.Float64("smoke-rotation", 0, "camera rotation in degrees relative to the default point-up view")
+	zoom := flag.Float64("smoke-zoom", 1, "camera zoom during render validation")
 	details := flag.Bool("smoke-details", false, "render snapshot damage explanation")
 	detailOffset := flag.Int("smoke-detail-offset", 0, "first weapon-window detail row during render smoke validation")
 	contentOffset := flag.Int("smoke-content-offset", 0, "window body scroll offset in pixels during render smoke validation")
-	smokeWindow := flag.String("smoke-window", "", "open a native floating window during smoke validation")
+	smokeWindow := flag.String("smoke-window", "", "open a native window or layout HUD editor during smoke validation")
 	smokeHover := flag.String("smoke-hover", "", "focus a native Hover during smoke validation")
 	smokePage := flag.String("smoke-page", "", "main or lobby during native render validation")
 	smokeAction := flag.String("smoke-hall-action", "", "walk to solo, host or join device during native validation")
+	cpuProfile := flag.String("cpuprofile", "", "write developer CPU profile on exit")
 	flag.Parse()
+	stopProfile, profileErr := perf.StartCPUProfile(*cpuProfile)
+	if profileErr != nil {
+		log.Fatal(profileErr)
+	}
+	defer stopProfile()
+	if *projectileRenderer != "batch" && *projectileRenderer != "sprites" {
+		log.Fatal("projectile renderer must be batch or sprites")
+	}
+	if *smokeSeconds < 0 || *smokeSeconds > 10*time.Minute {
+		log.Fatal("smoke duration must be 0..10m")
+	}
 	if *smokePage != "" && *smokePage != "main" && *smokePage != "lobby" || *smokeAction != "" && *smokeAction != "solo" && *smokeAction != "host" && *smokeAction != "join" {
 		log.Fatal("invalid smoke front page/action")
 	}
@@ -249,13 +266,15 @@ func main() {
 	}
 	options.TickRate = *hostTPS
 	options.SnapshotRate = *hostSnapshots
-	g := client.New(c, client.Config{ModRoot: *modRoot, Combination: *combination, ReloadContent: reload, BuildContent: build, FrameLimit: *fpsLimit, FPSOverride: fpsOverride, VSync: *vsync, VSyncOverride: vsyncOverride, InputRate: *inputRate, InterpolationDelay: time.Duration(*interpolation) * time.Millisecond, ShowPerformance: *performance || *metrics != "", Metrics: *metrics, SmokeAutoplay: *autoplay, SmokeNode: *smokeNode, Language: *language, Translations: translations, Address: *address, Name: *name, NameOverride: nameOverride, Profile: filepath.Join("data", "profiles", *profile+".json"), Host: startHost, StopHost: stopHost, RoomConfig: options, SmokePage: *smokePage, SmokeAction: *smokeAction, SmokeFrames: *smoke, Screenshot: *shot, SmokeState: *state, SmokeMap: *mapView, SmokeOblique: *oblique, SmokeDetails: *details, SmokeDetailOffset: *detailOffset, SmokeContentOffset: *contentOffset, SmokeWindow: *smokeWindow, SmokeHover: *smokeHover})
+	g := client.New(c, client.Config{ProjectileRenderer: *projectileRenderer, ModRoot: *modRoot, Combination: *combination, ReloadContent: reload, BuildContent: build, FrameLimit: *fpsLimit, FPSOverride: fpsOverride, VSync: *vsync, VSyncOverride: vsyncOverride, InputRate: *inputRate, InterpolationDelay: time.Duration(*interpolation) * time.Millisecond, ShowPerformance: *performance || *metrics != "", Metrics: *metrics, SmokeAutoplay: *autoplay, SmokeNode: *smokeNode, Language: *language, Translations: translations, Address: *address, Name: *name, NameOverride: nameOverride, Profile: filepath.Join("data", "profiles", *profile+".json"), Host: startHost, StopHost: stopHost, RoomConfig: options, SmokePage: *smokePage, SmokeAction: *smokeAction, SmokeFrames: *smoke, SmokeDuration: *smokeSeconds, Screenshot: *shot, SmokeState: *state, SmokeMap: *mapView, SmokeRotation: *rotation * math.Pi / 180, SmokeZoom: *zoom, SmokeDetails: *details, SmokeDetailOffset: *detailOffset, SmokeContentOffset: *contentOffset, SmokeWindow: *smokeWindow, SmokeHover: *smokeHover})
 	defer g.Close()
 	ebiten.SetWindowSize(*windowWidth, *windowHeight)
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	ebiten.SetRunnableOnUnfocused(true)
 	ebiten.SetTPS(60)
 	if err = ebiten.RunGame(g); err != nil {
+		g.Close()
+		stopProfile()
 		log.Fatal(err)
 	}
 }

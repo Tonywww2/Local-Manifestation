@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"hsmultiplayer/pkg/model"
+	"hsmultiplayer/pkg/perf"
 	"hsmultiplayer/pkg/protocol"
 	"hsmultiplayer/pkg/timing"
 )
@@ -16,18 +17,29 @@ type receivedMessage struct {
 	Message protocol.Message
 	At      time.Time
 }
+type latencyProbe struct {
+	id    uint64
+	at    time.Time
+	stamp perf.Stamp
+}
 type Link struct {
-	Messages    chan receivedMessage
-	requests    chan protocol.Request
-	conn        net.Conn
-	done        chan struct{}
-	once        sync.Once
-	inputMu     sync.Mutex
-	input       model.Input
-	inputAt     time.Time
-	inputActive bool
-	stopInput   bool
-	inputMeter  timing.Meter
+	diagnostics          perf.Recorder
+	pingMu               sync.Mutex
+	probe, acceptedProbe uint64
+	probes               [8]latencyProbe
+	latencyAt            time.Time
+	latency              time.Duration
+	Messages             chan receivedMessage
+	requests             chan protocol.Request
+	conn                 net.Conn
+	done                 chan struct{}
+	once                 sync.Once
+	inputMu              sync.Mutex
+	input                model.Input
+	inputAt              time.Time
+	inputActive          bool
+	stopInput            bool
+	inputMeter           timing.Meter
 }
 
 func Dial(addr string, h protocol.Hello, inputRates ...int) (*Link, error) {
@@ -58,11 +70,17 @@ func newLink(conn net.Conn, rate int) *Link {
 		scanner := bufio.NewScanner(conn)
 		scanner.Buffer(make([]byte, 4096), 4<<20)
 		for scanner.Scan() {
+			decodeStart := perf.Start()
 			var m protocol.Message
 			if json.Unmarshal(scanner.Bytes(), &m) != nil {
 				break
 			}
+			l.diagnostics.Since("client.network.decode", decodeStart)
 			received := receivedMessage{m, time.Now()}
+			if m.Kind == "pong" {
+				l.acceptPong(m.Probe, received.At)
+				continue
+			}
 			select {
 			case l.Messages <- received:
 			case <-l.done:
@@ -79,12 +97,17 @@ func newLink(conn net.Conn, rate int) *Link {
 		encoder := json.NewEncoder(conn)
 		ticker := time.NewTicker(time.Second / time.Duration(rate))
 		defer ticker.Stop()
+		pingTicker := time.NewTicker(time.Second)
+		defer pingTicker.Stop()
 		var sequence uint64
 		send := func(r protocol.Request) bool {
 			sequence++
 			r.Seq = sequence // One writer orders input and UI commands together.
 			conn.SetWriteDeadline(time.Now().Add(3 * time.Second))
-			return encoder.Encode(r) == nil
+			writeStart := perf.Start()
+			err := encoder.Encode(r)
+			l.diagnostics.Since("client.network.encode_write", writeStart)
+			return err == nil
 		}
 		for {
 			select {
@@ -92,6 +115,15 @@ func newLink(conn net.Conn, rate int) *Link {
 				return
 			case r := <-l.requests:
 				if !send(r) {
+					return
+				}
+			case <-pingTicker.C:
+				l.pingMu.Lock()
+				l.probe++
+				probe := l.probe
+				l.probes[probe%uint64(len(l.probes))] = latencyProbe{probe, time.Now(), perf.Start()}
+				l.pingMu.Unlock()
+				if !send(protocol.Request{Kind: "ping", Probe: probe}) {
 					return
 				}
 			case <-ticker.C:
@@ -158,3 +190,19 @@ func (l *Link) Send(r protocol.Request) bool {
 	}
 }
 func (l *Link) Close() { l.once.Do(func() { close(l.done); l.conn.Close() }) }
+
+func (l *Link) acceptPong(probe uint64, now time.Time) {
+	l.pingMu.Lock()
+	defer l.pingMu.Unlock()
+	p := &l.probes[probe%uint64(len(l.probes))]
+	if p.id != probe || probe <= l.acceptedProbe || p.at.IsZero() || now.Before(p.at) || now.Sub(p.at) > 8*time.Second {
+		return
+	}
+	l.latency, l.latencyAt, l.acceptedProbe = perf.Elapsed(p.stamp), now, probe
+	*p = latencyProbe{}
+}
+func (l *Link) Latency(now time.Time) (time.Duration, bool) {
+	l.pingMu.Lock()
+	defer l.pingMu.Unlock()
+	return l.latency, !l.latencyAt.IsZero() && now.Sub(l.latencyAt) < 3*time.Second
+}

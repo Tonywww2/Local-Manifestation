@@ -5,12 +5,14 @@ import (
 	"hsmultiplayer/internal/content"
 	"hsmultiplayer/pkg/damage"
 	"hsmultiplayer/pkg/model"
+	"hsmultiplayer/pkg/perf"
 	"hsmultiplayer/pkg/status"
 )
 
 // Commands and combat steps are serialized by the actor. Expiry is applied
 // before the next hit at the accepted adventure timestamp, even while paused.
 func (w *world) advanceStatuses(now int64) {
+	defer w.performance.Since("scene.logic.statuses", perf.Start())
 	if now < w.adventureTime {
 		return
 	}

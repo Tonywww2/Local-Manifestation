@@ -120,8 +120,8 @@ func (c *Catalog) validate() error {
 	if err := c.validateItems(claim); err != nil {
 		return definitionError("items", err.Error())
 	}
-	if err := c.validateSkills(claim); err != nil {
-		return definitionError("skills", err.Error())
+	if err := c.validateWeaponSkills(claim); err != nil {
+		return definitionError("weapon_skills", err.Error())
 	}
 	if err := c.validatePerks(claim); err != nil {
 		return definitionError("perks", err.Error())
@@ -130,13 +130,6 @@ func (c *Catalog) validate() error {
 		if v.RequiredPerk != "" {
 			if _, ok := c.perks[v.RequiredPerk]; !ok {
 				return definitionError(v.ID, "required perk")
-			}
-		}
-		for _, id := range v.Skills {
-			if id != "" {
-				if _, ok := c.skills[id]; !ok {
-					return definitionError(v.ID, "unknown skill")
-				}
 			}
 		}
 		if !claim(v.ID) || !valid(v.HP, 1, 1e6) || !valid(v.Speed, 1, 1000) || !valid(v.Armor, 0, 1e6) {
@@ -148,6 +141,12 @@ func (c *Catalog) validate() error {
 		for _, score := range []float64{v.Attributes.Strength, v.Attributes.Agility, v.Attributes.Constitution, v.Attributes.Intelligence, v.Attributes.Sense, v.Attributes.Mana} {
 			if !valid(score, 0, 1e6) {
 				return definitionError(v.ID, "attributes")
+			}
+		}
+		for _, key := range model.AttributeKeys() {
+			score, _ := v.GrowthPreference.Value(key)
+			if !valid(score, 0, 1000) || score != math.Trunc(score) {
+				return definitionError(v.ID, "growth preference")
 			}
 		}
 		contributions := make([]model.StatContribution, 0, len(v.Modifiers))
@@ -188,7 +187,7 @@ func (c *Catalog) validate() error {
 				return definitionError(v.ID, "type resistance")
 			}
 		}
-		if !claim(v.ID) || !valid(v.HP, 1, 1e6) || !valid(v.Speed, 1, 1000) || !valid(v.Radius, 1, 80) || !valid(v.Damage, 0, 1e6) || !valid(v.Armor, 0, 1e6) || v.Behavior == "" {
+		if !claim(v.ID) || !valid(v.HP, 1, 1e6) || !valid(v.Speed, 1, 1000) || !valid(v.Radius, 1, 80) || !valid(v.VisualRadius, 0, 80) || !valid(v.Damage, 0, 1e6) || !valid(v.Armor, 0, 1e6) || v.Behavior == "" {
 			return definitionError(v.ID, "enemy parameters or ID")
 		}
 		if len(v.Attacks) > 8 {
@@ -207,12 +206,18 @@ func (c *Catalog) validate() error {
 	if c.adventure.Format != model.ContentFormat {
 		return adventureError("format", fmt.Sprintf("version (expected %d)", model.ContentFormat))
 	}
+	c.roomArenas = map[string]geometry.Arena{}
+	c.nodeArenas = map[string]geometry.Arena{}
 	for _, room := range c.adventure.Rooms {
+		arena, err := geometry.NewRoomArena(room.Width, room.Height, room.Hexes)
+		if err != nil {
+			return adventureError(room.ID, "hexes: "+err.Error())
+		}
 		if len(room.Obstacles) > 128 {
 			return adventureError(room.ID, "obstacle budget")
 		}
 		for _, o := range room.Obstacles {
-			if !o.Position.Finite() || !valid(o.Radius, 1, 200) || !geometry.NewArena(room.Width, room.Height).ContainsDisk(o.Position, o.Radius) {
+			if !o.Position.Finite() || !valid(o.Radius, 1, 200) || !arena.ContainsDisk(o.Position, o.Radius) {
 				return adventureError(room.ID, "obstacle")
 			}
 		}
@@ -257,8 +262,12 @@ func (c *Catalog) validate() error {
 			}
 		}
 		c.rooms[room.ID] = room
+		c.roomArenas[room.ID] = arena
 	}
 	for _, n := range c.adventure.Nodes {
+		if n.WeaponUpgrade && n.Kind != "shop" {
+			return adventureError(n.ID, "weapon upgrade facility")
+		}
 		if n.Facility != "" && n.Facility != "revive" || n.FacilityCost < 0 || n.FacilityCost > 1e6 {
 			return adventureError(n.ID, "facility")
 		}
@@ -274,6 +283,9 @@ func (c *Catalog) validate() error {
 			return adventureError(n.ID, "payment or cost")
 		}
 		if n.Room != "" {
+			if len(n.Hexes) != 0 {
+				return adventureError(n.ID, "combat node uses its room's hexes")
+			}
 			if _, ok := c.rooms[n.Room]; !ok {
 				return adventureError(n.ID, "room reference "+n.Room)
 			}
@@ -281,10 +293,15 @@ func (c *Catalog) validate() error {
 		if n.Kind == "boss" && (n.Payment != "shared" || n.Room == "") {
 			return adventureError(n.ID, "boss payment or room")
 		}
-		if n.Kind == "passage" && (n.Payment != "none" || n.Room != "" || n.Handler != "engine:noop") {
-			return adventureError(n.ID, "passage must be free and have no combat or reward handler")
+		if n.Kind == "passage" && (n.Room != "" || n.Handler != "engine:noop") {
+			return adventureError(n.ID, "passage must have no combat or reward handler")
 		}
 		c.nodes[n.ID] = n
+		arena, err := geometry.NewRoomArena(DefaultSpaceWidth, DefaultSpaceHeight, n.Hexes)
+		if err != nil {
+			return adventureError(n.ID, "hexes: "+err.Error())
+		}
+		c.nodeArenas[n.ID] = arena
 	}
 	for _, d := range c.definitions.Perks {
 		for _, id := range d.SpecialNodes {
@@ -296,8 +313,14 @@ func (c *Catalog) validate() error {
 	}
 	for _, m := range c.adventure.Maps {
 		if g := m.Generator; g != nil {
+			if g.BossApproach != "" && (g.Passage == "" || c.nodes[g.BossApproach].Kind != "shop" || g.Count.Resolve(1, 1) < 5) {
+				return adventureError(m.ID, "boss approach")
+			}
 			if !countValid(g.Count) || g.Count.Resolve(1, 1) < 2 || g.Count.Resolve(len(r.Floors), 128) > 512 || len(g.Pool) == 0 || !valid(g.ExtraEdgeChance, 0, 1) {
 				return adventureError(m.ID, "map generator")
+			}
+			if g.Passage != "" && (c.nodes[g.Passage].Kind != "passage" || g.Count.Resolve(1, 1) < 3) {
+				return adventureError(m.ID, "generator passage")
 			}
 			for _, id := range g.Pool {
 				n := c.nodes[id]
@@ -386,11 +409,30 @@ func (c *Catalog) validate() error {
 		c.maps[m.ID] = m
 	}
 	for _, f := range c.adventure.Floors {
+		if len(f.ExcludedRandomKinds) > 32 {
+			return adventureError(f.ID, "excluded random kinds")
+		}
+		excluded := map[string]bool{}
+		for _, kind := range f.ExcludedRandomKinds {
+			if kind == "" || excluded[kind] {
+				return adventureError(f.ID, "excluded random kinds")
+			}
+			excluded[kind] = true
+		}
 		if !claim(f.ID) || f.PersonalAP < 1 || f.SharedAP < 1 || f.PersonalAP > 1000 || f.SharedAP > 1000 {
 			return adventureError(f.ID, "floor parameters or ID")
 		}
 		if _, ok := c.maps[f.Map]; !ok {
 			return adventureError(f.ID, "map reference "+f.Map)
+		}
+		if g := c.maps[f.Map].Generator; g != nil {
+			allowed := false
+			for _, id := range g.Pool {
+				allowed = allowed || !excluded[c.nodes[id].Kind]
+			}
+			if !allowed {
+				return adventureError(f.ID, "all random nodes excluded")
+			}
 		}
 		if _, ok := c.rooms[f.EnhancedRoom]; !ok {
 			return adventureError(f.ID, "enhanced_room reference "+f.EnhancedRoom)

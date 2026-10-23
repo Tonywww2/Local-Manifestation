@@ -18,8 +18,10 @@ func obstacles(s protocol.Scene) []model.Obstacle {
 	return v
 }
 func (g *Game) clearWalk(s protocol.Scene, from, to model.Vec) bool {
-	// Free doors may permit a point beyond the arena disk; the authoritative
-	// traversal already clamps their strips. Only obstacles are checked here.
+	// Prediction uses the same swept boundary as the authoritative simulation.
+	if !g.sceneArena(s).ClearStep(from, to, 12) {
+		return false
+	}
 	for _, o := range s.Obstacles {
 		if !geometry.DiskStepClear(from, to, o.Position, o.Radius+12) {
 			return false
@@ -43,7 +45,7 @@ func (g *Game) navigationDirection(p model.Player, s protocol.Scene) model.Vec {
 	now := time.Now()
 	if g.pathAt.IsZero() || now.Sub(g.pathAt) > 300*time.Millisecond {
 		g.pathAt = now
-		path, err := navigation.Path(navigation.Space{Arena: geometry.NewArena(s.Width, s.Height), Obstacles: obstacles(s), Radius: 12}, p.Position, goal)
+		path, err := navigation.Path(navigation.Space{Arena: g.sceneArena(s), Obstacles: obstacles(s), Radius: 12}, p.Position, goal)
 		if err == nil {
 			g.waypoints = path
 		} else {

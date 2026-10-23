@@ -16,13 +16,13 @@ type SegmentResult struct {
 	Overkill   float64             `json:"overkill"`
 }
 
-func evaluateParts(q Request) (Result, error) {
+func evaluateParts(q Request, defended bool) (Result, error) {
 	if len(q.Weapon.AdditionalDamage) > 15 {
 		return Result{}, fmt.Errorf("too many damage segments")
 	}
 	parts := q.Weapon.AdditionalDamage
 	q.Weapon.AdditionalDamage = nil
-	base, err := Evaluate(q)
+	base, err := evaluate(q, defended)
 	if err != nil {
 		return Result{}, err
 	}
@@ -40,7 +40,7 @@ func evaluateParts(q Request) (Result, error) {
 			next.FlatBonuses = append(next.FlatBonuses, Bonus{ID: b.ID, Value: b.Amount, Origin: b.Source, Basis: b.Basis})
 		}
 		next.Defense.IgnoreArmor = q.Defense.IgnoreArmor || p.Type == "magic" || p.Type == "electromagnetic"
-		part, err := Evaluate(next)
+		part, err := evaluate(next, defended)
 		if err != nil {
 			return Result{}, err
 		}

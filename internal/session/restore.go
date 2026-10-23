@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"hsmultiplayer/internal/content"
 	"hsmultiplayer/internal/persistence"
+	"hsmultiplayer/pkg/expedition"
 	"hsmultiplayer/pkg/life"
 	"hsmultiplayer/pkg/model"
 	"reflect"
@@ -75,7 +76,7 @@ func validateRestore(c *content.Catalog, saved *persistence.Checkpoint) error {
 	if s.PersonalInitial != x || s.SharedInitial != y || s.SharedAP != y {
 		return bad("layer initial AP")
 	}
-	template = content.AddSpecialNodes(template, special)
+	template = c.AddLayerSpecialNodes(template, special, s.Floor)
 	if !reflect.DeepEqual(s.Terrain, template.Terrain) {
 		return bad("terrain")
 	}
@@ -93,7 +94,7 @@ func validateRestore(c *content.Catalog, saved *persistence.Checkpoint) error {
 			return bad("node identity " + n.ID)
 		}
 		nd := c.Node(n.Definition)
-		if n.Kind != nd.Kind || n.Payment != nd.Payment || n.Cost != nd.Cost || n.Room != nd.Room {
+		if n.Blocking != expedition.Blocking(nd) || n.Kind != nd.Kind || n.Payment != nd.Payment || n.Cost != nd.Cost || n.Room != nd.Room {
 			return bad("node definition " + n.ID)
 		}
 		nodes[n.ID] = true
@@ -116,6 +117,18 @@ func validateRestore(c *content.Catalog, saved *persistence.Checkpoint) error {
 	for _, p := range s.Players {
 		counters[p.ID] = p.Inventory.NextID
 	}
+	checkID := func(id string) error {
+		index := strings.LastIndex(id, ":")
+		if index < 1 {
+			return bad("item identity")
+		}
+		number, err := strconv.ParseUint(id[index+1:], 10, 64)
+		if err != nil || number == 0 || number > counters[id[:index]] || items[id] {
+			return bad("item identity or counter")
+		}
+		items[id] = true
+		return nil
+	}
 	for _, p := range s.Players {
 		if err := c.ValidateRanks(p.MetaRanks); err != nil {
 			return bad("meta ranks " + p.ID)
@@ -125,18 +138,6 @@ func validateRestore(c *content.Catalog, saved *persistence.Checkpoint) error {
 		}
 		if s.SpecialMode && (p.Inventory.Capacity != s.BackpackCapacity || p.Inventory.AccessorySlots != s.AccessorySlots) {
 			return bad("inventory limits")
-		}
-		checkID := func(id string) error {
-			index := strings.LastIndex(id, ":")
-			if index < 1 {
-				return bad("item identity")
-			}
-			number, err := strconv.ParseUint(id[index+1:], 10, 64)
-			if err != nil || number == 0 || number > counters[id[:index]] || items[id] {
-				return bad("item identity or counter")
-			}
-			items[id] = true
-			return nil
 		}
 		for _, it := range p.Inventory.Items {
 			if err := checkID(it.ID); err != nil {
@@ -164,6 +165,20 @@ func validateRestore(c *content.Catalog, saved *persistence.Checkpoint) error {
 			return bad("stats " + p.ID + ": " + err.Error())
 		}
 		players[p.ID] = true
+	}
+	if len(s.GroundLoot) > 4096 {
+		return bad("shared loot budget")
+	}
+	for _, drop := range s.GroundLoot {
+		if !nodes[drop.Node] {
+			return bad("shared loot node")
+		}
+		if err := checkID(drop.Item.ID); err != nil {
+			return err
+		}
+		if err := content.ValidateLoot(c, drop, s.AdventureTime); err != nil {
+			return bad("shared loot: " + err.Error())
+		}
 	}
 	visits := map[string]bool{}
 	for _, visit := range saved.Visits {

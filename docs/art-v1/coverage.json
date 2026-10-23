@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-15",
+  "scope": "Final registry and file coverage; no behavior tests run.",
+  "manifest": "content/base/manifest.json",
+  "registered_keys": 151,
+  "unique_runtime_paths": 146,
+  "coverage": {
+    "item_icons": {
+      "expected": 72,
+      "registered": 72,
+      "kinds": {
+        "weapon": 11,
+        "accessory": 33,
+        "armor": 12,
+        "consumable": 5,
+        "movement": 7,
+        "passive": 4
+      }
+    },
+    "held_weapons": {
+      "expected": 11,
+      "registered": 11,
+      "internal_definition_without_item_or_sprite": [
+        "base:root-bolt"
+      ]
+    },
+    "player_bodies": {
+      "expected": 4,
+      "registered": 4
+    },
+    "portraits": {
+      "expected": 4,
+      "registered": 4,
+      "note": "Reuses matching empty-hand chassis body artwork"
+    },
+    "enemies": {
+      "expected": 13,
+      "registered": 13
+    },
+    "floors": {
+      "unique": 16,
+      "default_alias": "floor:start"
+    },
+    "props": {
+      "expected": 10,
+      "registered": 10
+    },
+    "skeletal_atlases": {
+      "players": 4,
+      "enemies": 13,
+      "parts_per_atlas": 24,
+      "registered": 17,
+      "rig_library": "animation:rigs",
+      "alpha_audit": "animation-alpha-audit.json"
+    },
+    "layout": true,
+    "main_menu": "Approved generated workshop backdrop, formatted to 1920x1080 at assets/art-v1/ui/main-menu.png"
+  },
+  "duplicate_resource_keys": [],
+  "id_mismatches": [],
+  "source_paths_registered": [],
+  "missing_files_at_registry_snapshot": [],
+  "notes": [
+    "All 151 resource keys verified present after generation completed; 146 unique runtime files, including 17 four-direction skeletal atlases and a rig library.",
+    "No source images registered; sources under docs/art-v1 are excluded from runtime pack.",
+    "Manifest id/version/sdk/definitions/adventure/scripts were preserved."
+  ]
+}

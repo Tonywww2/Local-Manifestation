@@ -1,0 +1,3435 @@
+{
+  "version": 1,
+  "tool": "built-in image_gen",
+  "layout": {
+    "columns": [
+      "body",
+      "head",
+      "arm_left",
+      "arm_right",
+      "leg_left",
+      "leg_right"
+    ],
+    "rows": [
+      "front",
+      "back",
+      "right",
+      "left"
+    ],
+    "cell_width": 256,
+    "cell_height": 256,
+    "width": 1536,
+    "height": 1024
+  },
+  "alpha_audit_file": "docs/art-v1/animation-alpha-audit.json",
+  "assets": [
+    {
+      "id": "base:scout",
+      "kind": "player",
+      "slug": "player-scout",
+      "key": "rig:base:scout",
+      "reference_file": "content/base/assets/art-v1/players/scout.png",
+      "source_file": "docs/art-v1/sources/animation/player-scout.png",
+      "file": "content/base/assets/art-v1/animation/player-scout.png",
+      "prompt": "Use case: stylized-concept.\nAsset type: PRODUCTION skeletal animation parts ATLAS, not a character sheet, for Local Manifestation, a contemporary 2D orthographic action game.\nInput image is identity and style reference ONLY. Preserve exactly that actor's clothing, anatomy and palette, but split the subject into isolated independent cutout parts.\nCanvas is LANDSCAPE 1536 pixels wide × 1024 pixels high. Fixed INVISIBLE regular grid EXACTLY 6 COLUMNS × 4 ROWS, 24 equal cells, each 256×256 pixels. No extra margins that change cell centers.\nRows, top to bottom: 1 FRONT facing screen DOWN (show face); 2 BACK facing screen UP (show rear head, no face); 3 RIGHT side facing screen RIGHT; 4 LEFT side facing screen LEFT. Body view is upright orthographic slightly overhead, same game-camera elevation and scale for all rows. NOT action poses.\nColumns, left to right in EVERY row: 1 BODY / torso only; 2 HEAD / upper feature only; 3 entire ARM_LEFT from shoulder to hand; 4 entire ARM_RIGHT from shoulder to hand; 5 entire LEG_LEFT from hip to foot; 6 entire LEG_RIGHT from hip to foot. Arms and legs are named from actor's own left/right. Side rows MUST STILL have both distinct arm cells and both distinct leg cells.\nEvery one of the 24 cells contains EXACTLY ONE detached part at its cell center, no complete people. Never draw arms/legs/head attached to torso. Long axis of every limb is upright vertical in the image, shoulder/hip socket at its top and hand/foot at bottom, relaxed straight shape; face or shoe points according to row. A small overlap allowance on joint ends. Parts remain fully inside their cell, 20 pixel transparent gap from every cell edge; no part touches another cell.\nUnified style: modern restrained hand-painted 2D indie game art, matte cloth/polymer/steel, deep-charcoal clean outlines, simple broad opaque shapes and sparse brushed texture, graphite gray / ash gray / warm white with tiny muted teal functional accents. Not photorealism, 3D render, pixel art, medieval fantasy, runes or steampunk.\nGenuinely transparent alpha everywhere outside the parts. NO grid lines, no boxes, no captions, no row/column labels, no words, no digits, no background, no floor, no cast shadows, no weapons or handheld equipment, no full-body silhouettes in any cell.\nActor identity and required anatomy: A lean everyday explorer in a light warm-gray hood-down field jacket with a slim charcoal cross-body pouch and muted teal buckle, dark straight trousers, low soft shoes, dark cap over short dark hair. Torso includes jacket body, hood behind neck, pouch and strap only. Head includes cap, short hair and neutral face. Arms are individual gray sleeves ending in bare hands; legs are individual dark trouser legs ending in soft shoes. Keep the slim silhouette and contemporary clothing.",
+      "source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-c0d6f382-cf46-42bb-aeee-bf6dc37f0f4f.png",
+      "edit_prompt": "Edit this existing 6-column ×4-row skeletal parts atlas. Preserve the exact canvas size, grid positions, clothing identity, colors and every existing valid arm/leg/head part. REMOVE the entire gray/black background and all vignette/glow/shadows; the background must be actual transparent alpha, including between every part and around every cell edge. DO NOT replace with painted checkerboard or solid color.\nCorrect ONLY the FIRST COLUMN in all four rows: replace each complete jacket/hood silhouette with JUST THE CENTRAL TORSO panel from collar base to waist. Remove all sleeves, shoulders extending as arms, hood/head, hands, legs. First column body must end at the shoulder sockets with a short open neck rim so the separately supplied heads/arms can be attached by the engine. For front/back the torso should be a short near-rectangular vest/jacket trunk, side views a narrow jacket trunk.\nKeep columns2–6 detached. Keep the entire grid exactly6 columns4rows, same centers as before. No text, grid borders, room or floor. Transparent cutout PNG. ",
+      "draft_source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-11b385d3-85ea-45f6-9ec5-92721a95bdac.png",
+      "cleanup_prompt": "Clean this 6×4 skeletal cutout atlas for use in a real game. Keep the same 1536×1024 canvas and all24 cell centers, part identities, exact part arrangement, existing sleeveless torso shapes and style. Required corrections ONLY: (1) Remove ALL disconnected gray/colored speckles, dust, haze, halo and mottled residue outside each main part. Outside the large connected silhouette of each part must be pure transparent alpha with clean hard-edged outlines, no feathered cloud or glow. Use clean cel-shaded cutout edges rather than distressed paper edges. (2) Third row both boots/toes must face SCREEN RIGHT. Fourth row both boots/toes must face SCREEN LEFT. In rows3/4 do not mirror the whole atlas or move the parts; correct only the boots of the individual legs which face the wrong way. Preserve separate left/right arms and legs. No new labels, borders, grid or background. This is a transparent PNG game atlas, not a painted poster.",
+      "pre_cleanup_source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-a5ac7f2b-205a-42e8-b3a6-0973ef2f9a63.png",
+      "foot_fix_prompt": "Targeted sprite atlas correction. Keep the existing image pixel canvas1536×1024, exact6×4 cells, current alpha transparency and identical styles. Change only the leg at row3,column6 (x=1280..1535,y=512..767) by reflecting its FOOT/SHOE horizontally so toe faces RIGHT, keeping upper leg position. Change only the leg at row4,column6 (x=1280..1535,y=768..1023) so its FOOT/SHOE faces LEFT. All remaining22 cells stay exactly unchanged. This is not a full sheet redraw. Preserve heads, torsos and arms exactly. No background, text or grid. Third row means its entire anatomy points SCREEN RIGHT; fourth row SCREEN LEFT.",
+      "pre_foot_fix_source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-10169d0b-0892-439a-9a10-07713ccd3cd7.png",
+      "sha256": "bdf268d52505bdd978256fa7f436ecb3924dd474dffe6673bb1d54323d08a8ad",
+      "source_sha256": "8c75ccb6650310cfa28e04d7fc6fe33a6e998ca369cc1ed5e812959339432f2a",
+      "source_size": [
+        1536,
+        1024
+      ],
+      "bytes": 1173941,
+      "width": 1536,
+      "height": 1024,
+      "format": "RGBA PNG",
+      "alpha": true,
+      "processing": "Shared .cache/art-v1/format-atlas.ps1: identify actual 4 row and 6 column transparent bands; alpha>16 bounds crop; aspect-preserving bicubic scale; center each generated part in256x256 cell with16px minimum margin; no painting, no new part geometry.",
+      "checked": "Individually inspected generated atlas and final edits; source anatomy and side shoe directions corrected with built-in image_gen; all24 packed cells have exact alpha0 edges.",
+      "alpha_formatting": {
+        "source_width": 1536,
+        "source_height": 1024,
+        "alpha_min": 0,
+        "alpha_max": 254,
+        "source_transparent_pixels": 1158861,
+        "width": 1536,
+        "height": 1024,
+        "cell_width": 256,
+        "cell_height": 256,
+        "padding": 16,
+        "border_alpha_max": 0,
+        "layout_cuts": [
+          {
+            "row": 0,
+            "column": 0,
+            "source": [
+              67,
+              38,
+              149,
+              199
+            ],
+            "target": [
+              44,
+              16,
+              168,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 1,
+            "source": [
+              348,
+              61,
+              109,
+              163
+            ],
+            "target": [
+              309,
+              16,
+              150,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 2,
+            "source": [
+              613,
+              27,
+              68,
+              223
+            ],
+            "target": [
+              606,
+              16,
+              68,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 3,
+            "source": [
+              856,
+              27,
+              68,
+              223
+            ],
+            "target": [
+              862,
+              16,
+              68,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 4,
+            "source": [
+              1111,
+              20,
+              77,
+              223
+            ],
+            "target": [
+              1113,
+              16,
+              77,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 5,
+            "source": [
+              1373,
+              20,
+              77,
+              223
+            ],
+            "target": [
+              1369,
+              16,
+              77,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 0,
+            "source": [
+              67,
+              286,
+              149,
+              200
+            ],
+            "target": [
+              44,
+              272,
+              167,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 1,
+            "source": [
+              348,
+              315,
+              110,
+              153
+            ],
+            "target": [
+              303,
+              272,
+              161,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 2,
+            "source": [
+              607,
+              271,
+              72,
+              233
+            ],
+            "target": [
+              605,
+              272,
+              69,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 3,
+            "source": [
+              859,
+              271,
+              71,
+              233
+            ],
+            "target": [
+              862,
+              272,
+              68,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 4,
+            "source": [
+              1108,
+              271,
+              81,
+              230
+            ],
+            "target": [
+              1112,
+              272,
+              79,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 5,
+            "source": [
+              1371,
+              271,
+              81,
+              230
+            ],
+            "target": [
+              1368,
+              272,
+              79,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 0,
+            "source": [
+              90,
+              533,
+              123,
+              204
+            ],
+            "target": [
+              60,
+              528,
+              135,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 1,
+            "source": [
+              334,
+              555,
+              166,
+              166
+            ],
+            "target": [
+              272,
+              528,
+              224,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 2,
+            "source": [
+              612,
+              526,
+              70,
+              224
+            ],
+            "target": [
+              605,
+              528,
+              70,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 3,
+            "source": [
+              857,
+              526,
+              69,
+              224
+            ],
+            "target": [
+              861,
+              528,
+              69,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 4,
+            "source": [
+              1102,
+              526,
+              123,
+              222
+            ],
+            "target": [
+              1090,
+              528,
+              124,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 5,
+            "source": [
+              1377,
+              526,
+              145,
+              218
+            ],
+            "target": [
+              1333,
+              528,
+              149,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 0,
+            "source": [
+              64,
+              781,
+              131,
+              199
+            ],
+            "target": [
+              54,
+              784,
+              147,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 1,
+            "source": [
+              313,
+              802,
+              157,
+              162
+            ],
+            "target": [
+              275,
+              784,
+              217,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 2,
+            "source": [
+              616,
+              771,
+              74,
+              236
+            ],
+            "target": [
+              605,
+              784,
+              70,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 3,
+            "source": [
+              848,
+              771,
+              73,
+              236
+            ],
+            "target": [
+              861,
+              784,
+              69,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 4,
+            "source": [
+              1069,
+              772,
+              134,
+              224
+            ],
+            "target": [
+              1085,
+              784,
+              134,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 5,
+            "source": [
+              1356,
+              772,
+              133,
+              224
+            ],
+            "target": [
+              1341,
+              784,
+              133,
+              224
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "base:arcanist",
+      "kind": "player",
+      "slug": "player-arcanist",
+      "key": "rig:base:arcanist",
+      "reference_file": "content/base/assets/art-v1/players/arcanist.png",
+      "source_file": "docs/art-v1/sources/animation/player-arcanist.png",
+      "file": "content/base/assets/art-v1/animation/player-arcanist.png",
+      "prompt": "Use case: stylized-concept.\nAsset type: PRODUCTION skeletal animation parts ATLAS, not a character sheet, for Local Manifestation, a contemporary 2D orthographic action game.\nInput image is identity and style reference ONLY. Preserve exactly that actor's clothing, anatomy and palette, but split the subject into isolated independent cutout parts.\nCanvas is LANDSCAPE 1536 pixels wide × 1024 pixels high. Fixed INVISIBLE regular grid EXACTLY 6 COLUMNS × 4 ROWS, 24 equal cells, each 256×256 pixels. No extra margins that change cell centers.\nRows, top to bottom: 1 FRONT facing screen DOWN (show face); 2 BACK facing screen UP (show rear head, no face); 3 RIGHT side facing screen RIGHT; 4 LEFT side facing screen LEFT. Body view is upright orthographic slightly overhead, same game-camera elevation and scale for all rows. NOT action poses.\nColumns, left to right in EVERY row: 1 BODY / torso only; 2 HEAD / upper feature only; 3 entire ARM_LEFT from shoulder to hand; 4 entire ARM_RIGHT from shoulder to hand; 5 entire LEG_LEFT from hip to foot; 6 entire LEG_RIGHT from hip to foot. Arms and legs are named from actor's own left/right. Side rows MUST STILL have both distinct arm cells and both distinct leg cells.\nEvery one of the 24 cells contains EXACTLY ONE detached part at its cell center, no complete people. Never draw arms/legs/head attached to torso. Long axis of every limb is upright vertical in the image, shoulder/hip socket at its top and hand/foot at bottom, relaxed straight shape; face or shoe points according to row. A small overlap allowance on joint ends. Parts remain fully inside their cell, 20 pixel transparent gap from every cell edge; no part touches another cell.\nUnified style: modern restrained hand-painted 2D indie game art, matte cloth/polymer/steel, deep-charcoal clean outlines, simple broad opaque shapes and sparse brushed texture, graphite gray / ash gray / warm white with tiny muted teal functional accents. Not photorealism, 3D render, pixel art, medieval fantasy, runes or steampunk.\nGenuinely transparent alpha everywhere outside the parts. NO grid lines, no boxes, no captions, no row/column labels, no words, no digits, no background, no floor, no cast shadows, no weapons or handheld equipment, no full-body silhouettes in any cell.\nActor identity and required anatomy: A contemporary field researcher wearing a short warm-white laboratory coat over graphite clothing, pale safety goggles, dark tied-back hair, charcoal gloves and practical dark work boots; tiny desaturated lavender sleeve indicator. Torso includes coat body only, WITHOUT sleeves or arms. Head includes dark hair, goggles and face. Arms are separate white coat sleeves ending in black gloves; legs are separate charcoal trouser legs ending in work boots. No wand or fantasy costume.\nFINAL CRITICAL CHECK: column1 is a SLEEVELESS torso vest trunk only, with empty arm sockets and neck cut; absolutely no attached head, arms, or legs in that column. All 24 cutouts need hard clean alpha edges, no hazy feathering, no vignette, no gray dust or soft shadow around them. Blank pixels must be transparent. Right-row BOTH shoes point right; left-row BOTH shoes point left.",
+      "source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-eea44497-2117-41bf-9909-44114f82b2c3.png",
+      "sha256": "553ce175be9a47bd2ea0805ec0f1f576eb9bca45afe956d7249b52aca71d3cae",
+      "source_sha256": "395bd2435cfe5b261c7812b7b8e8aca897f0ca679e77a32b70e278f1b12f76b0",
+      "source_size": [
+        1536,
+        1024
+      ],
+      "bytes": 1276677,
+      "width": 1536,
+      "height": 1024,
+      "format": "RGBA PNG",
+      "alpha": true,
+      "processing": "Shared .cache/art-v1/format-atlas.ps1: identify actual 4 row and 6 column transparent bands; alpha>16 bounds crop; aspect-preserving bicubic scale; center each generated part in256x256 cell with16px minimum margin; no painting, no new part geometry.",
+      "checked": "Individually inspected generated atlas and final edits; source anatomy and side shoe directions corrected with built-in image_gen; all24 packed cells have exact alpha0 edges.",
+      "alpha_formatting": {
+        "source_width": 1536,
+        "source_height": 1024,
+        "alpha_min": 0,
+        "alpha_max": 254,
+        "source_transparent_pixels": 1153804,
+        "width": 1536,
+        "height": 1024,
+        "cell_width": 256,
+        "cell_height": 256,
+        "padding": 16,
+        "border_alpha_max": 0,
+        "layout_cuts": [
+          {
+            "row": 0,
+            "column": 0,
+            "source": [
+              62,
+              44,
+              154,
+              197
+            ],
+            "target": [
+              40,
+              16,
+              175,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 1,
+            "source": [
+              301,
+              81,
+              156,
+              151
+            ],
+            "target": [
+              272,
+              19,
+              224,
+              217
+            ]
+          },
+          {
+            "row": 0,
+            "column": 2,
+            "source": [
+              611,
+              30,
+              67,
+              227
+            ],
+            "target": [
+              607,
+              16,
+              66,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 3,
+            "source": [
+              855,
+              26,
+              65,
+              231
+            ],
+            "target": [
+              864,
+              16,
+              63,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 4,
+            "source": [
+              1109,
+              25,
+              80,
+              228
+            ],
+            "target": [
+              1112,
+              16,
+              79,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 5,
+            "source": [
+              1371,
+              27,
+              73,
+              226
+            ],
+            "target": [
+              1372,
+              16,
+              72,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 0,
+            "source": [
+              55,
+              282,
+              165,
+              203
+            ],
+            "target": [
+              37,
+              272,
+              182,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 1,
+            "source": [
+              319,
+              328,
+              142,
+              144
+            ],
+            "target": [
+              273,
+              272,
+              221,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 2,
+            "source": [
+              615,
+              274,
+              65,
+              226
+            ],
+            "target": [
+              608,
+              272,
+              64,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 3,
+            "source": [
+              853,
+              274,
+              67,
+              226
+            ],
+            "target": [
+              863,
+              272,
+              66,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 4,
+            "source": [
+              1114,
+              275,
+              72,
+              222
+            ],
+            "target": [
+              1115,
+              272,
+              73,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 5,
+            "source": [
+              1372,
+              275,
+              71,
+              222
+            ],
+            "target": [
+              1372,
+              272,
+              72,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 0,
+            "source": [
+              69,
+              527,
+              142,
+              211
+            ],
+            "target": [
+              52,
+              528,
+              151,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 1,
+            "source": [
+              299,
+              574,
+              176,
+              150
+            ],
+            "target": [
+              272,
+              544,
+              224,
+              191
+            ]
+          },
+          {
+            "row": 2,
+            "column": 2,
+            "source": [
+              614,
+              520,
+              72,
+              223
+            ],
+            "target": [
+              604,
+              528,
+              72,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 3,
+            "source": [
+              849,
+              520,
+              68,
+              222
+            ],
+            "target": [
+              861,
+              528,
+              69,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 4,
+            "source": [
+              1107,
+              523,
+              110,
+              220
+            ],
+            "target": [
+              1096,
+              528,
+              112,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 5,
+            "source": [
+              1371,
+              521,
+              106,
+              220
+            ],
+            "target": [
+              1354,
+              528,
+              108,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 0,
+            "source": [
+              62,
+              765,
+              148,
+              213
+            ],
+            "target": [
+              50,
+              784,
+              156,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 1,
+            "source": [
+              304,
+              814,
+              187,
+              150
+            ],
+            "target": [
+              272,
+              806,
+              224,
+              180
+            ]
+          },
+          {
+            "row": 3,
+            "column": 2,
+            "source": [
+              618,
+              763,
+              71,
+              224
+            ],
+            "target": [
+              604,
+              784,
+              71,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 3,
+            "source": [
+              847,
+              763,
+              69,
+              224
+            ],
+            "target": [
+              861,
+              784,
+              69,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 4,
+            "source": [
+              1094,
+              767,
+              114,
+              211
+            ],
+            "target": [
+              1091,
+              784,
+              121,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 5,
+            "source": [
+              1331,
+              767,
+              110,
+              211
+            ],
+            "target": [
+              1349,
+              784,
+              117,
+              224
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "base:bulwark",
+      "kind": "player",
+      "slug": "player-bulwark",
+      "key": "rig:base:bulwark",
+      "reference_file": "content/base/assets/art-v1/players/bulwark.png",
+      "source_file": "docs/art-v1/sources/animation/player-bulwark.png",
+      "file": "content/base/assets/art-v1/animation/player-bulwark.png",
+      "prompt": "Use case: stylized-concept.\nAsset type: PRODUCTION skeletal animation parts ATLAS, not a character sheet, for Local Manifestation, a contemporary 2D orthographic action game.\nInput image is identity and style reference ONLY. Preserve exactly that actor's clothing, anatomy and palette, but split the subject into isolated independent cutout parts.\nCanvas is LANDSCAPE 1536 pixels wide × 1024 pixels high. Fixed INVISIBLE regular grid EXACTLY 6 COLUMNS × 4 ROWS, 24 equal cells, each 256×256 pixels. No extra margins that change cell centers.\nRows, top to bottom: 1 FRONT facing screen DOWN (show face); 2 BACK facing screen UP (show rear head, no face); 3 RIGHT side facing screen RIGHT; 4 LEFT side facing screen LEFT. Body view is upright orthographic slightly overhead, same game-camera elevation and scale for all rows. NOT action poses.\nColumns, left to right in EVERY row: 1 BODY / torso only; 2 HEAD / upper feature only; 3 entire ARM_LEFT from shoulder to hand; 4 entire ARM_RIGHT from shoulder to hand; 5 entire LEG_LEFT from hip to foot; 6 entire LEG_RIGHT from hip to foot. Arms and legs are named from actor's own left/right. Side rows MUST STILL have both distinct arm cells and both distinct leg cells.\nEvery one of the 24 cells contains EXACTLY ONE detached part at its cell center, no complete people. Never draw arms/legs/head attached to torso. Long axis of every limb is upright vertical in the image, shoulder/hip socket at its top and hand/foot at bottom, relaxed straight shape; face or shoe points according to row. A small overlap allowance on joint ends. Parts remain fully inside their cell, 20 pixel transparent gap from every cell edge; no part touches another cell.\nUnified style: modern restrained hand-painted 2D indie game art, matte cloth/polymer/steel, deep-charcoal clean outlines, simple broad opaque shapes and sparse brushed texture, graphite gray / ash gray / warm white with tiny muted teal functional accents. Not photorealism, 3D render, pixel art, medieval fantasy, runes or steampunk.\nGenuinely transparent alpha everywhere outside the parts. NO grid lines, no boxes, no captions, no row/column labels, no words, no digits, no background, no floor, no cast shadows, no weapons or handheld equipment, no full-body silhouettes in any cell.\nActor identity and required anatomy: A sturdy contemporary explorer wearing a thick graphite work jacket with square padded shoulders, pale-gray safety helmet with a small muted teal visor, reinforced charcoal trousers and heavy protective boots. Torso is the broad padded jacket body only, WITHOUT shoulder-to-hand arms. Head includes face and pale helmet. Each separate arm has a padded gray shoulder, heavy charcoal sleeve and dark glove; separate legs have reinforced knee fabric and chunky protective boots. Modern industrial worker, not medieval knight.\nFINAL CRITICAL CHECK: column1 is a SLEEVELESS torso vest trunk only, with empty arm sockets and neck cut; absolutely no attached head, arms, or legs in that column. All 24 cutouts need hard clean alpha edges, no hazy feathering, no vignette, no gray dust or soft shadow around them. Blank pixels must be transparent. Right-row BOTH shoes point right; left-row BOTH shoes point left.",
+      "source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-0ec14e4c-c3a1-481d-9be6-1761fd2c9852.png",
+      "sha256": "b0919444c15cd6e466dd89e92fa3aee1842604a2f6a006f1801a0ef9401c51ac",
+      "source_sha256": "bcc59fe6fd2c482503b710817ef3c44fd07b121549fe5d9a1d7faee07c2c8eca",
+      "source_size": [
+        1536,
+        1024
+      ],
+      "bytes": 1312903,
+      "width": 1536,
+      "height": 1024,
+      "format": "RGBA PNG",
+      "alpha": true,
+      "processing": "Shared .cache/art-v1/format-atlas.ps1: identify actual 4 row and 6 column transparent bands; alpha>16 bounds crop; aspect-preserving bicubic scale; center each generated part in256x256 cell with16px minimum margin; no painting, no new part geometry.",
+      "checked": "Individually inspected generated atlas and final edits; source anatomy and side shoe directions corrected with built-in image_gen; all24 packed cells have exact alpha0 edges.",
+      "alpha_formatting": {
+        "source_width": 1536,
+        "source_height": 1024,
+        "alpha_min": 0,
+        "alpha_max": 254,
+        "source_transparent_pixels": 1085896,
+        "width": 1536,
+        "height": 1024,
+        "cell_width": 256,
+        "cell_height": 256,
+        "padding": 16,
+        "border_alpha_max": 0,
+        "layout_cuts": [
+          {
+            "row": 0,
+            "column": 0,
+            "source": [
+              36,
+              33,
+              199,
+              204
+            ],
+            "target": [
+              18,
+              16,
+              219,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 1,
+            "source": [
+              313,
+              52,
+              139,
+              187
+            ],
+            "target": [
+              300,
+              16,
+              167,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 2,
+            "source": [
+              585,
+              20,
+              85,
+              233
+            ],
+            "target": [
+              599,
+              16,
+              82,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 3,
+            "source": [
+              867,
+              16,
+              81,
+              237
+            ],
+            "target": [
+              857,
+              16,
+              77,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 4,
+            "source": [
+              1113,
+              15,
+              83,
+              235
+            ],
+            "target": [
+              1112,
+              16,
+              79,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 5,
+            "source": [
+              1372,
+              15,
+              83,
+              235
+            ],
+            "target": [
+              1368,
+              16,
+              79,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 0,
+            "source": [
+              33,
+              282,
+              201,
+              201
+            ],
+            "target": [
+              16,
+              272,
+              224,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 1,
+            "source": [
+              313,
+              302,
+              139,
+              181
+            ],
+            "target": [
+              298,
+              272,
+              172,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 2,
+            "source": [
+              589,
+              270,
+              86,
+              235
+            ],
+            "target": [
+              599,
+              272,
+              82,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 3,
+            "source": [
+              860,
+              270,
+              86,
+              235
+            ],
+            "target": [
+              855,
+              272,
+              82,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 4,
+            "source": [
+              1107,
+              269,
+              86,
+              232
+            ],
+            "target": [
+              1110,
+              272,
+              83,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 5,
+            "source": [
+              1369,
+              269,
+              86,
+              232
+            ],
+            "target": [
+              1366,
+              272,
+              83,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 0,
+            "source": [
+              68,
+              523,
+              143,
+              210
+            ],
+            "target": [
+              51,
+              528,
+              153,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 1,
+            "source": [
+              305,
+              545,
+              171,
+              189
+            ],
+            "target": [
+              282,
+              528,
+              203,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 2,
+            "source": [
+              603,
+              522,
+              84,
+              230
+            ],
+            "target": [
+              599,
+              528,
+              82,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 3,
+            "source": [
+              851,
+              522,
+              83,
+              230
+            ],
+            "target": [
+              855,
+              528,
+              81,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 4,
+            "source": [
+              1110,
+              523,
+              116,
+              220
+            ],
+            "target": [
+              1093,
+              528,
+              118,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 5,
+            "source": [
+              1368,
+              524,
+              118,
+              219
+            ],
+            "target": [
+              1347,
+              528,
+              121,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 0,
+            "source": [
+              59,
+              768,
+              145,
+              211
+            ],
+            "target": [
+              51,
+              784,
+              154,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 1,
+            "source": [
+              291,
+              786,
+              174,
+              192
+            ],
+            "target": [
+              282,
+              784,
+              203,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 2,
+            "source": [
+              600,
+              768,
+              83,
+              229
+            ],
+            "target": [
+              599,
+              784,
+              81,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 3,
+            "source": [
+              852,
+              768,
+              81,
+              229
+            ],
+            "target": [
+              856,
+              784,
+              79,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 4,
+            "source": [
+              1083,
+              769,
+              124,
+              223
+            ],
+            "target": [
+              1089,
+              784,
+              125,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 5,
+            "source": [
+              1337,
+              771,
+              125,
+              222
+            ],
+            "target": [
+              1345,
+              784,
+              126,
+              224
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "base:renewal-frame",
+      "kind": "player",
+      "slug": "player-renewal-frame",
+      "key": "rig:base:renewal-frame",
+      "reference_file": "content/base/assets/art-v1/players/renewal-frame.png",
+      "source_file": "docs/art-v1/sources/animation/player-renewal-frame.png",
+      "file": "content/base/assets/art-v1/animation/player-renewal-frame.png",
+      "prompt": "Use case: stylized-concept.\nAsset type: PRODUCTION skeletal animation parts ATLAS, not a character sheet, for Local Manifestation, a contemporary 2D orthographic action game.\nInput image is identity and style reference ONLY. Preserve exactly that actor's clothing, anatomy and palette, but split the subject into isolated independent cutout parts.\nCanvas is LANDSCAPE 1536 pixels wide × 1024 pixels high. Fixed INVISIBLE regular grid EXACTLY 6 COLUMNS × 4 ROWS, 24 equal cells, each 256×256 pixels. No extra margins that change cell centers.\nRows, top to bottom: 1 FRONT facing screen DOWN (show face); 2 BACK facing screen UP (show rear head, no face); 3 RIGHT side facing screen RIGHT; 4 LEFT side facing screen LEFT. Body view is upright orthographic slightly overhead, same game-camera elevation and scale for all rows. NOT action poses.\nColumns, left to right in EVERY row: 1 BODY / torso only; 2 HEAD / upper feature only; 3 entire ARM_LEFT from shoulder to hand; 4 entire ARM_RIGHT from shoulder to hand; 5 entire LEG_LEFT from hip to foot; 6 entire LEG_RIGHT from hip to foot. Arms and legs are named from actor's own left/right. Side rows MUST STILL have both distinct arm cells and both distinct leg cells.\nEvery one of the 24 cells contains EXACTLY ONE detached part at its cell center, no complete people. Never draw arms/legs/head attached to torso. Long axis of every limb is upright vertical in the image, shoulder/hip socket at its top and hand/foot at bottom, relaxed straight shape; face or shoe points according to row. A small overlap allowance on joint ends. Parts remain fully inside their cell, 20 pixel transparent gap from every cell edge; no part touches another cell.\nUnified style: modern restrained hand-painted 2D indie game art, matte cloth/polymer/steel, deep-charcoal clean outlines, simple broad opaque shapes and sparse brushed texture, graphite gray / ash gray / warm white with tiny muted teal functional accents. Not photorealism, 3D render, pixel art, medieval fantasy, runes or steampunk.\nGenuinely transparent alpha everywhere outside the parts. NO grid lines, no boxes, no captions, no row/column labels, no words, no digits, no background, no floor, no cast shadows, no weapons or handheld equipment, no full-body silhouettes in any cell.\nActor identity and required anatomy: A contemporary support explorer wearing a sage-gray short utility coat, charcoal trousers and work shoes, pale-gray soft protective helmet, compact warm-white medical pack high on the back, small muted teal clip, empty gloved hands. Torso includes coat body and attached pack (especially clear in back row), WITHOUT arms. Head is face and helmet. Arms are separate sage-gray sleeves with dark gloves. Legs are individual charcoal trouser legs and work shoes. No medical cross or writing.\nFINAL CRITICAL CHECK: column1 is a SLEEVELESS torso vest trunk only, with empty arm sockets and neck cut; absolutely no attached head, arms, or legs in that column. All 24 cutouts need hard clean alpha edges, no hazy feathering, no vignette, no gray dust or soft shadow around them. Blank pixels must be transparent. Right-row BOTH shoes point right; left-row BOTH shoes point left.",
+      "source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-5d6bda0d-28e0-40dd-9991-fe1c6b47abf3.png",
+      "foot_fix_prompt": "Edit only two small feet in this1536×1024 six-column four-row transparent sprite atlas. Third row,column6 (x1280..1535,y512..767): make the shoe point SCREEN RIGHT like its neighboring column5 shoe. Fourth row,column6 (x1280..1535,y768..1023): make the shoe point SCREEN LEFT like neighboring column5. Keep upper legs at same centers. All other22 cells, all costumes, colors and pure alpha remain exactly unchanged. No background or new marks.",
+      "pre_final_fix_source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-884de3f7-abaa-4486-aced-19e6660eb732.png",
+      "sha256": "2505df49625e714931002f419a7f8f1ef1ed30debb1085910d1405c85ae51549",
+      "source_sha256": "9c88acb93de7acdd2c553533a69f9562452cdb8fb65e47ab0aafff458d3ee8a6",
+      "source_size": [
+        1536,
+        1024
+      ],
+      "bytes": 1224453,
+      "width": 1536,
+      "height": 1024,
+      "format": "RGBA PNG",
+      "alpha": true,
+      "processing": "Shared .cache/art-v1/format-atlas.ps1: identify actual 4 row and 6 column transparent bands; alpha>16 bounds crop; aspect-preserving bicubic scale; center each generated part in256x256 cell with16px minimum margin; no painting, no new part geometry.",
+      "checked": "Individually inspected generated atlas and final edits; source anatomy and side shoe directions corrected with built-in image_gen; all24 packed cells have exact alpha0 edges.",
+      "alpha_formatting": {
+        "source_width": 1536,
+        "source_height": 1024,
+        "alpha_min": 0,
+        "alpha_max": 254,
+        "source_transparent_pixels": 1183093,
+        "width": 1536,
+        "height": 1024,
+        "cell_width": 256,
+        "cell_height": 256,
+        "padding": 16,
+        "border_alpha_max": 0,
+        "layout_cuts": [
+          {
+            "row": 0,
+            "column": 0,
+            "source": [
+              86,
+              29,
+              155,
+              214
+            ],
+            "target": [
+              47,
+              16,
+              162,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 1,
+            "source": [
+              371,
+              67,
+              148,
+              171
+            ],
+            "target": [
+              287,
+              16,
+              194,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 2,
+            "source": [
+              638,
+              29,
+              69,
+              226
+            ],
+            "target": [
+              606,
+              16,
+              68,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 3,
+            "source": [
+              893,
+              30,
+              67,
+              225
+            ],
+            "target": [
+              862,
+              16,
+              67,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 4,
+            "source": [
+              1128,
+              26,
+              72,
+              227
+            ],
+            "target": [
+              1116,
+              16,
+              71,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 5,
+            "source": [
+              1362,
+              26,
+              71,
+              227
+            ],
+            "target": [
+              1373,
+              16,
+              70,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 0,
+            "source": [
+              88,
+              278,
+              165,
+              211
+            ],
+            "target": [
+              40,
+              272,
+              175,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 1,
+            "source": [
+              376,
+              318,
+              141,
+              157
+            ],
+            "target": [
+              283,
+              272,
+              201,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 2,
+            "source": [
+              640,
+              279,
+              66,
+              224
+            ],
+            "target": [
+              607,
+              272,
+              66,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 3,
+            "source": [
+              895,
+              279,
+              65,
+              224
+            ],
+            "target": [
+              863,
+              272,
+              65,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 4,
+            "source": [
+              1128,
+              279,
+              73,
+              221
+            ],
+            "target": [
+              1115,
+              272,
+              74,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 5,
+            "source": [
+              1359,
+              279,
+              73,
+              221
+            ],
+            "target": [
+              1371,
+              272,
+              74,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 0,
+            "source": [
+              97,
+              525,
+              149,
+              210
+            ],
+            "target": [
+              48,
+              528,
+              159,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 1,
+            "source": [
+              374,
+              567,
+              147,
+              166
+            ],
+            "target": [
+              285,
+              528,
+              198,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 2,
+            "source": [
+              641,
+              527,
+              66,
+              219
+            ],
+            "target": [
+              606,
+              528,
+              68,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 3,
+            "source": [
+              893,
+              528,
+              65,
+              218
+            ],
+            "target": [
+              862,
+              528,
+              67,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 4,
+            "source": [
+              1115,
+              525,
+              105,
+              217
+            ],
+            "target": [
+              1098,
+              528,
+              108,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 5,
+            "source": [
+              1362,
+              525,
+              113,
+              217
+            ],
+            "target": [
+              1349,
+              528,
+              117,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 0,
+            "source": [
+              97,
+              765,
+              157,
+              212
+            ],
+            "target": [
+              45,
+              784,
+              166,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 1,
+            "source": [
+              373,
+              803,
+              149,
+              167
+            ],
+            "target": [
+              284,
+              784,
+              200,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 2,
+            "source": [
+              642,
+              768,
+              62,
+              220
+            ],
+            "target": [
+              608,
+              784,
+              63,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 3,
+            "source": [
+              893,
+              768,
+              62,
+              220
+            ],
+            "target": [
+              864,
+              784,
+              63,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 4,
+            "source": [
+              1095,
+              766,
+              109,
+              218
+            ],
+            "target": [
+              1096,
+              784,
+              112,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 5,
+            "source": [
+              1364,
+              766,
+              109,
+              218
+            ],
+            "target": [
+              1352,
+              784,
+              112,
+              224
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "base:stalker",
+      "kind": "enemy",
+      "slug": "enemy-stalker",
+      "key": "rig:base:stalker",
+      "reference_file": "content/base/assets/art-v1/world/enemy-stalker.png",
+      "source_file": "docs/art-v1/sources/animation/enemy-stalker.png",
+      "file": "content/base/assets/art-v1/animation/enemy-stalker.png",
+      "prompt": "Use case: stylized-concept.\nAsset type: PRODUCTION skeletal animation parts ATLAS, not a character sheet, for Local Manifestation, a contemporary 2D orthographic action game.\nInput image is identity and style reference ONLY. Preserve exactly that actor's clothing, anatomy and palette, but split the subject into isolated independent cutout parts.\nCanvas is LANDSCAPE 1536 pixels wide × 1024 pixels high. Fixed INVISIBLE regular grid EXACTLY 6 COLUMNS × 4 ROWS, 24 equal cells, each 256×256 pixels. No extra margins that change cell centers.\nRows, top to bottom: 1 FRONT facing screen DOWN (show face); 2 BACK facing screen UP (show rear head, no face); 3 RIGHT side facing screen RIGHT; 4 LEFT side facing screen LEFT. Body view is upright orthographic slightly overhead, same game-camera elevation and scale for all rows. NOT action poses.\nColumns, left to right in EVERY row: 1 BODY / torso only; 2 HEAD / upper feature only; 3 entire ARM_LEFT from shoulder to hand; 4 entire ARM_RIGHT from shoulder to hand; 5 entire LEG_LEFT from hip to foot; 6 entire LEG_RIGHT from hip to foot. Arms and legs are named from actor's own left/right. Side rows MUST STILL have both distinct arm cells and both distinct leg cells.\nEvery one of the 24 cells contains EXACTLY ONE detached part at its cell center, no complete people. Never draw arms/legs/head attached to torso. Long axis of every limb is upright vertical in the image, shoulder/hip socket at its top and hand/foot at bottom, relaxed straight shape; face or shoe points according to row. A small overlap allowance on joint ends. Parts remain fully inside their cell, 20 pixel transparent gap from every cell edge; no part touches another cell.\nUnified style: modern restrained hand-painted 2D indie game art, matte cloth/polymer/steel, deep-charcoal clean outlines, simple broad opaque shapes and sparse brushed texture, graphite gray / ash gray / warm white with tiny muted teal functional accents. Not photorealism, 3D render, pixel art, medieval fantasy, runes or steampunk.\nGenuinely transparent alpha everywhere outside the parts. NO grid lines, no boxes, no captions, no row/column labels, no words, no digits, no background, no floor, no cast shadows, no weapons or handheld equipment, no full-body silhouettes in any cell.\nActor identity and required anatomy: An abnormal lean charcoal-hooded stalker, pale featureless oval mask with two small dark eye slits, hunched dark coat, long mitten-like gloves, dark short trousers and heavy boots, one slim muted teal seam. Body cell contains hooded coat TORSO ONLY with NO arms, legs or head. Head cell contains the hood and pale mask. Arm cells contain individual long dark sleeves and mitten-like hands; leg cells contain individual short trouser limbs and blunt boots. Back heads show dark hood, not a face.",
+      "source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-813cc40f-4e9c-493c-9376-41046bfe6b5c.png",
+      "edit_prompt": "Edit this existing 6-column ×4-row skeletal parts atlas. Preserve the exact canvas size, grid positions, clothing identity, colors and every existing valid arm/leg/head part. REMOVE the entire gray/black background and all vignette/glow/shadows; the background must be actual transparent alpha, including between every part and around every cell edge. DO NOT replace with painted checkerboard or solid color.\nCorrect ONLY the FIRST COLUMN in all four rows: replace each complete jacket/hood silhouette with JUST THE CENTRAL TORSO panel from collar base to waist. Remove all sleeves, shoulders extending as arms, hood/head, hands, legs. First column body must end at the shoulder sockets with a short open neck rim so the separately supplied heads/arms can be attached by the engine. For front/back the torso should be a short near-rectangular vest/jacket trunk, side views a narrow jacket trunk.\nKeep columns2–6 detached. Keep the entire grid exactly6 columns4rows, same centers as before. No text, grid borders, room or floor. Transparent cutout PNG. The stalker head is fully in column2; remove duplicated hood peak from column1.",
+      "draft_source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-70e8404f-ee33-4d4e-9302-a9c7e9a751d2.png",
+      "cleanup_prompt": "Clean this 6×4 skeletal cutout atlas for use in a real game. Keep the same 1536×1024 canvas and all24 cell centers, part identities, exact part arrangement, existing sleeveless torso shapes and style. Required corrections ONLY: (1) Remove ALL disconnected gray/colored speckles, dust, haze, halo and mottled residue outside each main part. Outside the large connected silhouette of each part must be pure transparent alpha with clean hard-edged outlines, no feathered cloud or glow. Use clean cel-shaded cutout edges rather than distressed paper edges. (2) Third row both boots/toes must face SCREEN RIGHT. Fourth row both boots/toes must face SCREEN LEFT. In rows3/4 do not mirror the whole atlas or move the parts; correct only the boots of the individual legs which face the wrong way. Preserve separate left/right arms and legs. No new labels, borders, grid or background. This is a transparent PNG game atlas, not a painted poster.",
+      "pre_cleanup_source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-8d47945f-0074-4374-bd96-941611cbf0c0.png",
+      "foot_fix_prompt": "Targeted sprite atlas correction. Keep the existing image pixel canvas1536×1024, exact6×4 cells, current alpha transparency and identical styles. Change only the leg at row3,column5 (x=1024..1279,y=512..767) so its FOOT/BOOT faces RIGHT. Change only the leg at row4,column6 (x=1280..1535,y=768..1023) so its FOOT/BOOT faces LEFT. All remaining22 cells stay exactly unchanged. This is not a full sheet redraw. Preserve heads, torsos and arms exactly. No background, text or grid. Third row means its entire anatomy points SCREEN RIGHT; fourth row SCREEN LEFT.",
+      "pre_foot_fix_source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-23af09b5-78e4-44d1-bf9e-abaced0b9cf6.png",
+      "background_fix_prompt": "BACKGROUND EXTRACTION ONLY. Remove all gray background everywhere in this 1536×1024 image, especially the cloudy opaque gray band across the lower half. The24 detached dark cloth body parts must stay unchanged with exact same positions, size, all colors, clothing details and facing directions. Preserve ALL part pixels; outside each of the24 large silhouettes must be actual alpha0. No gray halos, no feathered vignette. This is a production transparent sprite atlas, not artwork on gray paper. Do not alter geometry or add any new elements. Keep1536×1024.",
+      "pre_final_fix_source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-6c8eeec3-f563-4b37-af03-3b2afa3407eb.png",
+      "sha256": "8ca51b192b1d929968f2e9831c499aaee472240e5723c14281d86d82331aa4b4",
+      "source_sha256": "b29e35b6ae81af1a09a0b272fa966302c4b1be8f1a460f3fe954c00c4731d5d2",
+      "source_size": [
+        1536,
+        1024
+      ],
+      "bytes": 1051890,
+      "width": 1536,
+      "height": 1024,
+      "format": "RGBA PNG",
+      "alpha": true,
+      "processing": "Shared .cache/art-v1/format-atlas.ps1: identify actual 4 row and 6 column transparent bands; alpha>16 bounds crop; aspect-preserving bicubic scale; center each generated part in256x256 cell with16px minimum margin; no painting, no new part geometry.",
+      "checked": "Individually inspected generated atlas and final edits; source anatomy and side shoe directions corrected with built-in image_gen; all24 packed cells have exact alpha0 edges.",
+      "alpha_formatting": {
+        "source_width": 1536,
+        "source_height": 1024,
+        "alpha_min": 0,
+        "alpha_max": 254,
+        "source_transparent_pixels": 1136797,
+        "width": 1536,
+        "height": 1024,
+        "cell_width": 256,
+        "cell_height": 256,
+        "padding": 16,
+        "border_alpha_max": 0,
+        "layout_cuts": [
+          {
+            "row": 0,
+            "column": 0,
+            "source": [
+              52,
+              67,
+              169,
+              177
+            ],
+            "target": [
+              21,
+              16,
+              214,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 1,
+            "source": [
+              327,
+              53,
+              164,
+              176
+            ],
+            "target": [
+              279,
+              16,
+              209,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 2,
+            "source": [
+              607,
+              16,
+              82,
+              238
+            ],
+            "target": [
+              601,
+              16,
+              77,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 3,
+            "source": [
+              850,
+              16,
+              81,
+              238
+            ],
+            "target": [
+              858,
+              16,
+              76,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 4,
+            "source": [
+              1107,
+              14,
+              81,
+              239
+            ],
+            "target": [
+              1114,
+              16,
+              76,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 5,
+            "source": [
+              1367,
+              14,
+              81,
+              238
+            ],
+            "target": [
+              1370,
+              16,
+              76,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 0,
+            "source": [
+              53,
+              302,
+              168,
+              187
+            ],
+            "target": [
+              27,
+              272,
+              201,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 1,
+            "source": [
+              325,
+              306,
+              168,
+              165
+            ],
+            "target": [
+              272,
+              274,
+              224,
+              220
+            ]
+          },
+          {
+            "row": 1,
+            "column": 2,
+            "source": [
+              609,
+              265,
+              78,
+              241
+            ],
+            "target": [
+              604,
+              272,
+              72,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 3,
+            "source": [
+              851,
+              265,
+              78,
+              241
+            ],
+            "target": [
+              860,
+              272,
+              72,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 4,
+            "source": [
+              1108,
+              267,
+              86,
+              236
+            ],
+            "target": [
+              1111,
+              272,
+              82,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 5,
+            "source": [
+              1361,
+              267,
+              86,
+              236
+            ],
+            "target": [
+              1367,
+              272,
+              82,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 0,
+            "source": [
+              70,
+              537,
+              129,
+              195
+            ],
+            "target": [
+              54,
+              528,
+              148,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 1,
+            "source": [
+              325,
+              557,
+              159,
+              172
+            ],
+            "target": [
+              280,
+              528,
+              207,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 2,
+            "source": [
+              608,
+              519,
+              82,
+              240
+            ],
+            "target": [
+              601,
+              528,
+              77,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 3,
+            "source": [
+              847,
+              519,
+              83,
+              240
+            ],
+            "target": [
+              857,
+              528,
+              77,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 4,
+            "source": [
+              1112,
+              522,
+              148,
+              213
+            ],
+            "target": [
+              1074,
+              528,
+              156,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 5,
+            "source": [
+              1353,
+              521,
+              140,
+              218
+            ],
+            "target": [
+              1336,
+              528,
+              144,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 0,
+            "source": [
+              73,
+              780,
+              135,
+              202
+            ],
+            "target": [
+              53,
+              784,
+              150,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 1,
+            "source": [
+              328,
+              801,
+              165,
+              178
+            ],
+            "target": [
+              280,
+              784,
+              208,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 2,
+            "source": [
+              606,
+              766,
+              81,
+              247
+            ],
+            "target": [
+              603,
+              784,
+              73,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 3,
+            "source": [
+              851,
+              766,
+              80,
+              247
+            ],
+            "target": [
+              859,
+              784,
+              73,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 4,
+            "source": [
+              1054,
+              773,
+              142,
+              223
+            ],
+            "target": [
+              1080,
+              784,
+              143,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 5,
+            "source": [
+              1318,
+              772,
+              152,
+              224
+            ],
+            "target": [
+              1332,
+              784,
+              152,
+              224
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "base:warden",
+      "kind": "enemy",
+      "slug": "enemy-warden",
+      "key": "rig:base:warden",
+      "reference_file": "content/base/assets/art-v1/world/enemy-warden.png",
+      "source_file": "docs/art-v1/sources/animation/enemy-warden.png",
+      "file": "content/base/assets/art-v1/animation/enemy-warden.png",
+      "prompt": "Use case: stylized-concept.\nAsset type: PRODUCTION skeletal animation parts ATLAS, not a character sheet, for Local Manifestation, a contemporary 2D orthographic action game.\nInput image is identity and style reference ONLY. Preserve exactly that actor's clothing, anatomy and palette, but split the subject into isolated independent cutout parts.\nCanvas is LANDSCAPE 1536 pixels wide × 1024 pixels high. Fixed INVISIBLE regular grid EXACTLY 6 COLUMNS × 4 ROWS, 24 equal cells, each 256×256 pixels. No extra margins that change cell centers.\nRows, top to bottom: 1 FRONT facing screen DOWN (show face); 2 BACK facing screen UP (show rear head, no face); 3 RIGHT side facing screen RIGHT; 4 LEFT side facing screen LEFT. Body view is upright orthographic slightly overhead, same game-camera elevation and scale for all rows. NOT action poses.\nColumns, left to right in EVERY row: 1 BODY / torso only; 2 HEAD / upper feature only; 3 entire ARM_LEFT from shoulder to hand; 4 entire ARM_RIGHT from shoulder to hand; 5 entire LEG_LEFT from hip to foot; 6 entire LEG_RIGHT from hip to foot. Arms and legs are named from actor's own left/right. Side rows MUST STILL have both distinct arm cells and both distinct leg cells.\nEvery one of the 24 cells contains EXACTLY ONE detached part at its cell center, no complete people. Never draw arms/legs/head attached to torso. Long axis of every limb is upright vertical in the image, shoulder/hip socket at its top and hand/foot at bottom, relaxed straight shape; face or shoe points according to row. A small overlap allowance on joint ends. Parts remain fully inside their cell, 20 pixel transparent gap from every cell edge; no part touches another cell.\nUnified style: modern restrained hand-painted 2D indie game art, matte cloth/polymer/steel, deep-charcoal clean outlines, simple broad opaque shapes and sparse brushed texture, graphite gray / ash gray / warm white with tiny muted teal functional accents. Not photorealism, 3D render, pixel art, medieval fantasy, runes or steampunk.\nGenuinely transparent alpha everywhere outside the parts. NO grid lines, no boxes, no captions, no row/column labels, no words, no digits, no background, no floor, no cast shadows, no weapons or handheld equipment, no full-body silhouettes in any cell.\nActor identity and required anatomy: A broad squat abnormal industrial guard, pale square sealed inspection head housing with a tiny amber slit, warm-white protective apron torso over charcoal work fabric, pale utilitarian forearm protection, black flexible heavy arms and short heavy boots. Body cell contains broad torso with pale apron and teal shoulder straps, NO head or limbs. Head cell contains isolated square pale inspection housing. Arms are separate entire padded arms including pale protective panels and blunt dark ends; legs are separate short charcoal thighs and heavy work boots. No fantasy armor.\nFINAL CRITICAL CHECK: column1 is a SLEEVELESS torso vest trunk only, with empty arm sockets and neck cut; absolutely no attached head, arms, or legs in that column. All 24 cutouts need hard clean alpha edges, no hazy feathering, no vignette, no gray dust or soft shadow around them. Blank pixels must be transparent. Right-row BOTH shoes point right; left-row BOTH shoes point left.",
+      "source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-41b8dcf7-03ba-4d76-9e4f-d057e2209800.png",
+      "final_fix_prompt": "Edit this 1536×1024 six-column four-row transparent skeletal atlas; exact cell positions stay fixed. ONLY correct: (1) Third row sixth column leg/boot must point SCREEN RIGHT like the third row fifth column boot; fourth row sixth column leg/boot must point SCREEN LEFT like fourth row fifth column boot. Keep leg upper sockets fixed. (2) ALL FOUR first-column torso parts must sit fully within their256-pixel cell: torso center x128, opaque silhouette entirely between x40 and x216, preserve same industrial apron design at slightly narrower scale. Do not move any head/arm/leg. All other24-part content and true transparent alpha stay unchanged. No added background or labels. Body remains just sleeveless torso.",
+      "pre_final_fix_source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-0f0b4478-e85f-4c60-8eab-a4f1efd616af.png",
+      "foot_fix_prompt": "Correct just TWO BOOTS in this transparent sprite atlas. Do not alter the rest.\nAt row3 column6, the rightmost boot in the THIRD ROW currently points left. Horizontally flip THAT BOOT within its existing cell so its toe now points RIGHT, matching the neighboring boot at row3 column5.\nAt row4 column6, the rightmost boot in the FOURTH ROW currently points right. Horizontally flip THAT BOOT within its existing cell so its toe now points LEFT, matching the neighboring boot at row4 column5.\nThe changed boot stays at the same center; top leg socket stays at top. No change to the remaining22 sprite parts, their poses, colors, placement or alpha. Canvas1536×1024 remains6 columns4 rows. No new objects, no background.",
+      "pre_foot_fix_source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-867cfd74-3453-42ca-914f-3399dd0f297e.png",
+      "last_foot_fix_prompt": "Make ONE isolated edit, keep rest pixel-identical. In the very bottom-right cell of this6-column4-row1536×1024 sprite sheet, the boot toe currently points to the RIGHT. Flip this bottom-right LEG AND BOOT horizontally within its own256×256 cell (x1280..1535,y768..1023) so the toe points LEFT, exactly like the boot immediately to its left. Do not flip the whole image. Do not change any other23 cells. Do not alter colors, scale, positions or transparency. No background. This single bottom-right boot must visibly face LEFT.",
+      "before_last_foot_fix_source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-4d020986-bc04-4e62-9455-8e6751989a61.png",
+      "sha256": "2295f121bbd44ac9aa2e444936ac73616af4fa1a91939b1ca481eb90220c33f7",
+      "source_sha256": "d1db073f615a243ef0e6cffda292d756dfaea063ec0d7cd2547ab8c2295eba74",
+      "source_size": [
+        1536,
+        1024
+      ],
+      "bytes": 1413956,
+      "width": 1536,
+      "height": 1024,
+      "format": "RGBA PNG",
+      "alpha": true,
+      "processing": "Shared .cache/art-v1/format-atlas.ps1: identify actual 4 row and 6 column transparent bands; alpha>16 bounds crop; aspect-preserving bicubic scale; center each generated part in256x256 cell with16px minimum margin; no painting, no new part geometry.",
+      "checked": "Individually inspected generated atlas and final edits; source anatomy and side shoe directions corrected with built-in image_gen; all24 packed cells have exact alpha0 edges.",
+      "alpha_formatting": {
+        "source_width": 1536,
+        "source_height": 1024,
+        "alpha_min": 0,
+        "alpha_max": 254,
+        "source_transparent_pixels": 1055572,
+        "width": 1536,
+        "height": 1024,
+        "cell_width": 256,
+        "cell_height": 256,
+        "padding": 16,
+        "border_alpha_max": 0,
+        "layout_cuts": [
+          {
+            "row": 0,
+            "column": 0,
+            "source": [
+              85,
+              35,
+              187,
+              199
+            ],
+            "target": [
+              23,
+              16,
+              210,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 1,
+            "source": [
+              367,
+              77,
+              162,
+              141
+            ],
+            "target": [
+              272,
+              30,
+              224,
+              195
+            ]
+          },
+          {
+            "row": 0,
+            "column": 2,
+            "source": [
+              609,
+              13,
+              119,
+              237
+            ],
+            "target": [
+              584,
+              16,
+              112,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 3,
+            "source": [
+              850,
+              13,
+              119,
+              237
+            ],
+            "target": [
+              840,
+              16,
+              112,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 4,
+            "source": [
+              1086,
+              29,
+              124,
+              219
+            ],
+            "target": [
+              1088,
+              16,
+              127,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 5,
+            "source": [
+              1354,
+              28,
+              122,
+              220
+            ],
+            "target": [
+              1346,
+              16,
+              124,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 0,
+            "source": [
+              80,
+              280,
+              196,
+              200
+            ],
+            "target": [
+              18,
+              272,
+              220,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 1,
+            "source": [
+              367,
+              334,
+              163,
+              141
+            ],
+            "target": [
+              272,
+              287,
+              224,
+              194
+            ]
+          },
+          {
+            "row": 1,
+            "column": 2,
+            "source": [
+              635,
+              267,
+              87,
+              243
+            ],
+            "target": [
+              600,
+              272,
+              80,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 3,
+            "source": [
+              850,
+              267,
+              87,
+              243
+            ],
+            "target": [
+              856,
+              272,
+              80,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 4,
+            "source": [
+              1099,
+              275,
+              108,
+              224
+            ],
+            "target": [
+              1098,
+              272,
+              108,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 5,
+            "source": [
+              1356,
+              274,
+              108,
+              225
+            ],
+            "target": [
+              1354,
+              272,
+              108,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 0,
+            "source": [
+              88,
+              522,
+              178,
+              215
+            ],
+            "target": [
+              35,
+              528,
+              185,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 1,
+            "source": [
+              374,
+              567,
+              143,
+              138
+            ],
+            "target": [
+              272,
+              532,
+              224,
+              216
+            ]
+          },
+          {
+            "row": 2,
+            "column": 2,
+            "source": [
+              639,
+              516,
+              89,
+              228
+            ],
+            "target": [
+              596,
+              528,
+              87,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 3,
+            "source": [
+              850,
+              516,
+              88,
+              227
+            ],
+            "target": [
+              852,
+              528,
+              87,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 4,
+            "source": [
+              1094,
+              526,
+              145,
+              207
+            ],
+            "target": [
+              1073,
+              528,
+              157,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 5,
+            "source": [
+              1359,
+              526,
+              153,
+              207
+            ],
+            "target": [
+              1325,
+              528,
+              166,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 0,
+            "source": [
+              92,
+              762,
+              183,
+              216
+            ],
+            "target": [
+              33,
+              784,
+              190,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 1,
+            "source": [
+              372,
+              806,
+              147,
+              136
+            ],
+            "target": [
+              272,
+              792,
+              224,
+              207
+            ]
+          },
+          {
+            "row": 3,
+            "column": 2,
+            "source": [
+              637,
+              751,
+              83,
+              228
+            ],
+            "target": [
+              599,
+              784,
+              82,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 3,
+            "source": [
+              855,
+              751,
+              82,
+              228
+            ],
+            "target": [
+              855,
+              784,
+              81,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 4,
+            "source": [
+              1070,
+              771,
+              151,
+              206
+            ],
+            "target": [
+              1070,
+              784,
+              164,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 5,
+            "source": [
+              1364,
+              771,
+              122,
+              207
+            ],
+            "target": [
+              1342,
+              784,
+              132,
+              224
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "base:spitter",
+      "kind": "enemy",
+      "slug": "enemy-spitter",
+      "key": "rig:base:spitter",
+      "reference_file": "content/base/assets/art-v1/world/enemy-spitter.png",
+      "source_file": "docs/art-v1/sources/animation/enemy-spitter.png",
+      "file": "content/base/assets/art-v1/animation/enemy-spitter.png",
+      "prompt": "Use case: stylized-concept.\nAsset type: PRODUCTION skeletal animation parts ATLAS, not a character sheet, for Local Manifestation, a contemporary 2D orthographic action game.\nInput image is identity and style reference ONLY. Preserve exactly that actor's clothing, anatomy and palette, but split the subject into isolated independent cutout parts.\nCanvas is LANDSCAPE 1536 pixels wide × 1024 pixels high. Fixed INVISIBLE regular grid EXACTLY 6 COLUMNS × 4 ROWS, 24 equal cells, each 256×256 pixels. No extra margins that change cell centers.\nRows, top to bottom: 1 FRONT facing screen DOWN (show face); 2 BACK facing screen UP (show rear head, no face); 3 RIGHT side facing screen RIGHT; 4 LEFT side facing screen LEFT. Body view is upright orthographic slightly overhead, same game-camera elevation and scale for all rows. NOT action poses.\nColumns, left to right in EVERY row: 1 BODY / torso only; 2 HEAD / upper feature only; 3 entire ARM_LEFT from shoulder to hand; 4 entire ARM_RIGHT from shoulder to hand; 5 entire LEG_LEFT from hip to foot; 6 entire LEG_RIGHT from hip to foot. Arms and legs are named from actor's own left/right. Side rows MUST STILL have both distinct arm cells and both distinct leg cells.\nEvery one of the 24 cells contains EXACTLY ONE detached part at its cell center, no complete people. Never draw arms/legs/head attached to torso. Long axis of every limb is upright vertical in the image, shoulder/hip socket at its top and hand/foot at bottom, relaxed straight shape; face or shoe points according to row. A small overlap allowance on joint ends. Parts remain fully inside their cell, 20 pixel transparent gap from every cell edge; no part touches another cell.\nUnified style: modern restrained hand-painted 2D indie game art, matte cloth/polymer/steel, deep-charcoal clean outlines, simple broad opaque shapes and sparse brushed texture, graphite gray / ash gray / warm white with tiny muted teal functional accents. Not photorealism, 3D render, pixel art, medieval fantasy, runes or steampunk.\nGenuinely transparent alpha everywhere outside the parts. NO grid lines, no boxes, no captions, no row/column labels, no words, no digits, no background, no floor, no cast shadows, no weapons or handheld equipment, no full-body silhouettes in any cell.\nActor identity and required anatomy: An uncanny squat walking industrial pressure sprayer: pale round tank belly, charcoal screw cap with squared carrying handle, muted teal vertical liquid sight window, dark rectangular spout/nozzle facing forward, charcoal rubbery stub legs. Nonhuman decomposition: body is the pale round tank ONLY, with NO cap, nozzle or legs; head is the charcoal cap with handle; arm_left is the curved teal side hose; arm_right is the forward dark nozzle assembly (in back row show its back attachment, not a face); leg_left and leg_right are separate pairs of squat flexible rubber supports with blunt feet, each pair grouped to one limb part. Preserve its industrial sprayer identity, no human head.\nFINAL CRITICAL CHECK: tank body has NO cap/hose/spout/legs attached. All parts independent in their exact6×4 cells. Hard clean alpha, no vignette, no gray dust, no shadow. Row3 both feet and nozzle point right, row4 point left.",
+      "source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-703fb13c-592c-438b-aa59-1f0e9f84eeea.png",
+      "sha256": "76591665179068178920707c2031782b4e72821795d61f665b7e2854a09748cb",
+      "source_sha256": "a67cf24f025e9a567795cecd9a0ad5c223c8d39123c54a5598d12adbb89b9912",
+      "source_size": [
+        1536,
+        1024
+      ],
+      "bytes": 1482246,
+      "width": 1536,
+      "height": 1024,
+      "format": "RGBA PNG",
+      "alpha": true,
+      "processing": "Shared .cache/art-v1/format-atlas.ps1: identify actual 4 row and 6 column transparent bands; alpha>16 bounds crop; aspect-preserving bicubic scale; center each generated part in256x256 cell with16px minimum margin; no painting, no new part geometry.",
+      "checked": "Individually inspected generated atlas and final edits; source anatomy and side shoe directions corrected with built-in image_gen; all24 packed cells have exact alpha0 edges.",
+      "alpha_formatting": {
+        "source_width": 1536,
+        "source_height": 1024,
+        "alpha_min": 0,
+        "alpha_max": 254,
+        "source_transparent_pixels": 1043509,
+        "width": 1536,
+        "height": 1024,
+        "cell_width": 256,
+        "cell_height": 256,
+        "padding": 16,
+        "border_alpha_max": 0,
+        "layout_cuts": [
+          {
+            "row": 0,
+            "column": 0,
+            "source": [
+              39,
+              47,
+              238,
+              216
+            ],
+            "target": [
+              16,
+              26,
+              224,
+              203
+            ]
+          },
+          {
+            "row": 0,
+            "column": 1,
+            "source": [
+              320,
+              117,
+              182,
+              126
+            ],
+            "target": [
+              272,
+              50,
+              224,
+              155
+            ]
+          },
+          {
+            "row": 0,
+            "column": 2,
+            "source": [
+              572,
+              53,
+              133,
+              199
+            ],
+            "target": [
+              565,
+              16,
+              150,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 3,
+            "source": [
+              774,
+              95,
+              222,
+              135
+            ],
+            "target": [
+              784,
+              60,
+              224,
+              136
+            ]
+          },
+          {
+            "row": 0,
+            "column": 4,
+            "source": [
+              1039,
+              79,
+              204,
+              162
+            ],
+            "target": [
+              1040,
+              39,
+              224,
+              178
+            ]
+          },
+          {
+            "row": 0,
+            "column": 5,
+            "source": [
+              1293,
+              79,
+              201,
+              162
+            ],
+            "target": [
+              1296,
+              37,
+              224,
+              181
+            ]
+          },
+          {
+            "row": 1,
+            "column": 0,
+            "source": [
+              39,
+              291,
+              237,
+              217
+            ],
+            "target": [
+              16,
+              281,
+              224,
+              205
+            ]
+          },
+          {
+            "row": 1,
+            "column": 1,
+            "source": [
+              322,
+              366,
+              182,
+              125
+            ],
+            "target": [
+              272,
+              307,
+              224,
+              154
+            ]
+          },
+          {
+            "row": 1,
+            "column": 2,
+            "source": [
+              580,
+              298,
+              133,
+              200
+            ],
+            "target": [
+              565,
+              272,
+              149,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 3,
+            "source": [
+              779,
+              348,
+              231,
+              138
+            ],
+            "target": [
+              784,
+              317,
+              224,
+              134
+            ]
+          },
+          {
+            "row": 1,
+            "column": 4,
+            "source": [
+              1040,
+              329,
+              204,
+              159
+            ],
+            "target": [
+              1040,
+              296,
+              224,
+              175
+            ]
+          },
+          {
+            "row": 1,
+            "column": 5,
+            "source": [
+              1292,
+              329,
+              203,
+              160
+            ],
+            "target": [
+              1296,
+              295,
+              224,
+              177
+            ]
+          },
+          {
+            "row": 2,
+            "column": 0,
+            "source": [
+              53,
+              525,
+              207,
+              222
+            ],
+            "target": [
+              23,
+              528,
+              209,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 1,
+            "source": [
+              330,
+              559,
+              171,
+              143
+            ],
+            "target": [
+              272,
+              546,
+              224,
+              187
+            ]
+          },
+          {
+            "row": 2,
+            "column": 2,
+            "source": [
+              564,
+              535,
+              122,
+              201
+            ],
+            "target": [
+              572,
+              528,
+              136,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 3,
+            "source": [
+              771,
+              581,
+              253,
+              128
+            ],
+            "target": [
+              784,
+              583,
+              224,
+              113
+            ]
+          },
+          {
+            "row": 2,
+            "column": 4,
+            "source": [
+              1102,
+              549,
+              126,
+              184
+            ],
+            "target": [
+              1075,
+              528,
+              153,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 5,
+            "source": [
+              1326,
+              549,
+              138,
+              184
+            ],
+            "target": [
+              1324,
+              528,
+              168,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 0,
+            "source": [
+              57,
+              763,
+              208,
+              218
+            ],
+            "target": [
+              21,
+              784,
+              214,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 1,
+            "source": [
+              329,
+              804,
+              170,
+              133
+            ],
+            "target": [
+              272,
+              808,
+              224,
+              175
+            ]
+          },
+          {
+            "row": 3,
+            "column": 2,
+            "source": [
+              598,
+              776,
+              119,
+              199
+            ],
+            "target": [
+              573,
+              784,
+              134,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 3,
+            "source": [
+              776,
+              820,
+              244,
+              126
+            ],
+            "target": [
+              784,
+              838,
+              224,
+              116
+            ]
+          },
+          {
+            "row": 3,
+            "column": 4,
+            "source": [
+              1066,
+              786,
+              130,
+              183
+            ],
+            "target": [
+              1072,
+              784,
+              159,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 5,
+            "source": [
+              1318,
+              786,
+              139,
+              183
+            ],
+            "target": [
+              1323,
+              784,
+              170,
+              224
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "base:dragger",
+      "kind": "enemy",
+      "slug": "enemy-dragger",
+      "key": "rig:base:dragger",
+      "reference_file": "content/base/assets/art-v1/world/enemy-dragger.png",
+      "source_file": "docs/art-v1/sources/animation/enemy-dragger.png",
+      "file": "content/base/assets/art-v1/animation/enemy-dragger.png",
+      "prompt": "Use case: stylized-concept.\nAsset type: PRODUCTION skeletal animation parts ATLAS, not a character sheet, for Local Manifestation, a contemporary 2D orthographic action game.\nInput image is identity and style reference ONLY. Preserve exactly that actor's clothing, anatomy and palette, but split the subject into isolated independent cutout parts.\nCanvas is LANDSCAPE 1536 pixels wide × 1024 pixels high. Fixed INVISIBLE regular grid EXACTLY 6 COLUMNS × 4 ROWS, 24 equal cells, each 256×256 pixels. No extra margins that change cell centers.\nRows, top to bottom: 1 FRONT facing screen DOWN (show face); 2 BACK facing screen UP (show rear head, no face); 3 RIGHT side facing screen RIGHT; 4 LEFT side facing screen LEFT. Body view is upright orthographic slightly overhead, same game-camera elevation and scale for all rows. NOT action poses.\nColumns, left to right in EVERY row: 1 BODY / torso only; 2 HEAD / upper feature only; 3 entire ARM_LEFT from shoulder to hand; 4 entire ARM_RIGHT from shoulder to hand; 5 entire LEG_LEFT from hip to foot; 6 entire LEG_RIGHT from hip to foot. Arms and legs are named from actor's own left/right. Side rows MUST STILL have both distinct arm cells and both distinct leg cells.\nEvery one of the 24 cells contains EXACTLY ONE detached part at its cell center, no complete people. Never draw arms/legs/head attached to torso. Long axis of every limb is upright vertical in the image, shoulder/hip socket at its top and hand/foot at bottom, relaxed straight shape; face or shoe points according to row. A small overlap allowance on joint ends. Parts remain fully inside their cell, 20 pixel transparent gap from every cell edge; no part touches another cell.\nUnified style: modern restrained hand-painted 2D indie game art, matte cloth/polymer/steel, deep-charcoal clean outlines, simple broad opaque shapes and sparse brushed texture, graphite gray / ash gray / warm white with tiny muted teal functional accents. Not photorealism, 3D render, pixel art, medieval fantasy, runes or steampunk.\nGenuinely transparent alpha everywhere outside the parts. NO grid lines, no boxes, no captions, no row/column labels, no words, no digits, no background, no floor, no cast shadows, no weapons or handheld equipment, no full-body silhouettes in any cell.\nActor identity and required anatomy: A hunched faceless charcoal-coated dragger, pale long oblong featureless head, oversized charcoal coat, impossibly long broad heavy sleeves with muted teal open cuffs reaching below short feet. Body is short charcoal TORSO ONLY, no head or sleeves or feet. Head is isolated pale oblong blank mask; back head is dark rear hood with no facial marks. Arms are separate very long heavy angular cloth sleeves ending in teal-lined square cuffs; legs are short separate dark stumps ending in tiny plain shoes. No tentacles, no gore.\nFINAL CRITICAL CHECK: body is a SLEEVELESS torso with no mask, no sleeves. Keep every part narrower than180px and shorter than210px to ensure32pixel transparent grid gutters; total6×4 grid1536×1024. Row3 both short feet point right, row4 both point left. True transparent hard clean alpha with no hazy dust or background.",
+      "source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-a5feb3d9-3012-43f7-8a6e-5deeef10f066.png",
+      "final_fix_prompt": "Edit ONLY THE FIRST COLUMN in all four rows of this1536×1024 six-column four-row transparent skeletal atlas. These four charcoal body parts currently have tiny attached feet/leg stumps below the coat. REMOVE those attached feet/leg stumps entirely. Leave just the short sleeveless coat trunk, ending at the coat hem, with a small hip overlap stub hidden under the hem but NO visible shoes or legs. Detached legs in columns5/6 are correct and must stay exactly unchanged, as do heads and long teal-cuff sleeves. Maintain all24 cell centers, row facing directions, materials, colors, exact6×4 layout and actual alpha0 background. No new marks, grid, shadows or background.",
+      "pre_final_fix_source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-16311698-2327-447f-88e4-839136679e91.png",
+      "sha256": "3d4c90657e5abef7b38138266df931167fdfe86578eb7fc4f113ba17b4a23b5a",
+      "source_sha256": "fd7f13cbb1ec780706eff9f85c921b5ae4fafeff40d37379a3bc01a6e5d19c7d",
+      "source_size": [
+        1536,
+        1024
+      ],
+      "bytes": 1172355,
+      "width": 1536,
+      "height": 1024,
+      "format": "RGBA PNG",
+      "alpha": true,
+      "processing": "Shared .cache/art-v1/format-atlas.ps1: identify actual 4 row and 6 column transparent bands; alpha>16 bounds crop; aspect-preserving bicubic scale; center each generated part in256x256 cell with16px minimum margin; no painting, no new part geometry.",
+      "checked": "Individually inspected generated atlas and final edits; source anatomy and side shoe directions corrected with built-in image_gen; all24 packed cells have exact alpha0 edges.",
+      "alpha_formatting": {
+        "source_width": 1536,
+        "source_height": 1024,
+        "alpha_min": 0,
+        "alpha_max": 254,
+        "source_transparent_pixels": 1219804,
+        "width": 1536,
+        "height": 1024,
+        "cell_width": 256,
+        "cell_height": 256,
+        "padding": 16,
+        "border_alpha_max": 0,
+        "layout_cuts": [
+          {
+            "row": 0,
+            "column": 0,
+            "source": [
+              76,
+              52,
+              140,
+              169
+            ],
+            "target": [
+              35,
+              16,
+              186,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 1,
+            "source": [
+              328,
+              56,
+              119,
+              156
+            ],
+            "target": [
+              298,
+              16,
+              171,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 2,
+            "source": [
+              574,
+              25,
+              100,
+              225
+            ],
+            "target": [
+              590,
+              16,
+              100,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 3,
+            "source": [
+              861,
+              25,
+              101,
+              225
+            ],
+            "target": [
+              845,
+              16,
+              101,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 4,
+            "source": [
+              1108,
+              79,
+              94,
+              158
+            ],
+            "target": [
+              1085,
+              16,
+              133,
+              224
+            ]
+          },
+          {
+            "row": 0,
+            "column": 5,
+            "source": [
+              1354,
+              79,
+              95,
+              159
+            ],
+            "target": [
+              1341,
+              16,
+              134,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 0,
+            "source": [
+              68,
+              289,
+              156,
+              170
+            ],
+            "target": [
+              25,
+              272,
+              206,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 1,
+            "source": [
+              337,
+              309,
+              122,
+              158
+            ],
+            "target": [
+              297,
+              272,
+              173,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 2,
+            "source": [
+              571,
+              278,
+              105,
+              228
+            ],
+            "target": [
+              588,
+              272,
+              103,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 3,
+            "source": [
+              860,
+              278,
+              105,
+              228
+            ],
+            "target": [
+              844,
+              272,
+              103,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 4,
+            "source": [
+              1105,
+              333,
+              94,
+              151
+            ],
+            "target": [
+              1082,
+              272,
+              139,
+              224
+            ]
+          },
+          {
+            "row": 1,
+            "column": 5,
+            "source": [
+              1357,
+              332,
+              95,
+              152
+            ],
+            "target": [
+              1338,
+              272,
+              140,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 0,
+            "source": [
+              64,
+              533,
+              148,
+              183
+            ],
+            "target": [
+              37,
+              528,
+              181,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 1,
+            "source": [
+              330,
+              561,
+              119,
+              145
+            ],
+            "target": [
+              292,
+              528,
+              184,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 2,
+            "source": [
+              581,
+              532,
+              112,
+              218
+            ],
+            "target": [
+              582,
+              528,
+              115,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 3,
+            "source": [
+              844,
+              532,
+              111,
+              218
+            ],
+            "target": [
+              839,
+              528,
+              114,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 4,
+            "source": [
+              1107,
+              593,
+              103,
+              131
+            ],
+            "target": [
+              1064,
+              528,
+              176,
+              224
+            ]
+          },
+          {
+            "row": 2,
+            "column": 5,
+            "source": [
+              1371,
+              591,
+              96,
+              129
+            ],
+            "target": [
+              1324,
+              528,
+              167,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 0,
+            "source": [
+              79,
+              781,
+              153,
+              181
+            ],
+            "target": [
+              33,
+              784,
+              189,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 1,
+            "source": [
+              333,
+              812,
+              118,
+              142
+            ],
+            "target": [
+              291,
+              784,
+              186,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 2,
+            "source": [
+              595,
+              771,
+              106,
+              223
+            ],
+            "target": [
+              587,
+              784,
+              106,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 3,
+            "source": [
+              835,
+              771,
+              106,
+              223
+            ],
+            "target": [
+              843,
+              784,
+              106,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 4,
+            "source": [
+              1094,
+              837,
+              101,
+              128
+            ],
+            "target": [
+              1063,
+              784,
+              177,
+              224
+            ]
+          },
+          {
+            "row": 3,
+            "column": 5,
+            "source": [
+              1351,
+              836,
+              99,
+              129
+            ],
+            "target": [
+              1322,
+              784,
+              172,
+              224
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

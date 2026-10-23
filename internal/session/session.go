@@ -8,7 +8,9 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"maps"
 	"math"
+	"slices"
 	"sort"
 	"time"
 
@@ -16,10 +18,10 @@ import (
 	"hsmultiplayer/internal/persistence"
 	"hsmultiplayer/internal/scene"
 	"hsmultiplayer/internal/script"
-	"hsmultiplayer/pkg/geometry"
+	"hsmultiplayer/pkg/expedition"
 	"hsmultiplayer/pkg/inventory"
 	"hsmultiplayer/pkg/model"
-	"hsmultiplayer/pkg/progression"
+	"hsmultiplayer/pkg/perf"
 	"hsmultiplayer/pkg/protocol"
 	"hsmultiplayer/pkg/timing"
 	"hsmultiplayer/sdk"
@@ -53,13 +55,14 @@ type member struct {
 	visited     map[string]bool
 }
 type event struct {
-	kind       string
-	hello      protocol.Hello
-	out        chan protocol.Message
-	id         string
-	generation uint64
-	request    protocol.Request
-	reply      chan joined
+	kind        string
+	hello       protocol.Hello
+	out         chan protocol.Message
+	id          string
+	generation  uint64
+	request     protocol.Request
+	reply       chan joined
+	diagnostics chan Diagnostics
 }
 type joined struct {
 	ID         string
@@ -67,10 +70,14 @@ type joined struct {
 	Err        error
 }
 type Coordinator struct {
-	events chan event
-	done   chan struct{}
+	performance *perf.Recorder
+	events      chan event
+	done        chan struct{}
 }
 type team struct {
+	groundLoot     []model.Loot
+	performance    *perf.Recorder
+	processSampler perf.ProcessSampler
 	nextHost       uint64
 	spaces         map[string]*scene.FreeSpace
 	layerMembers   []string
@@ -169,6 +176,7 @@ func New(c *content.Catalog, cfg Config) (*Coordinator, error) {
 	t.runtime = vm
 	if cfg.Restore != nil {
 		s := protocol.CloneState(cfg.Restore.State)
+		t.groundLoot = s.GroundLoot
 		t.runID = s.RunID
 		t.started = s.Started
 		t.config.ProgressionScope = s.ProgressionScope
@@ -212,7 +220,7 @@ func New(c *content.Catalog, cfg Config) (*Coordinator, error) {
 		t.mapPlayers = s.MapPlayers
 		t.mapTemplate, _ = c.GenerateMap(t.floor, t.config.Seed, t.mapPlayers)
 		_, _, special := c.TeamMeta(layerPlayers(s.Players, s.LayerMembers), t.metaRules())
-		t.mapTemplate = content.AddSpecialNodes(t.mapTemplate, special)
+		t.mapTemplate = t.catalog.AddLayerSpecialNodes(t.mapTemplate, special, t.floor)
 		t.terrain = t.mapTemplate.Terrain
 		for _, v := range cfg.Restore.Visits {
 			if m := t.players[v.Player]; m != nil {
@@ -229,7 +237,8 @@ func New(c *content.Catalog, cfg Config) (*Coordinator, error) {
 			}
 		}
 	}
-	a := &Coordinator{events: make(chan event, 256), done: make(chan struct{})}
+	t.performance = &perf.Recorder{}
+	a := &Coordinator{performance: t.performance, events: make(chan event, 256), done: make(chan struct{})}
 	success = true
 	go a.run(t, release)
 	return a, nil
@@ -280,7 +289,11 @@ func (a *Coordinator) run(t *team, release func()) {
 	for {
 		select {
 		case e := <-a.events:
+			eventStart := perf.Start()
 			switch e.kind {
+			case "diagnostics":
+				e.diagnostics <- t.diagnostics(time.Now())
+				continue
 			case "stop":
 				return
 			case "connect":
@@ -306,8 +319,10 @@ func (a *Coordinator) run(t *team, release func()) {
 					t.send(m, protocol.ErrorMessage(err))
 				}
 			}
+			t.performance.Since("server.command", eventStart)
 		case <-logic.C:
 			now := time.Now()
+			batchStart := perf.Start()
 			steps := stepper.Advance(now)
 			for i := 0; i < steps; i++ {
 				t.serverTick++
@@ -319,13 +334,16 @@ func (a *Coordinator) run(t *team, release func()) {
 			if steps > 0 {
 				t.refresh()
 			}
+			t.performance.Since("server.logic.batch", batchStart)
 		case <-network.C:
+			snapshotStart := perf.Start()
 			s := t.snapshot()
 			for _, m := range t.players {
 				if m.player.Online {
 					t.send(m, protocol.Message{Kind: "state", State: &s})
 				}
 			}
+			t.performance.Since("server.snapshot_publish", snapshotStart)
 		}
 	}
 }
@@ -378,6 +396,10 @@ func (t *team) connect(h protocol.Hello, out chan protocol.Message) (string, uin
 		}
 		if t.floor > 0 {
 			p.Level = t.floor
+			p, err = t.catalog.RefreshLevelGrowth(p)
+			if err != nil {
+				return "", 0, err
+			}
 			p, err = content.ApplyFloorJoinGrowth(p, t.floor)
 			if err != nil {
 				return "", 0, err
@@ -432,9 +454,16 @@ func (t *team) send(m *member, msg protocol.Message) {
 	}
 }
 func (t *team) request(m *member, r protocol.Request) error {
+	if r.Kind == "ping" {
+		t.send(m, protocol.Message{Kind: "pong", Probe: r.Probe})
+		return nil
+	}
 	if r.Kind == "inventory_return" {
 		_, err := t.inventoryRequest(m, r)
 		return err
+	}
+	if r.Kind == "debug_grant_item" {
+		return t.debugGrantItem(m, r.Item)
 	}
 	if r.Kind == "export" {
 		if m.player.ID != t.admin {
@@ -486,14 +515,14 @@ func (t *team) request(m *member, r protocol.Request) error {
 		t.phase = "exploring"
 		return nil
 	}
-	if (t.phase == "preparation" || t.phase == "lobby") && (r.Kind == "inventory_click" || r.Kind == "equip") {
+	if (t.phase == "preparation" || t.phase == "lobby") && (r.Kind == "inventory_click" || r.Kind == "inventory_quick" || r.Kind == "equip" || r.Kind == "drop_item" || r.Kind == "pickup") {
 		if !m.player.Active || m.player.Life != "alive" {
 			return protocol.Reject("error.incapacitated")
 		}
 		_, err := t.inventoryRequest(m, r)
 		return err
 	}
-	if t.phase == "preparation" && (r.Kind == "skill" || r.Kind == "use_item") {
+	if t.phase == "preparation" && (r.Kind == "weapon_skill" || r.Kind == "use_item") {
 		if !m.player.Active || m.player.Life != "alive" {
 			return protocol.Reject("error.incapacitated")
 		}
@@ -508,13 +537,25 @@ func (t *team) request(m *member, r protocol.Request) error {
 	if t.phase != "exploring" && t.phase != "intermission" {
 		return protocol.Reject("error.not_exploring")
 	}
+	if r.Kind == "withdraw_vote" {
+		if t.vote == nil || t.vote.Node != t.bossNode() || t.vote.Item != "" {
+			return protocol.Reject("error.no_vote")
+		}
+		t.vote.Yes = slices.DeleteFunc(t.vote.Yes, func(id string) bool { return id == m.player.ID })
+		t.vote.Entrants = slices.DeleteFunc(t.vote.Entrants, func(id string) bool { return id == m.player.ID })
+		delete(t.vote.Tools, m.player.ID)
+		if len(t.vote.Yes) == 0 {
+			t.vote = nil
+		}
+		return nil
+	}
 	if r.Kind == "vote" {
-		if r.Accept && t.vote != nil {
+		if r.Accept && t.vote != nil && t.nodes[t.vote.Node].ID == "" {
 			if err := t.deviceReady(m, t.vote.Node); err != nil {
 				return err
 			}
 		}
-		return t.castVote(m, r.Accept)
+		return t.castVoteEntry(m, r.Accept, r.Join)
 	}
 	if m.player.Life != "alive" {
 		return protocol.Reject("error.incapacitated")
@@ -529,14 +570,13 @@ func (t *team) request(m *member, r protocol.Request) error {
 		return protocol.Reject("error.not_exploring")
 	}
 	if t.bossRoute != "" {
-		if r.Kind == "attribute" {
-			return t.invest(m, r.Node)
-		}
 		return protocol.Reject("error.boss_committed")
 	}
 	switch r.Kind {
+	case "travel_tool":
+		return t.useMovement(m, r.Item, r.Node)
 	case "enter":
-		return t.enterDoor(m, r.Node)
+		return t.enter(m, r.Node)
 	case "propose":
 		if err := t.deviceReady(m, r.Node); err != nil {
 			return err
@@ -547,7 +587,7 @@ func (t *team) request(m *member, r protocol.Request) error {
 			return protocol.Reject("error.outside_combat")
 		}
 		n := t.nodes[m.player.Node]
-		if n.Kind != "shop" || !n.Open {
+		if n.Kind != "shop" || !n.Open || !t.catalog.Node(n.Definition).WeaponUpgrade {
 			return protocol.Reject("error.shop_required")
 		}
 		if !t.atShop(m) {
@@ -561,27 +601,12 @@ func (t *team) request(m *member, r protocol.Request) error {
 		return nil
 	case "rescue":
 		return t.rescue(m)
-	case "attribute":
-		return t.invest(m, r.Node)
 	default:
 		return protocol.Reject("error.unknown_command")
 	}
 }
-func (t *team) invest(m *member, key string) error {
-	if a := t.actors[m.player.Scene]; a != nil {
-		return a.Invest(m.player.ID, key)
-	}
-	if m.player.Points < 1 {
-		return protocol.Reject("error.no_points")
-	}
-	next, err := content.Invest(m.player, key)
-	if err != nil {
-		return err
-	}
-	m.player = next
-	return nil
-}
 func (t *team) initialize(floor int) error {
+	defer t.performance.Since("server.load.floor", perf.Start())
 	count := 0
 	for _, m := range t.players {
 		if m.player.Online || m.player.Active {
@@ -600,7 +625,7 @@ func (t *team) initialize(floor int) error {
 		}
 	}
 	extraX, extraY, special := t.catalog.TeamMeta(members, t.metaRules())
-	template = content.AddSpecialNodes(template, special)
+	template = t.catalog.AddLayerSpecialNodes(template, special, floor)
 	prepared := make(map[string]model.Player, len(t.players))
 	for id, m := range t.players {
 		p, err := content.PrepareLayerPlayer(m.player)
@@ -629,6 +654,7 @@ func (t *team) initialize(floor int) error {
 	t.shared = t.initialY
 	t.nodes = t.makeMap()
 	t.spaces = nil
+	t.groundLoot = nil
 	t.terrain = template.Terrain
 	for _, id := range t.ids() {
 		m := t.players[id]
@@ -650,7 +676,7 @@ func (t *team) makeMap() map[string]model.Node {
 	for _, entry := range template.Nodes {
 		def := t.catalog.Node(entry.Definition)
 		free := entry.ID == template.Start || def.Kind == "passage"
-		nodes[entry.ID] = model.Node{ID: entry.ID, Definition: def.ID, Name: def.Name, NameKey: def.NameKey, Room: def.Room, Cost: def.Cost, Q: entry.Q, R: entry.R, Kind: def.Kind, Payment: def.Payment, Hint: def.Hint, HintKey: def.HintKey, Edges: entry.Edges, Open: free, Completed: free}
+		nodes[entry.ID] = model.Node{ID: entry.ID, Definition: def.ID, Name: def.Name, NameKey: def.NameKey, Room: def.Room, Cost: def.Cost, Q: entry.Q, R: entry.R, Kind: def.Kind, Blocking: expedition.Blocking(def), Payment: def.Payment, Hint: def.Hint, HintKey: def.HintKey, Edges: entry.Edges, Open: free, Completed: free}
 	}
 	return nodes
 }
@@ -667,139 +693,12 @@ func (t *team) interact(m *member, n model.Node, command string, first bool) (mo
 	}
 	return next[m.player.ID], nil
 }
-func (t *team) reachable(from, to string) bool {
-	if from == to {
-		return true
-	}
-	seen := map[string]bool{from: true}
-	queue := []string{from}
-	for len(queue) > 0 {
-		id := queue[0]
-		queue = queue[1:]
-		for _, next := range t.nodes[id].Edges {
-			if next == to {
-				return true
-			}
-			if !seen[next] && t.nodes[next].Completed {
-				seen[next] = true
-				queue = append(queue, next)
-			}
-		}
-	}
-	return false
-}
-func (t *team) enter(m *member, id string) error {
-	return t.enterAt(m, id, nil)
-}
-func (t *team) enterAt(m *member, id string, arrival *model.Vec) error {
-	if m.player.Scene != "" {
-		return protocol.Reject("error.already_battle")
-	}
-	n, ok := t.nodes[id]
-	if !ok || !t.reachable(m.player.Node, id) {
-		return protocol.Reject("error.unreachable")
-	}
-	if id == t.bossNode() {
-		return protocol.Reject("error.boss_vote")
-	}
-	entry := *m
-	if m.player.Node != id {
-		var err error
-		entry.player, err = content.LeaveStatuses(m.player)
-		if err != nil {
-			return err
-		}
-	}
-	if n.Completed && (n.Room != "" || n.Kind == "passage" || n.Kind == "start") {
-		m.player = entry.player
-		t.placeInSpace(m, id)
-		if arrival != nil {
-			m.player.Position = *arrival
-		}
-		return nil
-	}
-	if n.Payment == "shared" && !n.Open {
-		return protocol.Reject("error.node_vote")
-	}
-	cost := 0
-	if n.Payment == "personal" && !n.Completed {
-		cost = n.Cost
-	}
-	if m.player.AP < cost {
-		return protocol.Reject("error.no_personal_ap")
-	}
-	first := !m.visited[id]
-	player, err := t.interact(&entry, n, "enter", first)
-	if err != nil {
-		return err
-	}
-	player.Node = id
-	player.AP -= cost
-	if n.Room != "" {
-		player.Scene = id
-	}
-	// Evaluate all scripts and validate their commands before charging or adding
-	// the actor. A failed hook leaves the original space and resources intact.
-	if first {
-		commands, hookErr := t.runtime.Dispatch(sdk.EventContext{Scope: "session", Scene: player.Scene, Floor: t.floor, Event: model.Event{Kind: "node_entered", Scene: player.Scene, Source: player.ID, Target: n.ID}, Players: []model.Player{player}})
-		if hookErr != nil {
-			return hookErr
-		}
-		next, hookErr := content.ApplyCommands(t.catalog, map[string]model.Player{player.ID: player}, commands, content.EventCommands)
-		if hookErr != nil {
-			return hookErr
-		}
-		player = next[player.ID]
-	}
-	if n.Room != "" {
-		a := t.actors[id]
-		created := a == nil
-		if created {
-			a, err = scene.New(t.catalog, scene.Config{ShotOrigin: t.projectileOrigin(id), ExternalClock: true, AdventureTime: t.adventureTime, TickRate: t.config.TickRate, ID: id, Room: n.Room, Floor: t.floor, Seed: content.Seed(t.config.Seed, t.floor, id+":"+n.Room)})
-			if err != nil {
-				return err
-			}
-			a.EnableProjectileTransit()
-		}
-		player.Scene = id
-		addErr := a.AddWithActions(player, arrival, m.actions)
-		if addErr != nil {
-			if created {
-				a.Stop()
-			}
-			return addErr
-		}
-		m.actions = scene.PlayerActions{}
-		t.actors[id] = a
-		if space := t.spaces[id]; space != nil {
-			a.ReceiveProjectiles(space.ReleaseProjectiles())
-			delete(t.spaces, id)
-		}
-	} else {
-		n.Completed = true
-		t.nodes[id] = n
-	}
-	if m.visited == nil {
-		m.visited = map[string]bool{}
-	}
-	m.visited[id] = true
-	m.player = player
-	m.walk = model.Input{}
-	if player.Scene == "" {
-		t.placeInSpace(m, id)
-		if arrival != nil {
-			m.player.Position = *arrival
-		}
-	}
-	if a := t.actors[id]; a != nil {
-		t.merge(a.Snapshot())
-		player = m.player
-	}
-	return nil
-}
 func (t *team) propose(m *member, id string) error {
 	if t.bossRoute != "" {
 		return protocol.Reject("error.boss_committed")
+	}
+	if id == t.bossNode() {
+		return t.selectBoss(m, "")
 	}
 	if t.vote != nil {
 		return protocol.Reject("error.vote_open")
@@ -814,10 +713,10 @@ func (t *team) propose(m *member, id string) error {
 		}
 	} else {
 		n, ok := t.nodes[id]
-		if !ok || n.Payment != "shared" || n.Open || !t.reachable(m.player.Node, id) || m.player.Scene != "" {
+		if !ok || !t.reachable(m.player.Node, id) || m.player.Scene != "" {
 			return protocol.Reject("error.invalid_shared_node")
 		}
-		if t.shared < n.Cost {
+		if t.shared < 1 {
 			return protocol.Reject("error.no_shared_ap")
 		}
 		if n.Kind == "boss" {
@@ -838,12 +737,18 @@ func (t *team) propose(m *member, id string) error {
 		return protocol.Reject("error.no_voters")
 	}
 	t.vote = v
-	return t.castVote(m, true)
+	return t.castVoteEntry(m, true, t.nodes[id].ID != "" && t.nodes[id].Kind != "boss")
 }
 func (t *team) castVote(m *member, yes bool) error {
+	return t.castVoteEntry(m, yes, false)
+}
+func (t *team) castVoteEntry(m *member, yes, join bool) error {
 	v := t.vote
 	if v == nil {
 		return protocol.Reject("error.no_vote")
+	}
+	if v.Node == t.bossNode() && v.Item == "" && yes {
+		return t.selectBoss(m, "")
 	}
 	has := func(ids []string) bool {
 		for _, id := range ids {
@@ -859,6 +764,12 @@ func (t *team) castVote(m *member, yes bool) error {
 	if has(v.Yes) || has(v.No) {
 		return protocol.Reject("error.already_voted")
 	}
+	if yes && join && t.nodes[v.Node].ID != "" {
+		if m.player.Scene != "" || !t.reachable(m.player.Node, v.Node) {
+			return protocol.Reject("error.unreachable")
+		}
+		v.Entrants = append(v.Entrants, m.player.ID)
+	}
 	if yes {
 		v.Yes = append(v.Yes, m.player.ID)
 	} else {
@@ -867,6 +778,9 @@ func (t *team) castVote(m *member, yes bool) error {
 	if len(v.Yes) >= v.Required {
 		id := v.Node
 		t.vote = nil
+		if v.Item != "" {
+			return t.executeTeamMovement(*v)
+		}
 		switch id {
 		case "exhaust":
 			t.shared = 0
@@ -884,14 +798,13 @@ func (t *team) castVote(m *member, yes bool) error {
 			}
 			return t.startBoss(false)
 		default:
-			n := t.nodes[id]
-			if t.shared < n.Cost {
-				return protocol.Reject("error.no_shared_ap")
+			var entrants []*member
+			for _, pid := range v.Entrants {
+				if entry := t.players[pid]; entry != nil && entry.player.Online && entry.player.Active && entry.player.Life == "alive" && entry.player.Scene == "" && t.reachable(entry.player.Node, id) {
+					entrants = append(entrants, entry)
+				}
 			}
-			t.shared -= n.Cost
-			n.Open = true
-			t.nodes[id] = n
-			return nil
+			return t.enterGroup(entrants, id, true)
 		}
 	}
 	if len(v.No) > len(v.Eligible)-v.Required {
@@ -900,13 +813,9 @@ func (t *team) castVote(m *member, yes bool) error {
 	return nil
 }
 func (t *team) normalBossReady() error {
-	if len(t.actors) > 0 {
-		return protocol.Reject("error.battles_pending")
-	}
-	for _, m := range t.players {
-		p := m.player
-		if p.Active && p.Life == "alive" && !t.reachable(p.Node, t.bossNode()) {
-			return protocol.Reject("error.boss_route")
+	for _, a := range t.actors {
+		if a.Snapshot().State != "paused" {
+			return protocol.Reject("error.battles_pending")
 		}
 	}
 	return nil
@@ -915,7 +824,7 @@ func (t *team) startBoss(enhanced bool) error {
 	if t.bossRoute != "" {
 		return protocol.Reject("error.boss_committed")
 	}
-	if !enhanced && t.shared < t.nodes[t.bossNode()].Cost {
+	if !enhanced && t.shared < 1 {
 		return protocol.Reject("error.no_shared_ap")
 	}
 	boss := t.bossNode()
@@ -927,7 +836,6 @@ func (t *team) startBoss(enhanced bool) error {
 	if err != nil {
 		return err
 	}
-	a.EnableProjectileTransit()
 	// Capture each scene before stopping; earned wave rewards survive forced unfinished settlement.
 	t.stopScenes()
 	for _, id := range t.ids() {
@@ -954,7 +862,7 @@ func (t *team) startBoss(enhanced bool) error {
 		t.cursed = true
 		t.bossRoute = "enhanced"
 	} else {
-		t.shared -= t.nodes[boss].Cost
+		t.shared--
 		t.bossRoute = "normal"
 	}
 	t.actors[boss] = a
@@ -1013,6 +921,7 @@ func (t *team) stopScenes() {
 	t.views = map[string]protocol.Scene{}
 }
 func (t *team) refresh() {
+	defer t.performance.Since("server.logic.scene_sync", perf.Start())
 	for _, id := range t.sceneIDs() {
 		a := t.actors[id]
 		s := a.Snapshot()
@@ -1025,6 +934,9 @@ func (t *team) refresh() {
 			delete(t.actors, id)
 			delete(t.views, id)
 			t.keepSceneProjectiles(id, departure.Projectiles)
+			if space, err := t.freeSpace(id); err == nil {
+				space.ReceiveEnemyVisuals(s.EnemyActions)
+			}
 			n := t.nodes[id]
 			n.Completed = true
 			t.nodes[id] = n
@@ -1032,15 +944,11 @@ func (t *team) refresh() {
 				m := t.players[p.ID]
 				m.actions = departure.Actions[p.ID]
 				m.player.Scene = ""
-				oldArena := geometry.NewArena(s.Width, s.Height)
-				newArena := t.spaceArena(id)
-				m.player.Position = newArena.ClampDisk(newArena.Center.Add(p.Position.Sub(oldArena.Center).Scale(newArena.Radius/oldArena.Radius)), 12)
+				// Combat completion changes the simulation owner, not the node or
+				// its coordinate frame. Stay exactly where the battle ended.
+				m.player.Position = t.spaceArena(id).ClampDisk(p.Position, 12)
 				m.walk = model.Input{}
-				for m.player.XP >= progression.NextLevelXP(m.player.Level) {
-					m.player.XP -= progression.NextLevelXP(m.player.Level)
-					m.player.Level++
-					m.player.Points++
-				}
+
 				m.player.MaxHP = content.MaxHP(m.player)
 			}
 			if id == t.bossNode() {
@@ -1102,8 +1010,14 @@ func (t *team) sceneIDs() []string {
 	return ids
 }
 func (t *team) snapshot() protocol.State {
+	defer t.performance.Since("server.snapshot_build", perf.Start())
 	s := protocol.State{AdventureTime: t.adventureTime, ServerTick: t.serverTick, TickRate: t.config.TickRate, SnapshotRate: t.config.SnapshotRate, ActualTPS: t.actualTPS.Rate(), DroppedTicks: t.droppedTicks, Phase: t.phase, Floor: t.floor, Floors: len(t.catalog.Run().Floors), SharedAP: t.shared, PersonalInitial: t.initialX, SharedInitial: t.initialY, Cursed: t.cursed, Admin: t.admin}
+	if t.performance != nil {
+		s.Performance = t.performance.Snapshot(time.Now())
+		s.Process = t.processSampler.Sample(time.Now())
+	}
 	s.Trades = t.tradeSnapshot()
+	s.GroundLoot = slices.Clone(t.groundLoot)
 	s.RunID = t.runID
 	s.Started = t.started
 	s.ProgressionScope = t.config.ProgressionScope
@@ -1137,7 +1051,10 @@ func (t *team) snapshot() protocol.State {
 	sort.Strings(spaceIDs)
 	for _, id := range spaceIDs {
 		view := t.spaces[id].Snapshot()
-		if len(view.Projectiles) > 0 {
+		for _, p := range t.spacePlayers(id) {
+			view.Actions = append(view.Actions, p.Actions.View(p.Player.ID, p.Player.Life))
+		}
+		if len(view.Projectiles) > 0 || len(view.Actions) > 0 || len(view.EnemyActions) > 0 {
 			s.Scenes = append(s.Scenes, view)
 		}
 	}
@@ -1146,6 +1063,8 @@ func (t *team) snapshot() protocol.State {
 		v.Eligible = append([]string(nil), v.Eligible...)
 		v.Yes = append([]string(nil), v.Yes...)
 		v.No = append([]string(nil), v.No...)
+		v.Entrants = append([]string(nil), v.Entrants...)
+		v.Tools = maps.Clone(v.Tools)
 		s.Vote = &v
 	}
 	return s
@@ -1158,10 +1077,12 @@ func (t *team) metaRules() model.MetaRules {
 }
 func (t *team) save() error {
 	c := persistence.Checkpoint{Version: persistence.Version, Digest: t.catalog.Digest, Seed: t.config.Seed, State: t.snapshot()}
+	c.State.Performance, c.State.Process = perf.Snapshot{}, perf.Process{}
 	// Checkpoints contain layer preparation, not transient practice projectiles.
 	var battles []protocol.Scene
 	for _, view := range c.State.Scenes {
 		if view.State != "idle" {
+			view.Performance = perf.Snapshot{}
 			battles = append(battles, view)
 		}
 	}

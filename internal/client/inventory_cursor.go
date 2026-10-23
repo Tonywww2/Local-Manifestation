@@ -38,7 +38,14 @@ func (g *Game) inventoryClick(c uiControl, right bool) {
 	}
 	v := g.displayInventory()
 	area := strings.TrimPrefix(c.Action, "inventory-")
-	n, err := inventory.Click(v, p.ID, inventory.Slot{Area: area, Index: index}, right, g.catalog.Item)
+	kind := "inventory_click"
+	var n model.Inventory
+	if !right && bindingDown("Shift") && v.Cursor == "" {
+		kind = "inventory_quick"
+		n, err = inventory.QuickTransfer(v, inventory.Slot{Area: area, Index: index}, g.catalog.Item)
+	} else {
+		n, err = inventory.Click(v, p.ID, inventory.Slot{Area: area, Index: index}, right, g.catalog.Item)
+	}
 	if err != nil {
 		g.notifyMessage(protocol.ErrorMessage(err))
 		return
@@ -46,7 +53,7 @@ func (g *Game) inventoryClick(c uiControl, right bool) {
 	if n.Revision == v.Revision {
 		return
 	}
-	if !g.sendItem(protocol.Request{Kind: "inventory_click", Area: area, Slot: index, Right: right, Revision: v.Revision}) {
+	if !g.sendItem(protocol.Request{Kind: kind, Area: area, Slot: index, Right: right, Revision: v.Revision}) {
 		g.notify("error.inventory_queue")
 		return
 	}

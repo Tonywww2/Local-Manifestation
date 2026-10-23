@@ -19,6 +19,8 @@ func (g *Game) itemControl(owner, id string, it model.ItemInstance, r ui.Rect, a
 	if !ok {
 		return c
 	}
+	c.Item = it
+	c.ItemKind = d.Kind
 	c.Count = inventory.Count(it)
 	key := g.itemViewKey(it)
 	if info, ok := g.itemViews[key]; ok {
@@ -40,8 +42,36 @@ func (g *Game) itemControl(owner, id string, it model.ItemInstance, r ui.Rect, a
 		c.Icon = "status"
 	}
 	c.Title = g.contentName(d.ID, d.Name)
-	c.Summary = []string{g.localized("content."+d.ID+".description", d.Description)}
-	c.Details = []string{g.tr("ui.item.value", "value", g.catalog.ItemValue(it))}
+	c.Summary = []string{g.tr("ui.item.type", "type", g.localized("ui.item.kind."+d.Kind, d.Kind)), g.localized("content."+d.ID+".description", d.Description)}
+	if d.Kind == "movement" || d.Kind == "passive" {
+		c.Icon = d.Kind
+		c.Summary = append(c.Summary, g.tr("ui.item.bag_only"))
+		if d.Durability == -1 {
+			c.Summary = append(c.Summary, g.tr("ui.item.unlimited"))
+			c.Badge = "∞"
+		} else {
+			remaining := it.Durability
+			if remaining == 0 {
+				remaining = d.Durability
+			}
+			c.Summary = append(c.Summary, g.tr("ui.item.durability", "remaining", remaining, "maximum", d.Durability))
+			c.Badge = fmt.Sprint(remaining)
+		}
+	}
+	if d.Kind == "weapon" {
+		if p := g.self(); p != nil {
+			if q, err := g.catalog.PreviewWeaponAttack(*p, it); err == nil {
+				if result, err := content.EvaluatePreview(q); err == nil {
+					c.Summary = append(c.Summary, g.weaponDamageSummary(result, p.Inventory.Equipment[0] == it.ID))
+				}
+			}
+		}
+		if skill, ok := g.catalog.WeaponSkill(g.catalog.Weapon(d.Weapon).Skill); ok {
+			c.Summary = append(c.Summary, g.tr("ui.weapon_skill.named", "name", g.contentName(skill.ID, skill.Name)))
+			c.Details = append(c.Details, g.weaponSkillLines(skill)...)
+		}
+	}
+	c.Details = append(c.Details, g.tr("ui.item.value", "value", g.catalog.ItemValue(it)))
 	if d.Tier > 0 {
 		c.Summary = append(c.Summary, g.tr("ui.item.tier", "tier", d.Tier))
 	}
@@ -91,6 +121,9 @@ func (g *Game) itemControl(owner, id string, it model.ItemInstance, r ui.Rect, a
 	}
 	if g.self() != nil {
 		g.equipmentComparison(&c, it, d, *g.self())
+	}
+	if g.resources.images["icon:"+d.ID] != nil {
+		c.Icon = d.ID
 	}
 	if g.itemViews == nil || len(g.itemViews) > 512 {
 		g.itemViews = map[itemViewKey]itemView{}
@@ -237,6 +270,22 @@ func (g *Game) buildTrade(f *uiFrame, layout ui.Layout) {
 }
 func (g *Game) itemAction(c uiControl) bool {
 	switch c.Action {
+	case "item-details":
+		g.openItemDetails(c.Item)
+		g.u.itemMenu = nil
+	case "formula-pin":
+		if c.Inspection != nil {
+			g.openInspection(*c.Inspection)
+		}
+	case "formula-left", "formula-right":
+		if g.u.formulaOffsets == nil {
+			g.u.formulaOffsets = map[string]float64{}
+		}
+		delta := 180.0
+		if c.Action == "formula-left" {
+			delta = -delta
+		}
+		g.u.formulaOffsets[c.Value] = max(0, min(float64(c.Count), g.u.formulaOffsets[c.Value]+delta))
 	case "inventory-bag", "inventory-equipment", "inventory-accessory":
 		g.inventoryClick(c, false)
 	case "equip-slot":
@@ -258,6 +307,10 @@ func (g *Game) itemAction(c uiControl) bool {
 		g.sendItem(protocol.Request{Kind: "buy", Item: c.Value})
 	case "item-pickup":
 		g.sendItem(protocol.Request{Kind: "pickup", Item: c.Value})
+	case "item-drop":
+		v := g.displayInventory()
+		g.sendItem(protocol.Request{Kind: "drop_item", Item: c.Value, Revision: v.Revision})
+		g.u.itemMenu = nil
 	case "trade-start":
 		if _, _, ok := g.currentTrade(); ok {
 			g.openWindow("trade")
@@ -284,9 +337,8 @@ func (g *Game) itemAction(c uiControl) bool {
 	case "item-use":
 		slot, _ := strconv.Atoi(c.Value)
 		g.sendItem(protocol.Request{Kind: "use_item", Slot: slot, Node: g.u.selectedNode})
-	case "skill-use":
-		slot, _ := strconv.Atoi(c.Value)
-		g.sendItem(protocol.Request{Kind: "skill", Slot: slot, Input: model.Input{Aim: g.localInput.Aim}})
+	case "weapon-skill-use":
+		g.sendItem(protocol.Request{Kind: "weapon_skill", Input: model.Input{Aim: g.localInput.Aim}})
 	case "revive":
 		g.sendItem(protocol.Request{Kind: "revive", Peer: c.Value})
 	default:
@@ -302,9 +354,11 @@ func (g *Game) buildLoot(f *uiFrame, layout ui.Layout) {
 		return
 	}
 	var drops []model.Loot
-	for _, it := range p.Loot {
-		if it.Node == p.Node {
-			drops = append(drops, it)
+	for _, list := range g.lootLists() {
+		for _, it := range list {
+			if it.Node == p.Node {
+				drops = append(drops, it)
+			}
 		}
 	}
 	g.addLabel(f, "loot", ui.Rect{X: r.X + 14, Y: r.Y + 36, W: r.W - 28, H: 40}, g.tr("ui.loot.help"))
@@ -332,16 +386,18 @@ func (g *Game) buildShop(f *uiFrame, layout ui.Layout) {
 }
 
 func (g *Game) actionKeys(aim model.Vec, captured bool) {
-	for i := 0; i < 4; i++ {
-		for _, a := range []string{"skill", "item"} {
-			key := g.bound(fmt.Sprintf("%s%d", a, i+1))
-			if bindingAvailable(key, captured) && bindingPressed(key) {
-				kind := a
-				if a == "item" {
-					kind = "use_item"
-				}
-				g.sendItem(protocol.Request{Kind: kind, Slot: i, Node: g.u.selectedNode, Input: model.Input{Aim: aim}})
+	key := g.bound("weapon_skill")
+	if bindingAvailable(key, captured) && bindingPressed(key) {
+		if p := g.self(); p != nil {
+			if d, it, ok := g.catalog.EquippedWeaponSkill(*p); ok && it.SkillReady <= p.Statuses.Time && p.Energy >= d.Cost {
+				g.sendItem(protocol.Request{Kind: "weapon_skill", Input: model.Input{Aim: aim}})
 			}
+		}
+	}
+	for i := 0; i < 4; i++ {
+		key := g.bound(fmt.Sprintf("item%d", i+1))
+		if bindingAvailable(key, captured) && bindingPressed(key) {
+			g.sendItem(protocol.Request{Kind: "use_item", Slot: i, Node: g.u.selectedNode, Input: model.Input{Aim: aim}})
 		}
 	}
 }

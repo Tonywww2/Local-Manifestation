@@ -1,6 +1,7 @@
 # Local caches, build output and player/server data
 /.cache/
 /bin/
+/dist/
 /data/
 /internal/native/generated.go
 

@@ -16,7 +16,7 @@ type Space struct {
 }
 
 func Clear(s Space, a, b model.Vec) bool {
-	if !s.Arena.ContainsDisk(b, s.Radius) {
+	if !s.Arena.ClearStep(a, b, s.Radius) {
 		return false
 	}
 	return geometry.ObstaclesClear(a, b, s.Radius, s.Obstacles)

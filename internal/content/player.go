@@ -7,7 +7,6 @@ import (
 	"hsmultiplayer/pkg/inventory"
 	"hsmultiplayer/pkg/life"
 	"hsmultiplayer/pkg/model"
-	"hsmultiplayer/pkg/protocol"
 	"hsmultiplayer/pkg/stats"
 	"hsmultiplayer/pkg/status"
 )
@@ -37,33 +36,6 @@ func RefreshPlayer(p model.Player) (model.Player, error) {
 	} else {
 		next.HP = next.MaxHP
 	}
-	return next, nil
-}
-
-func Invest(p model.Player, key string) (model.Player, error) {
-	if p.Points < 1 {
-		return model.Player{}, protocol.Reject("error.no_points")
-	}
-	if _, ok := p.Attributes.Value(key); !ok {
-		return model.Player{}, protocol.Reject("error.unknown_attribute")
-	}
-	c := model.StatContribution{StatModifier: model.StatModifier{ID: "engine:allocation:" + key, Stat: key, Operation: "add", Value: 1}, Source: model.SourceRef{Kind: "growth", Actor: p.ID, Definition: "engine:level"}}
-	for _, old := range p.StatContributions {
-		if old.ID == c.ID && old.Source == c.Source {
-			c.Value += old.Value
-		}
-	}
-	next := model.ClonePlayer(p)
-	var err error
-	next.StatContributions, err = stats.Upsert(next.StatContributions, c)
-	if err != nil {
-		return model.Player{}, err
-	}
-	next, err = RefreshPlayer(next)
-	if err != nil {
-		return model.Player{}, err
-	}
-	next.Points--
 	return next, nil
 }
 

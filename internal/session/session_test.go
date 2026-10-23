@@ -280,14 +280,14 @@ func TestCheckpointRejectsInvalidFloorOrDefinition(t *testing.T) {
 	}
 }
 
-func TestStatAllocationSurvivesRestoreAndInvalidSourcesAreRejected(t *testing.T) {
+func TestLevelGrowthSurvivesRestoreAndInvalidSourcesAreRejected(t *testing.T) {
 	tm := fixture(t)
 	p := &tm.players["a"].player
-	p.Level = 2
-	p.Points = 1
-	if err := tm.invest(tm.players["a"], "agility"); err != nil {
+	grown, err := tm.catalog.GrantExperience(*p, 20)
+	if err != nil {
 		t.Fatal(err)
 	}
+	*p = grown
 	saved := persistence.Checkpoint{Version: persistence.Version, Digest: tm.catalog.Digest, State: tm.snapshot(), Identities: []persistence.Identity{{Player: "a", Token: "a"}, {Player: "b", Token: "b"}}}
 	co, err := New(tm.catalog, Config{MaxPlayers: 2, Restore: &saved})
 	if err != nil {

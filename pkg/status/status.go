@@ -34,7 +34,7 @@ func ValidateDefinition(d model.StatusDef) error {
 	if math.IsNaN(d.Shield) || math.IsInf(d.Shield, 0) || d.Shield < 0 || d.Shield > 1e9 || (d.Shield > 0 || d.ShieldMaxHP > 0) && (d.Level != 0 || d.MaxLayers != 1) {
 		return fmt.Errorf("invalid shield definition %s", d.ID)
 	}
-	if d.ID == "" || len(d.ID) > 128 || d.Name == "" || d.Shield == 0 && d.ShieldMaxHP == 0 && d.Level < 1 || d.Level > 10000 || d.MaxLayers < 1 || d.MaxLayers > MaxLayers || d.DurationMillis < 1 || d.DurationMillis > 86400000 || len(d.Modifiers) > 8 || len(d.Conflicts) > 16 {
+	if d.ID == "" || len(d.ID) > 128 || d.Name == "" || d.Shield == 0 && d.ShieldMaxHP == 0 && d.Level < 1 || d.Level > 10000 || d.MaxLayers < 1 || d.MaxLayers > MaxLayers || d.DurationMillis < 0 || d.DurationMillis == 0 && !d.ClearOnLeave || d.DurationMillis > 86400000 || len(d.Modifiers) > 8 || len(d.Conflicts) > 16 {
 		return fmt.Errorf("invalid status definition %s", d.ID)
 	}
 	seen := map[string]bool{}
@@ -205,9 +205,13 @@ func ApplyEffectSnapshot(s model.StatusSet, d model.StatusDef, source model.Sour
 		index = len(s.Instances) - 1
 	}
 	v := &s.Instances[index]
+	expires := now + d.DurationMillis*60
+	if d.DurationMillis == 0 { // Explicit room lifetime, removed only on departure.
+		expires = MaxTime
+	}
 	if len(v.Layers) == d.MaxLayers {
 		// Highest layer means the last surviving layer, never a layer level.
-		v.Layers[len(v.Layers)-1].Expires = now + d.DurationMillis*60
+		v.Layers[len(v.Layers)-1].Expires = expires
 	} else {
 		s.NextID++
 		periodic, err := SnapshotPeriodic(d, attributes, now)
@@ -220,7 +224,7 @@ func ApplyEffectSnapshot(s model.StatusSet, d model.StatusDef, source model.Sour
 				periodic[i].Amount *= healing
 			}
 		}
-		v.Layers = append(v.Layers, model.StatusLayer{ID: s.NextID, Applied: now, Expires: now + d.DurationMillis*60, Shield: shield, Capacity: shield, ShieldMaxHP: maxHP, Modifiers: Modifiers(d), Periodic: periodic})
+		v.Layers = append(v.Layers, model.StatusLayer{ID: s.NextID, Applied: now, Expires: expires, Shield: shield, Capacity: shield, ShieldMaxHP: maxHP, Modifiers: Modifiers(d), Periodic: periodic})
 	}
 	s.Revision++
 	if err = Validate(s); err != nil {

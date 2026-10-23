@@ -43,6 +43,7 @@ type Modifier struct {
 	Origin  SourceRef `json:"origin,omitempty"`
 }
 type Weapon struct {
+	Skill            string       `json:"weapon_skill,omitempty"`
 	OnHitStatuses    []string     `json:"on_hit_statuses,omitempty"`
 	Mode             string       `json:"mode,omitempty"`
 	Windup           float64      `json:"windup,omitempty"`
@@ -93,16 +94,16 @@ type DamageBasis struct {
 func (b DamageBasis) Total() float64 { return b.Base + b.Attributes + b.Flat + b.Upgrade }
 
 type Chassis struct {
-	RequiredPerk string         `json:"required_perk,omitempty"`
-	Skills       [4]string      `json:"skills"`
-	Modifiers    []StatModifier `json:"modifiers,omitempty"`
-	ID           string         `json:"id"`
-	Name         string         `json:"name"`
-	Attributes   Attributes     `json:"attributes"`
-	HP           float64        `json:"hp"`
-	Armor        float64        `json:"armor"`
-	Speed        float64        `json:"speed"`
-	Weapon       string         `json:"weapon"`
+	RequiredPerk     string         `json:"required_perk,omitempty"`
+	GrowthPreference Attributes     `json:"growth_preference"`
+	Modifiers        []StatModifier `json:"modifiers,omitempty"`
+	ID               string         `json:"id"`
+	Name             string         `json:"name"`
+	Attributes       Attributes     `json:"attributes"`
+	HP               float64        `json:"hp"`
+	Armor            float64        `json:"armor"`
+	Speed            float64        `json:"speed"`
+	Weapon           string         `json:"weapon"`
 }
 type EnemyAttackDef struct {
 	Kind     string  `json:"kind"`
@@ -139,9 +140,11 @@ type EnemyDef struct {
 	Armor              float64            `json:"armor"`
 	Speed              float64            `json:"speed"`
 	Radius             float64            `json:"radius"`
+	VisualRadius       float64            `json:"visual_radius,omitempty"`
 	Behavior           string             `json:"behavior"`
 }
 type Node struct {
+	Blocking   bool     `json:"blocking"`
 	Definition string   `json:"definition"`
 	Name       string   `json:"name"`
 	NameKey    string   `json:"name_key"`
@@ -171,8 +174,6 @@ type Player struct {
 	KnockdownBase     int                `json:"knockdown_base"`
 	MetaRanks         map[string]int     `json:"meta_ranks,omitempty"`
 	Loot              []Loot             `json:"loot,omitempty"`
-	Skills            [4]string          `json:"skills"`
-	SkillReady        [4]int64           `json:"skill_ready"`
 	Energy            float64            `json:"energy"`
 	MaxEnergy         float64            `json:"max_energy"`
 	EnergyRegen       float64            `json:"energy_regen"`
@@ -200,7 +201,6 @@ type Player struct {
 	Attributes        Attributes         `json:"attributes"`
 	Weapon            string             `json:"weapon"`
 	Level             int                `json:"level"`
-	Points            int                `json:"points"`
 	XP                int                `json:"xp"`
 	Coins             int                `json:"coins"`
 	Upgrade           int                `json:"upgrade"`
@@ -223,6 +223,7 @@ type Enemy struct {
 	Radius          float64   `json:"radius"`
 }
 type Projectile struct {
+	Arc        float64 `json:"arc,omitempty"`
 	DamageType string  `json:"damage_type,omitempty"`
 	Identity   string  `json:"identity,omitempty"` // Stable across simulation hosts; ID is room-local.
 	Kind       string  `json:"kind,omitempty"`

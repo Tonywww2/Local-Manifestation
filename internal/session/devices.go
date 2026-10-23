@@ -16,7 +16,7 @@ func (t *team) nearDevice(m *member, target string) bool {
 		return false
 	}
 	if target != "next" && target != "enhanced" && target != "exhaust" {
-		return t.atDoor(m, target)
+		return t.nodes[target].ID != ""
 	}
 	if target == "next" && p.Scene != "" {
 		return false
@@ -76,11 +76,14 @@ func (t *team) advanceLayer() error {
 	return nil
 }
 func (t *team) deviceReady(m *member, target string) error {
+	if t.nodes[target].ID != "" {
+		if m.player.Scene != "" || !t.reachable(m.player.Node, target) {
+			return protocol.Reject("error.unreachable")
+		}
+		return nil
+	}
 	if !t.nearDevice(m, target) {
 		return protocol.Reject("error.door_distance")
-	}
-	if t.nodes[target].ID != "" {
-		return t.sharedDoorReady(target)
 	}
 	return nil
 }
@@ -97,6 +100,7 @@ func (t *team) useDevice(m *member, target string) error {
 		}
 		if slices.Contains(t.vote.Yes, m.player.ID) {
 			t.vote.Yes = slices.DeleteFunc(t.vote.Yes, func(id string) bool { return id == m.player.ID })
+			t.vote.Entrants = slices.DeleteFunc(t.vote.Entrants, func(id string) bool { return id == m.player.ID })
 			if len(t.vote.Yes) == 0 {
 				t.vote = nil
 			}
@@ -126,6 +130,15 @@ func (t *team) withdrawDepartedVotes() {
 		return
 	}
 	t.vote.Yes = slices.DeleteFunc(t.vote.Yes, func(id string) bool { return t.players[id] == nil || !t.nearDevice(t.players[id], t.vote.Node) })
+	if t.nodes[t.vote.Node].ID != "" {
+		if t.vote.Item != "" || t.vote.Node == t.bossNode() {
+			return
+		}
+		t.vote.Entrants = slices.DeleteFunc(t.vote.Entrants, func(id string) bool {
+			m := t.players[id]
+			return m == nil || !m.player.Active || !m.player.Online || m.player.Life != "alive" || m.player.Scene != "" || !t.reachable(m.player.Node, t.vote.Node)
+		})
+	}
 	if len(t.vote.Yes) == 0 {
 		t.vote = nil
 	}

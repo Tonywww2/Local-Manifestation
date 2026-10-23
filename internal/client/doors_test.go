@@ -2,8 +2,7 @@ package client
 
 import (
 	"hsmultiplayer/internal/client/ui"
-	"hsmultiplayer/internal/content"
-	"hsmultiplayer/pkg/geometry"
+	"hsmultiplayer/pkg/device"
 	"hsmultiplayer/pkg/model"
 	"hsmultiplayer/pkg/protocol"
 	"slices"
@@ -11,64 +10,52 @@ import (
 	"time"
 )
 
-func TestEntranceConfirmationAndRoomChangeClearLocalIntent(t *testing.T) {
+func TestMapConfirmationAndRoomChangeClearLocalIntent(t *testing.T) {
 	g := interfaceGame(t)
-	g.state.Players[0].Position = geometry.NewArena(content.DefaultSpaceWidth, content.DefaultSpaceHeight).DoorPoint(0, 24)
-	if door, ok := g.nearbyDoor(); !ok || door.ID != "room" {
-		t.Fatal("missing nearby opening")
-	}
-	g.performControl(uiControl{Action: "entrance", Value: "room"})
+	g.confirmMapEntry("room", false)
 	g.buildInterface()
 	if !slices.Contains(g.u.windows, "entrance") || !slices.ContainsFunc(g.u.frame.Panels, func(p ui.Panel) bool { return p.ID == "entrance" && p.Floating }) {
-		t.Fatal("confirmation not draggable")
+		t.Fatal("map admission lacks a draggable confirmation")
 	}
 	target := model.Vec{X: 500, Y: 200}
-	g.destination = &target
-	g.mouseFrames = 8
+	g.destination, g.mouseFrames = &target, 8
 	next := protocol.CloneState(*g.state)
 	next.Players[0].Node = "room"
 	next.Players[0].PositionEpoch++
 	g.receiveState(&next, time.Now())
 	if g.destination != nil || g.mouseFrames != 0 || slices.Contains(g.u.windows, "entrance") {
-		t.Fatal("old-room intent survived transition")
+		t.Fatal("old-room intent survived independent room travel")
 	}
-	if _, ok := g.nearbyDoor(); ok {
-		t.Fatal("generated reverse entrance without explicit edge")
+	if g.canMapMove(next.Nodes[0]) {
+		t.Fatal("created an unauthored reverse route")
 	}
 }
 
-func TestSharedDeviceUsesWorldInteractionAndNoVotePanel(t *testing.T) {
+func TestMapVoteAndIndependentRoomDevices(t *testing.T) {
 	g := interfaceGame(t)
-	g.state.Players[0].Position = geometry.NewArena(content.DefaultSpaceWidth, content.DefaultSpaceHeight).DoorPoint(0, 24)
-	g.state.Nodes[1].Payment = "shared"
-	g.state.Nodes[1].Cost = 1
-	g.inspectInteraction("room")
-	g.state.Vote = &protocol.Vote{Node: "room", Yes: []string{g.id}, Required: 2}
+	next := protocol.CloneState(*g.state)
+	next.Nodes[1].Payment = "shared"
+	next.Vote = &protocol.Vote{Node: "room", Yes: []string{g.id}, Entrants: []string{g.id}, Required: 2}
+	g.receiveState(&next, time.Now())
 	g.buildInterface()
-	if slices.Contains(g.u.windows, "entrance") || slices.ContainsFunc(g.u.frame.Panels, func(p ui.Panel) bool { return p.ID == "vote" }) {
-		t.Fatal("shared device opened a voting window")
+	if !slices.Contains(g.u.windows, "vote") {
+		t.Fatal("map vote has no response window")
+	}
+	scene := g.sceneForNode(g.currentNode())
+	if slices.ContainsFunc(g.worldDevices(g.currentNode(), scene), func(d device.Device) bool { return d.Kind == "entrance" }) {
+		t.Fatal("independent room still has a physical travel entrance")
 	}
 }
 
-func TestFreeHandoffKeepsPredictedWorldPointAndHeldInput(t *testing.T) {
+func TestMapTravelClearsHistoryEvenWithoutEpochChange(t *testing.T) {
 	g := interfaceGame(t)
-	a := geometry.NewArena(content.DefaultSpaceWidth, content.DefaultSpaceHeight)
-	g.state.Players[0].Position = a.DoorPoint(0, -3)
-	g.state.Players[0].PositionEpoch = 10
-	g.state.Nodes[1].Payment = "none"
-	g.state.Nodes[1].Edges = []string{"start"}
-	at := time.Now()
-	g.prediction = MovementPrediction{}.Reconcile(g.state.Players[0], a, at, 0)
 	g.localInput = model.Input{Move: model.Vec{X: 1}}
-	g.mouseFrames = 20
-	before := a.WorldPoint(g.state.Nodes[0], g.prediction.Position, a.Radius)
 	next := protocol.CloneState(*g.state)
 	next.Players[0].Node = "room"
-	next.Players[0].Position = geometry.TransferPoint(next.Nodes[0], next.Nodes[1], a, a, next.Players[0].Position)
-	g.receiveState(&next, at.Add(50*time.Millisecond))
-	after := a.WorldPoint(next.Nodes[1], g.prediction.Position, a.Radius)
-	if before.Sub(after).Length() > 1e-7 || g.localInput.Move.X != 1 || g.mouseFrames != 20 {
-		t.Fatal("seamless handoff reset presentation or input")
+	next.Players[0].Position = model.Vec{X: 100, Y: 200}
+	g.receiveState(&next, time.Now())
+	if g.localInput != (model.Input{}) || len(g.worldHistory.frames) != 1 || g.prediction.Position != next.Players[0].Position {
+		t.Fatal("map travel continued motion from another room")
 	}
 	if g.state.Players[0].Position != next.Players[0].Position {
 		t.Fatal("display mutated authority")
@@ -86,7 +73,7 @@ func TestOldCustomBindingsPreservedWithNewInteractionAction(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, mode := range []string{"keyboard", "mouse"} {
-		if next[mode]["map"] != "G" || next[mode]["interact"] != "T" || old[mode]["interact"] != "" {
+		if next[mode]["map"] != "G" || next[mode]["interact"] != "F" || old[mode]["interact"] != "" {
 			t.Fatal("migration changed existing binding")
 		}
 	}

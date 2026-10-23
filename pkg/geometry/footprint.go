@@ -3,12 +3,12 @@ package geometry
 import (
 	"fmt"
 	"math"
-	"sort"
+	"slices"
 
 	"hsmultiplayer/pkg/model"
 )
 
-type Cell struct{ Q, R int }
+type Cell = model.HexCell
 
 // Footprint is an immutable union of adjacent hexagons. Only exterior edges
 // collide; shared seams remain open even for a disk with nonzero radius.
@@ -119,7 +119,8 @@ func (f Footprint) ClipSegment(s Segment) (Segment, bool) {
 		return s, f.ContainsDisk(s.A, 0)
 	}
 	type span struct{ lo, hi float64 }
-	spans := make([]span, 0, len(f.cells))
+	var storage [128]span
+	spans := storage[:0]
 	for _, a := range f.cells {
 		if v, ok := a.ClipSegment(s); ok {
 			spans = append(spans, span{dot(v.A.Sub(s.A), d) / length, dot(v.B.Sub(s.A), d) / length})
@@ -128,7 +129,15 @@ func (f Footprint) ClipSegment(s Segment) (Segment, bool) {
 	if len(spans) == 0 {
 		return Segment{}, false
 	}
-	sort.Slice(spans, func(i, j int) bool { return spans[i].lo < spans[j].lo })
+	slices.SortFunc(spans, func(a, b span) int {
+		if a.lo < b.lo {
+			return -1
+		}
+		if a.lo > b.lo {
+			return 1
+		}
+		return 0
+	})
 	lo, hi := spans[0].lo, spans[0].hi
 	for _, v := range spans[1:] {
 		if v.lo > hi+1e-8 {

@@ -62,6 +62,7 @@ func Settle(p model.Progression, runID string, player model.Player, won bool, po
 		n.Points += points
 		n.Earned += points
 		for _, it := range player.Inventory.Items {
+			it.SkillReady = 0
 			n.Warehouse = append(n.Warehouse, model.StoredItem{Item: it, RunID: runID})
 		}
 		if !slices.Contains(n.Achievements, "engine:first-clear") {

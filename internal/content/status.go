@@ -16,7 +16,7 @@ func (c *Catalog) knownStatusSource(id string) bool {
 	_, e := c.enemies[id]
 	_, ch := c.chassis[id]
 	_, it := c.items[id]
-	_, sk := c.skills[id]
+	_, sk := c.weaponSkills[id]
 	_, af := c.affixes[id]
 	_, perk := c.perks[id]
 	return w || n || s || e || ch || it || sk || af || perk
@@ -95,7 +95,11 @@ func advancePlayerStatuses(p model.Player, now int64, defenses func(model.Player
 			if e != nil {
 				return model.Player{}, e
 			}
-			_, next.HP, next.Statuses, e = damage.Settle(r, next.HP, next.Statuses)
+			if c != nil {
+				_, next, e = c.SettlePlayerDamage(r, next)
+			} else {
+				_, next.HP, next.Statuses, e = damage.Settle(r, next.HP, next.Statuses)
+			}
 			if e != nil {
 				return model.Player{}, e
 			}
@@ -140,7 +144,8 @@ func ValidatePlayerStatuses(c *Catalog, p model.Player) error {
 			return fmt.Errorf("invalid status definition snapshot")
 		}
 		for _, l := range v.Layers {
-			if l.Capacity != d.Shield+d.ShieldMaxHP*l.ShieldMaxHP || !reflect.DeepEqual(l.Modifiers, status.Modifiers(d)) || len(l.Periodic) != len(d.Periodic) || l.Expires-p.Statuses.Time > d.DurationMillis*60 {
+			roomLifetime := d.DurationMillis == 0 && d.ClearOnLeave && l.Expires == status.MaxTime
+			if l.Capacity != d.Shield+d.ShieldMaxHP*l.ShieldMaxHP || !reflect.DeepEqual(l.Modifiers, status.Modifiers(d)) || len(l.Periodic) != len(d.Periodic) || !roomLifetime && l.Expires-p.Statuses.Time > d.DurationMillis*60 {
 				return fmt.Errorf("invalid status effect snapshot")
 			}
 			for i, pulse := range l.Periodic {

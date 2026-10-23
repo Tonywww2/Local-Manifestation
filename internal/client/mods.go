@@ -7,6 +7,7 @@ import (
 	"hsmultiplayer/internal/client/ui"
 	"hsmultiplayer/internal/content"
 	"hsmultiplayer/pkg/mods"
+	"hsmultiplayer/pkg/perf"
 	"os"
 	"path/filepath"
 	"strings"
@@ -178,6 +179,7 @@ func (g *Game) modAction(c uiControl) bool {
 	return true
 }
 func (g *Game) pollMods() {
+	defer g.diagnostics.Since("client.logic.mods", perf.Start())
 	if g.mods.pending == nil {
 		return
 	}
@@ -207,6 +209,8 @@ func (g *Game) pollMods() {
 			}
 			g.roomSurfaces = nil
 			g.u.wrapped = nil
+			g.u.textTerms = nil
+			g.u.textStyles = nil
 			g.u.previewState = nil
 			g.u.previewValid = false
 		}

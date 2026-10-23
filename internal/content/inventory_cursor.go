@@ -20,7 +20,12 @@ func (c *Catalog) InventoryMouse(p model.Player, r protocol.Request) (model.Play
 		if p.Life != "alive" {
 			return model.Player{}, protocol.Reject("error.incapacitated")
 		}
-		n.Inventory, err = inventory.Click(p.Inventory, p.ID, inventory.Slot{Area: r.Area, Index: r.Slot}, r.Right, c.Item)
+		slot := inventory.Slot{Area: r.Area, Index: r.Slot}
+		if r.Kind == "inventory_quick" {
+			n.Inventory, err = inventory.QuickTransfer(p.Inventory, slot, c.Item)
+		} else {
+			n.Inventory, err = inventory.Click(p.Inventory, p.ID, slot, r.Right, c.Item)
+		}
 	}
 	if err != nil {
 		return model.Player{}, err

@@ -1,6 +1,9 @@
 {
-  "_comment": "Development artwork created with the built-in image_gen.imagegen tool. Original PNGs are preserved. Menu, hall and HUD follow the approved minimalist near-modern v2 design. Previous slate artwork remains archived; the warrior is an existing single-pose placeholder. UI and workshop furniture use code-native drawing, not flattened concept screenshots.",
-  "date": "2026-10-08",
+  "_comment": "Generated-art provenance history. The current contemporary art-v1 pack is indexed below; earlier source PNGs, prompts and hashes remain preserved in the assets array. Live UI continues to be rendered by the client rather than flattened concept screenshots.",
+  "date": "2026-10-15",
+  "current_pack": "docs/art-v1/README.md",
+  "current_catalog": "docs/art-v1/catalog.json",
+  "_current_comment": "Current runtime assets use the unified contemporary art-v1 pack. The entries below preserve earlier source artwork and prompts for provenance.",
   "tool": "image_gen.imagegen",
   "assets": [
     {

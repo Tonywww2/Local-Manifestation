@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"hsmultiplayer/pkg/model"
+	"hsmultiplayer/pkg/perf"
 	"hsmultiplayer/pkg/protocol"
 )
 
@@ -53,7 +54,7 @@ func TestIndependentInputClockSequenceAndDodgeLatch(t *testing.T) {
 						if r.Input.Move == (model.Vec{}) {
 							stops++
 						}
-					} else {
+					} else if r.Kind != "ping" {
 						commands++
 					}
 				case <-deadline.C:
@@ -69,5 +70,80 @@ func TestIndependentInputClockSequenceAndDodgeLatch(t *testing.T) {
 			}
 			l.ClearInput()
 		})
+	}
+}
+
+func TestLatencyAcceptsDelayedPongAndExpires(t *testing.T) {
+	l := &Link{}
+	now := time.Now()
+	stamp := perf.Start()
+	// A pong may arrive after a newer ping has already been sent (> 1s RTT).
+	l.probe = 2
+	l.probes[1] = latencyProbe{1, now.Add(-1500 * time.Millisecond), stamp}
+	l.probes[2] = latencyProbe{2, now, stamp}
+	l.acceptPong(1, now)
+	if _, valid := l.Latency(now); !valid || l.acceptedProbe != 1 {
+		t.Fatal("delayed pong was discarded")
+	}
+	l.acceptPong(2, now.Add(time.Millisecond))
+	if l.acceptedProbe != 2 {
+		t.Fatal("new pong was not accepted")
+	}
+	l.acceptPong(1, now.Add(2*time.Millisecond))
+	if l.latencyAt != now.Add(time.Millisecond) {
+		t.Fatal("duplicate/reordered pong replaced latency")
+	}
+	if _, valid := l.Latency(now.Add(4 * time.Second)); valid {
+		t.Fatal("stale latency still displayed")
+	}
+	l.acceptPong(999, now)
+	if l.acceptedProbe != 2 {
+		t.Fatal("unknown probe was accepted")
+	}
+}
+
+func TestPingPongUsesOrderedConnectionWithoutUIQueue(t *testing.T) {
+	clientConn, peerConn := net.Pipe()
+	l := newLink(clientConn, 60)
+	defer l.Close()
+	defer peerConn.Close()
+	errCh := make(chan error, 1)
+	go func() {
+		var request protocol.Request
+		if err := json.NewDecoder(peerConn).Decode(&request); err != nil {
+			errCh <- err
+			return
+		}
+		if request.Kind != "ping" || request.Probe != 1 || request.Seq != 1 {
+			errCh <- fmt.Errorf("unexpected probe %+v", request)
+			return
+		}
+		time.Sleep(10 * time.Millisecond)
+		errCh <- json.NewEncoder(peerConn).Encode(protocol.Message{Kind: "pong", Probe: request.Probe})
+	}()
+	select {
+	case err := <-errCh:
+		if err != nil {
+			t.Fatal(err)
+		}
+	case <-time.After(3 * time.Second):
+		t.Fatal("ping/pong stalled")
+	}
+	deadline := time.Now().Add(time.Second)
+	for {
+		latency, valid := l.Latency(time.Now())
+		if valid {
+			if latency < 10*time.Millisecond {
+				t.Fatal("RTT omitted peer delay", latency)
+			}
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatal("pong did not update latency")
+		}
+		time.Sleep(time.Millisecond)
+	}
+	if len(l.Messages) != 0 {
+		t.Fatal("pong entered gameplay/UI queue")
 	}
 }

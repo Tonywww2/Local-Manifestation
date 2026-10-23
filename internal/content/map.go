@@ -9,7 +9,8 @@ import (
 )
 
 func (c *Catalog) GenerateMap(floor int, seed int64, players int) (model.MapTemplateDef, error) {
-	base := c.Map(c.Floor(floor).Map)
+	f := c.Floor(floor)
+	base := c.Map(f.Map)
 	if g := base.Generator; g != nil {
 		pool := slices.Clone(g.Pool)
 		rng := rand.New(rand.NewSource(Seed(seed, floor, "map-templates")))
@@ -17,6 +18,9 @@ func (c *Catalog) GenerateMap(floor int, seed int64, players int) (model.MapTemp
 		seen := map[string]bool{}
 		g.Pool = nil
 		for _, id := range pool {
+			if slices.Contains(f.ExcludedRandomKinds, c.nodes[id].Kind) {
+				continue
+			}
 			key := id
 			if node := c.nodes[id]; node.Room != "" {
 				key = node.Room
@@ -28,6 +32,17 @@ func (c *Catalog) GenerateMap(floor int, seed int64, players int) (model.MapTemp
 		}
 	}
 	return expedition.Generate(base, Seed(seed, floor, "map"), floor, players)
+}
+
+func (c *Catalog) AddLayerSpecialNodes(base model.MapTemplateDef, definitions []string, floor int) model.MapTemplateDef {
+	excluded := c.Floor(floor).ExcludedRandomKinds
+	allowed := make([]string, 0, len(definitions))
+	for _, id := range definitions {
+		if !slices.Contains(excluded, c.nodes[id].Kind) {
+			allowed = append(allowed, id)
+		}
+	}
+	return AddSpecialNodes(base, allowed)
 }
 
 // AddSpecialNodes fixes team unlocks into the layer's published map.

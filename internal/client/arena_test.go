@@ -19,8 +19,8 @@ func TestStartingPlayerGetsAVisibleSpaceWithoutCombatScene(t *testing.T) {
 	if s == nil || s.State != "idle" || len(s.Players) != 2 || s.Players[0].ID != g.id {
 		t.Fatal("starting avatar missing", s)
 	}
-	for _, oblique := range []bool{false, true} {
-		g.oblique = oblique
+	for _, angle := range []float64{0, defaultCameraAngle, 1.17, -2.4} {
+		g.cameraControls.Rotation = angle
 		p := g.camera(*s).Project(s.Players[0].Position)
 		if p.X < 24 || p.X > float64(g.width-24) || p.Y < 24 || p.Y > float64(g.height-24) {
 			t.Fatal("avatar outside viewport", p)
@@ -30,14 +30,14 @@ func TestStartingPlayerGetsAVisibleSpaceWithoutCombatScene(t *testing.T) {
 		t.Fatal("renderer mutated authority")
 	}
 }
-func TestHexCameraFitsBothViewsAndLargeContent(t *testing.T) {
-	for _, oblique := range []bool{false, true} {
+func TestHexCameraFitsRotatedViewsAndLargeContent(t *testing.T) {
+	for _, angle := range []float64{0, defaultCameraAngle, 1.17, -2.4} {
 		for _, size := range []model.Vec{{X: 800, Y: 500}, {X: 200, Y: 4096}, {X: 4096, Y: 200}, {X: 4096, Y: 4096}} {
-			c := FitArenaCameraIn(size.X, size.Y, oblique, ui.Rect{X: 24, Y: 24, W: 976, H: 672})
+			c := FitArenaCameraIn(size.X, size.Y, angle, ui.Rect{X: 24, Y: 24, W: 976, H: 672})
 			for _, p := range geometry.NewArena(size.X, size.Y).Vertices() {
 				v := c.Project(p)
 				if v.X < 23.99 || v.X > 1000.01 || v.Y < 23.99 || v.Y > 696.01 || c.Unproject(v).Sub(p).Length() > 1e-8 {
-					t.Fatal(size, oblique, v)
+					t.Fatal(size, angle, v)
 				}
 			}
 			mesh := buildArenaDrawing(size.X, size.Y, c)

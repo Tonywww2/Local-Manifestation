@@ -4,6 +4,7 @@ import (
 	"hsmultiplayer/internal/content"
 	"hsmultiplayer/internal/script"
 	"hsmultiplayer/pkg/model"
+	"hsmultiplayer/pkg/perf"
 	"hsmultiplayer/sdk"
 )
 
@@ -23,6 +24,7 @@ func (g *Game) publishExtensions(c *content.Catalog) error {
 	return nil
 }
 func (g *Game) dispatchClientSnapshot() {
+	defer g.diagnostics.Since("client.logic.script_callbacks", perf.Start())
 	if g.extensions == nil || g.state == nil || !g.extensions.HasEvent("client", "snapshot") {
 		return
 	}

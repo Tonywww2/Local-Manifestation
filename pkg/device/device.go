@@ -70,16 +70,6 @@ type Context struct {
 
 func World(c Context) []Device {
 	var result []Device
-	for _, id := range c.Node.Edges {
-		for _, to := range c.Nodes {
-			if to.ID == id {
-				if e, ok := RoomEntrance(c.Node, to, c.Arena); ok {
-					result = append(result, e.Device)
-				}
-				break
-			}
-		}
-	}
 	if c.Node.Kind == "shop" && c.Node.Open {
 		result = append(result, Device{ID: "shop:" + c.Node.ID, Kind: "shop", Name: c.Node.Name, NameKey: c.Node.NameKey, DescriptionKey: "device.shop.description", Position: c.Arena.Center, Range: 64, Radius: 24, Action: "shop", Target: c.Node.ID})
 	}

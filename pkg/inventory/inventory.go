@@ -2,11 +2,14 @@
 package inventory
 
 import (
+	"errors"
 	"fmt"
 	"hsmultiplayer/pkg/model"
 	"math"
 	"slices"
 )
+
+var ErrFull = errors.New("backpack full")
 
 type Resolve func(string) (model.ItemDef, bool)
 
@@ -65,13 +68,20 @@ func validate(v model.Inventory, resolve Resolve, capacity bool) error {
 	ids := map[string]model.ItemDef{}
 	for _, it := range v.Items {
 		d, ok := resolve(it.Definition)
-		if !ok || it.ID == "" || ids[it.ID].ID != "" || it.Upgrade < 0 || it.Upgrade > 100000 || math.IsNaN(it.WeaponBonus) || math.IsInf(it.WeaponBonus, 0) || it.WeaponBonus < 0 || it.WeaponBonus > 1e9 {
+		if !ok || it.ID == "" || ids[it.ID].ID != "" || it.Upgrade < 0 || it.Upgrade > 100000 || math.IsNaN(it.WeaponBonus) || math.IsInf(it.WeaponBonus, 0) || it.WeaponBonus < 0 || it.WeaponBonus > 1e9 || it.SkillReady < 0 {
 			return fmt.Errorf("invalid item instance")
 		}
 		if Count(it) < 1 || Count(it) > StackLimit(d) {
 			return fmt.Errorf("invalid stack count")
 		}
-		if d.Kind != "weapon" && (it.Upgrade != 0 || it.WeaponBonus != 0) {
+		if d.Kind == "movement" || d.Kind == "passive" {
+			if d.Durability == -1 && it.Durability != -1 || d.Durability > 0 && (it.Durability < 1 || it.Durability > d.Durability) {
+				return fmt.Errorf("invalid item durability")
+			}
+		} else if it.Durability != 0 {
+			return fmt.Errorf("unexpected durability")
+		}
+		if d.Kind != "weapon" && (it.Upgrade != 0 || it.WeaponBonus != 0 || it.SkillReady != 0) {
 			return fmt.Errorf("non-weapon upgrade")
 		}
 		if it.Affix != "" && !slices.Contains(d.Affixes, it.Affix) {
@@ -128,14 +138,15 @@ func validate(v model.Inventory, resolve Resolve, capacity bool) error {
 			return fmt.Errorf("unplaced item")
 		}
 	} else if capacity && len(v.Items)-len(seen) > v.Capacity {
-		return fmt.Errorf("backpack full")
+		return ErrFull
 	}
 	return nil
 }
 func Grant(v model.Inventory, owner, definition string, resolve Resolve) (model.Inventory, model.ItemInstance, error) {
 	n := layout(v)
 	n.NextID++
-	it := model.ItemInstance{ID: fmt.Sprintf("%s:%d", owner, n.NextID), Definition: definition, Count: 1}
+	d, _ := resolve(definition)
+	it := NewInstance(fmt.Sprintf("%s:%d", owner, n.NextID), d)
 	return Insert(n, it, resolve)
 }
 

@@ -3,9 +3,9 @@ package ui
 // CharacterInventory describes display geometry only. Its height is virtual;
 // the host clips and scrolls this content when the window is shorter.
 type CharacterInventory struct {
-	Character, Accessories, Bag, Consumables, Skills Rect
-	Equipment                                        [5]Rect
-	AttributeButton, LootButton, Help                Rect
+	Character, Accessories, Bag, Consumables, WeaponSkill Rect
+	Equipment                                             [5]Rect
+	AttributeButton, LootButton, Help                     Rect
 }
 
 func CharacterInventoryAt(r Rect) CharacterInventory {
@@ -17,7 +17,7 @@ func CharacterInventoryAt(r Rect) CharacterInventory {
 		Accessories:     Rect{x, r.Y + 76, right, 116},
 		Bag:             Rect{x, r.Y + 260, right, 192},
 		Consumables:     Rect{r.X + 14, r.Y + 352, left - 14, 54},
-		Skills:          Rect{r.X + 14, r.Y + 446, left - 14, 54},
+		WeaponSkill:     Rect{r.X + 14, r.Y + 446, 60, 54},
 		AttributeButton: Rect{r.X + 14, r.Y + r.H - 48, left - 14, 34},
 		LootButton:      Rect{x, r.Y + r.H - 48, 34, 34},
 		Help:            Rect{x + 48, r.Y + r.H - 52, right - 48, 46},

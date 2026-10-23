@@ -1,0 +1,183 @@
+{
+  "version": 1,
+  "generator": "built-in image_gen",
+  "style_reference": "docs/art-v1/sources/weapons/sword.png",
+  "runtime_size": [
+    256,
+    256
+  ],
+  "format": "RGBA PNG",
+  "projection": "strict orthographic top-down; horizontal tops only",
+  "formatting": "bin/artpack.exe cutout; alpha-bound crop; proportional resize; 6% padding",
+  "preview": "docs/art-v1/fixtures-preview.png",
+  "items": [
+    {
+      "id": "hall-progression",
+      "asset_key": "prop:hall-progression",
+      "slug": "hall-progression",
+      "name": "Learning Workbench",
+      "prompt": "Use case: stylized-concept.\nAsset type: individual gameplay world fixture texture for Local Manifestation, contemporary industrial personal-base / workshop setting.\nProjection constraint: STRICT ORTHOGRAPHIC TOP-DOWN, camera exactly 90 degrees straight overhead. Show ONLY horizontal top surfaces and their outlines; NO side/front/vertical faces, NO horizon, NO isometric, NO oblique perspective, NO scene or floor. This must integrate into a flat top-down game without perspective conflict.\nStyle reference: input knife image is ONLY for matte hand-painted surface finish, restrained ash-gray/charcoal/warm-white palette, dark contours and sparse muted teal accents. Do not copy knife or its side-view projection.\nStyle/medium: unified clean hand-painted 2D game texture, simplified large readable geometric forms, subtle dry-brush material texture, functional present-day industrial design, calm everyday workshop, no fantasy, no runes, no steampunk, no decorative sci-fi.\nComposition: one cohesive complete fixture centered, tightly occupy approximately 85% of square image while preserving all edges; strong readable top-down silhouette. Small functional accents only; no words, no numbers, no letters or logos.\nBackground: genuinely transparent alpha, NO background, floor, cast shadow, contact shadow, frame, or environmental objects.\nSubject: A cohesive contemporary rectangular study and calibration workbench seen directly from overhead: pale gray tabletop, a closed warm-white notebook, charcoal archival folders, a compact dark diagnostic tray with a small teal indicator. Parts are integrated on one single work surface, 3:2 overall rectangle.",
+      "source_file": "docs/art-v1/sources/fixtures/hall-progression.png",
+      "file": "content/base/assets/art-v1/fixtures/hall-progression.png",
+      "reference_file": "docs/art-v1/sources/weapons/sword.png",
+      "source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-8ce443c9-5d76-46c8-a4cc-6ec1b46533df.png",
+      "sha256": "8efa3b3178b6f97dfd890bb920cc9c9ee2dc8f106195c377d7f01c0e9b4ebeaf",
+      "bytes": 37418,
+      "source_sha256": "d4719ed174b225288b628b0882e2592715458962c6b63a226966f041b3bc7353",
+      "source_size": [
+        1536,
+        1024
+      ],
+      "width": 256,
+      "height": 256,
+      "alpha": true
+    },
+    {
+      "id": "hall-host",
+      "asset_key": "prop:hall-host",
+      "slug": "hall-host",
+      "name": "Server Cabinets",
+      "prompt": "Use case: stylized-concept.\nAsset type: individual gameplay world fixture texture for Local Manifestation, contemporary industrial personal-base / workshop setting.\nProjection constraint: STRICT ORTHOGRAPHIC TOP-DOWN, camera exactly 90 degrees straight overhead. Show ONLY horizontal top surfaces and their outlines; NO side/front/vertical faces, NO horizon, NO isometric, NO oblique perspective, NO scene or floor. This must integrate into a flat top-down game without perspective conflict.\nStyle reference: input knife image is ONLY for matte hand-painted surface finish, restrained ash-gray/charcoal/warm-white palette, dark contours and sparse muted teal accents. Do not copy knife or its side-view projection.\nStyle/medium: unified clean hand-painted 2D game texture, simplified large readable geometric forms, subtle dry-brush material texture, functional present-day industrial design, calm everyday workshop, no fantasy, no runes, no steampunk, no decorative sci-fi.\nComposition: one cohesive complete fixture centered, tightly occupy approximately 85% of square image while preserving all edges; strong readable top-down silhouette. Small functional accents only; no words, no numbers, no letters or logos.\nBackground: genuinely transparent alpha, NO background, floor, cast shadow, contact shadow, frame, or environmental objects.\nSubject: A cohesive group of three small server cabinets aligned side by side, viewed strictly down onto their charcoal top surfaces: ash-gray rectangular protective top housings, subtle vent slots, small muted teal connectors and a neatly contained cable channel; overall footprint a 3:2 rectangle. The tops only, no front rack faces.",
+      "source_file": "docs/art-v1/sources/fixtures/hall-host.png",
+      "file": "content/base/assets/art-v1/fixtures/hall-host.png",
+      "reference_file": "docs/art-v1/sources/weapons/sword.png",
+      "source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-583c8f24-1f59-4c74-9301-d687b4fe3d0e.png",
+      "sha256": "a705f9f63a2ee33ed735cba05dbccf9918ea74e44375a238747618c8dae1d040",
+      "bytes": 34859,
+      "source_sha256": "3695397b35affa1d3c42d1abc9da07b608e1930bd80b144e3531e26124955d84",
+      "source_size": [
+        1536,
+        1024
+      ],
+      "width": 256,
+      "height": 256,
+      "alpha": true
+    },
+    {
+      "id": "hall-join",
+      "asset_key": "prop:hall-join",
+      "slug": "hall-join",
+      "name": "Terminal Desk",
+      "prompt": "Use case: stylized-concept.\nAsset type: individual gameplay world fixture texture for Local Manifestation, contemporary industrial personal-base / workshop setting.\nProjection constraint: STRICT ORTHOGRAPHIC TOP-DOWN, camera exactly 90 degrees straight overhead. Show ONLY horizontal top surfaces and their outlines; NO side/front/vertical faces, NO horizon, NO isometric, NO oblique perspective, NO scene or floor. This must integrate into a flat top-down game without perspective conflict.\nStyle reference: input knife image is ONLY for matte hand-painted surface finish, restrained ash-gray/charcoal/warm-white palette, dark contours and sparse muted teal accents. Do not copy knife or its side-view projection.\nStyle/medium: unified clean hand-painted 2D game texture, simplified large readable geometric forms, subtle dry-brush material texture, functional present-day industrial design, calm everyday workshop, no fantasy, no runes, no steampunk, no decorative sci-fi.\nComposition: one cohesive complete fixture centered, tightly occupy approximately 85% of square image while preserving all edges; strong readable top-down silhouette. Small functional accents only; no words, no numbers, no letters or logos.\nBackground: genuinely transparent alpha, NO background, floor, cast shadow, contact shadow, frame, or environmental objects.\nSubject: A compact rectangular contemporary terminal computer desk seen straight from overhead: ash-gray work surface, charcoal flat keyboard with simplified blank keys, a small flat tabletop terminal display showing only two muted teal geometric status shapes, small trackball. Unified 3:2 tabletop footprint. Display lies nearly flat so only its top is visible.",
+      "source_file": "docs/art-v1/sources/fixtures/hall-join.png",
+      "file": "content/base/assets/art-v1/fixtures/hall-join.png",
+      "reference_file": "docs/art-v1/sources/weapons/sword.png",
+      "source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-7a8f16ad-9483-4ed9-86f3-b49eed9805d5.png",
+      "sha256": "f59ec2989835995f639dc4c7ed5b6174cf315c8464a2c0b30b071f35945c2c88",
+      "bytes": 37563,
+      "source_sha256": "31fbb8ff8341cb61ddebb5a72a4634fcd1f68a5014d52b000a5d756c9e98b51a",
+      "source_size": [
+        1536,
+        1024
+      ],
+      "width": 256,
+      "height": 256,
+      "alpha": true
+    },
+    {
+      "id": "hall-warehouse",
+      "asset_key": "prop:hall-warehouse",
+      "slug": "hall-warehouse",
+      "name": "Storage Crate Rack",
+      "prompt": "Use case: stylized-concept.\nAsset type: individual gameplay world fixture texture for Local Manifestation, contemporary industrial personal-base / workshop setting.\nProjection constraint: STRICT ORTHOGRAPHIC TOP-DOWN, camera exactly 90 degrees straight overhead. Show ONLY horizontal top surfaces and their outlines; NO side/front/vertical faces, NO horizon, NO isometric, NO oblique perspective, NO scene or floor. This must integrate into a flat top-down game without perspective conflict.\nStyle reference: input knife image is ONLY for matte hand-painted surface finish, restrained ash-gray/charcoal/warm-white palette, dark contours and sparse muted teal accents. Do not copy knife or its side-view projection.\nStyle/medium: unified clean hand-painted 2D game texture, simplified large readable geometric forms, subtle dry-brush material texture, functional present-day industrial design, calm everyday workshop, no fantasy, no runes, no steampunk, no decorative sci-fi.\nComposition: one cohesive complete fixture centered, tightly occupy approximately 85% of square image while preserving all edges; strong readable top-down silhouette. Small functional accents only; no words, no numbers, no letters or logos.\nBackground: genuinely transparent alpha, NO background, floor, cast shadow, contact shadow, frame, or environmental objects.\nSubject: An integrated low industrial storage rack seen directly from overhead, containing four closed charcoal and ash-gray storage crates in a 2 by 2 arrangement, large simple inset lids and muted teal latch tabs, compact 3:2 rectangular footprint. Only the crate tops and thin rack rim are visible.",
+      "source_file": "docs/art-v1/sources/fixtures/hall-warehouse.png",
+      "file": "content/base/assets/art-v1/fixtures/hall-warehouse.png",
+      "reference_file": "docs/art-v1/sources/weapons/sword.png",
+      "source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-f71c71fa-f69c-42ce-b90c-f9ec2c27a301.png",
+      "sha256": "331a8bc8cebe320c2427798e958b8d06194fe6c374020387ef5789037d5df6d5",
+      "bytes": 47173,
+      "source_sha256": "41314bca21f5f4ccc54d34f7137e3a1b5e41766cb595955134fe01a07194c6e4",
+      "source_size": [
+        1536,
+        1024
+      ],
+      "width": 256,
+      "height": 256,
+      "alpha": true
+    },
+    {
+      "id": "shop",
+      "asset_key": "prop:shop",
+      "slug": "shop",
+      "name": "Supply Dispenser",
+      "prompt": "Use case: stylized-concept.\nAsset type: individual gameplay world fixture texture for Local Manifestation, contemporary industrial personal-base / workshop setting.\nProjection constraint: STRICT ORTHOGRAPHIC TOP-DOWN, camera exactly 90 degrees straight overhead. Show ONLY horizontal top surfaces and their outlines; NO side/front/vertical faces, NO horizon, NO isometric, NO oblique perspective, NO scene or floor. This must integrate into a flat top-down game without perspective conflict.\nStyle reference: input knife image is ONLY for matte hand-painted surface finish, restrained ash-gray/charcoal/warm-white palette, dark contours and sparse muted teal accents. Do not copy knife or its side-view projection.\nStyle/medium: unified clean hand-painted 2D game texture, simplified large readable geometric forms, subtle dry-brush material texture, functional present-day industrial design, calm everyday workshop, no fantasy, no runes, no steampunk, no decorative sci-fi.\nComposition: one cohesive complete fixture centered, tightly occupy approximately 85% of square image while preserving all edges; strong readable top-down silhouette. Small functional accents only; no words, no numbers, no letters or logos.\nBackground: genuinely transparent alpha, NO background, floor, cast shadow, contact shadow, frame, or environmental objects.\nSubject: A compact square contemporary supply dispenser seen directly from overhead, dark charcoal outer housing, broad warm-white top panel, a small inset teal status panel and two visible recessed supply compartments holding plain packaged supplies. A coherent top access cabinet, no front face, no letters.",
+      "source_file": "docs/art-v1/sources/fixtures/shop.png",
+      "file": "content/base/assets/art-v1/fixtures/shop.png",
+      "reference_file": "docs/art-v1/sources/weapons/sword.png",
+      "source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-9ad403bd-4858-48bd-ada2-c4c75ddf0016.png",
+      "sha256": "8a12371037886ae6453e43fe801f04328153c570408e45aef724be803a89be35",
+      "bytes": 74954,
+      "source_sha256": "dfd8e0cb9818f664777dc742846a310bddd188639bd36d20232beb7ba93656ad",
+      "source_size": [
+        1254,
+        1254
+      ],
+      "width": 256,
+      "height": 256,
+      "alpha": true
+    },
+    {
+      "id": "revival",
+      "asset_key": "prop:revival",
+      "slug": "revival",
+      "name": "Medical Revival Bed",
+      "prompt": "Use case: stylized-concept.\nAsset type: individual gameplay world fixture texture for Local Manifestation, contemporary industrial personal-base / workshop setting.\nProjection constraint: STRICT ORTHOGRAPHIC TOP-DOWN, camera exactly 90 degrees straight overhead. Show ONLY horizontal top surfaces and their outlines; NO side/front/vertical faces, NO horizon, NO isometric, NO oblique perspective, NO scene or floor. This must integrate into a flat top-down game without perspective conflict.\nStyle reference: input knife image is ONLY for matte hand-painted surface finish, restrained ash-gray/charcoal/warm-white palette, dark contours and sparse muted teal accents. Do not copy knife or its side-view projection.\nStyle/medium: unified clean hand-painted 2D game texture, simplified large readable geometric forms, subtle dry-brush material texture, functional present-day industrial design, calm everyday workshop, no fantasy, no runes, no steampunk, no decorative sci-fi.\nComposition: one cohesive complete fixture centered, tightly occupy approximately 85% of square image while preserving all edges; strong readable top-down silhouette. Small functional accents only; no words, no numbers, no letters or logos.\nBackground: genuinely transparent alpha, NO background, floor, cast shadow, contact shadow, frame, or environmental objects.\nSubject: A compact medical revival bed seen strictly straight down from overhead: narrow warm-white padded mattress within an ash-gray base frame, charcoal head cushion, a compact integrated teal diagnostic module on one side, small folded pale cloth. A single coherent rectangular bed unit, only top surfaces, no legs or side walls.",
+      "source_file": "docs/art-v1/sources/fixtures/revival.png",
+      "file": "content/base/assets/art-v1/fixtures/revival.png",
+      "reference_file": "docs/art-v1/sources/weapons/sword.png",
+      "source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-95c4838d-2f54-4d53-b6db-ddba3c756620.png",
+      "sha256": "3403b7958537ebcebffb507e48a7226f71620ed0dc997851af1ae7db2a350336",
+      "bytes": 36015,
+      "source_sha256": "3cc73a687a04ed5428cc214b2a52bace3a7ced2da7d4d6fdc5b4827347116639",
+      "source_size": [
+        1254,
+        1254
+      ],
+      "width": 256,
+      "height": 256,
+      "alpha": true
+    },
+    {
+      "id": "exit",
+      "asset_key": "prop:exit",
+      "slug": "exit",
+      "name": "Floor Exit Console",
+      "prompt": "Use case: stylized-concept.\nAsset type: individual gameplay world fixture texture for Local Manifestation, contemporary industrial personal-base / workshop setting.\nProjection constraint: STRICT ORTHOGRAPHIC TOP-DOWN, camera exactly 90 degrees straight overhead. Show ONLY horizontal top surfaces and their outlines; NO side/front/vertical faces, NO horizon, NO isometric, NO oblique perspective, NO scene or floor. This must integrate into a flat top-down game without perspective conflict.\nStyle reference: input knife image is ONLY for matte hand-painted surface finish, restrained ash-gray/charcoal/warm-white palette, dark contours and sparse muted teal accents. Do not copy knife or its side-view projection.\nStyle/medium: unified clean hand-painted 2D game texture, simplified large readable geometric forms, subtle dry-brush material texture, functional present-day industrial design, calm everyday workshop, no fantasy, no runes, no steampunk, no decorative sci-fi.\nComposition: one cohesive complete fixture centered, tightly occupy approximately 85% of square image while preserving all edges; strong readable top-down silhouette. Small functional accents only; no words, no numbers, no letters or logos.\nBackground: genuinely transparent alpha, NO background, floor, cast shadow, contact shadow, frame, or environmental objects.\nSubject: A compact square floor exit interaction console viewed strictly directly from overhead: charcoal metal base, ash-gray top panel, one large circular muted teal activation pad, a short flush rectangular amber safety indicator and simple recessed border. A coherent functional contemporary control device, no upright monitor, no text.",
+      "source_file": "docs/art-v1/sources/fixtures/exit.png",
+      "file": "content/base/assets/art-v1/fixtures/exit.png",
+      "reference_file": "docs/art-v1/sources/weapons/sword.png",
+      "source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-b271d39f-60d6-45d0-839c-722f5deb1b54.png",
+      "sha256": "ef5f80387014a2d65cea107d7433829be58740131edf81df0801c49a61b580ec",
+      "bytes": 86567,
+      "source_sha256": "dd0a58c6a10e164a83537b3b5181f24c389470d84653116a941f0deac5c14ad9",
+      "source_size": [
+        1254,
+        1254
+      ],
+      "width": 256,
+      "height": 256,
+      "alpha": true
+    },
+    {
+      "id": "obstacle",
+      "asset_key": "prop:obstacle",
+      "slug": "obstacle",
+      "name": "Metal Protective Crate",
+      "prompt": "Use case: stylized-concept.\nAsset type: individual gameplay world fixture texture for Local Manifestation, contemporary industrial personal-base / workshop setting.\nProjection constraint: STRICT ORTHOGRAPHIC TOP-DOWN, camera exactly 90 degrees straight overhead. Show ONLY horizontal top surfaces and their outlines; NO side/front/vertical faces, NO horizon, NO isometric, NO oblique perspective, NO scene or floor. This must integrate into a flat top-down game without perspective conflict.\nStyle reference: input knife image is ONLY for matte hand-painted surface finish, restrained ash-gray/charcoal/warm-white palette, dark contours and sparse muted teal accents. Do not copy knife or its side-view projection.\nStyle/medium: unified clean hand-painted 2D game texture, simplified large readable geometric forms, subtle dry-brush material texture, functional present-day industrial design, calm everyday workshop, no fantasy, no runes, no steampunk, no decorative sci-fi.\nComposition: one cohesive complete fixture centered, tightly occupy approximately 85% of square image while preserving all edges; strong readable top-down silhouette. Small functional accents only; no words, no numbers, no letters or logos.\nBackground: genuinely transparent alpha, NO background, floor, cast shadow, contact shadow, frame, or environmental objects.\nSubject: A sturdy square industrial protective metal crate seen strictly from directly overhead, ash-gray inset square lid, deep charcoal broad protective frame, four muted steel corner reinforcements, two small restrained teal locking tabs. A clear solid square footprint, only top surface visible, no side faces.",
+      "source_file": "docs/art-v1/sources/fixtures/obstacle.png",
+      "file": "content/base/assets/art-v1/fixtures/obstacle.png",
+      "reference_file": "docs/art-v1/sources/weapons/sword.png",
+      "source_original": "C:\\Users\\Tony\\.codex\\generated_images\\01a141e9-3b2c-72c3-b1fa-05f1ce55fdd5\\exec-e1db7a9a-7cc4-4d09-a55e-9cc2fb46e57f.png",
+      "sha256": "64c284a175b9e022607e0fb163631d6e643cb64abdd57a7f0b29d1c24bf00074",
+      "bytes": 79376,
+      "source_sha256": "5fac3f23ed1d54c63256658b5478ccbc865901b89c97fe166b6e54398557864b",
+      "source_size": [
+        1254,
+        1254
+      ],
+      "width": 256,
+      "height": 256,
+      "alpha": true
+    }
+  ]
+}

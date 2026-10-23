@@ -26,6 +26,7 @@ func (g *Game) buildChassisWindow(f *uiFrame, layout ui.Layout) {
 		}
 		c.Summary = []string{g.localized("content."+ch.ID+".description", ""), g.tr("ui.preset.base", "hp", ch.HP, "armor", ch.Armor), g.contentName(ch.Weapon, g.catalog.Weapon(ch.Weapon).Name)}
 		c.Details = []string{g.tr("ui.preset.attributes", "strength", ch.Attributes.Strength, "agility", ch.Attributes.Agility, "constitution", ch.Attributes.Constitution, "intelligence", ch.Attributes.Intelligence, "sense", ch.Attributes.Sense, "mana", ch.Attributes.Mana)}
+		c.Summary = append(c.Summary, g.tr("ui.growth.base"), g.growthPreferenceLine(ch))
 		if c.Badge != "" {
 			c.Summary = append(c.Summary, c.Badge)
 		}
@@ -63,15 +64,15 @@ func (g *Game) drawPresetCard(dst *ebiten.Image, c uiControl) {
 		}
 		g.drawIcon(dst, icon, center.X-9, center.Y-9)
 	}
-	fitText(dst, strings.Trim(c.Caption, "[] "), r.X+80, r.Y+16, r.W-90, 14, false)
+	g.fitText(dst, strings.Trim(c.Caption, "[] "), r.X+80, r.Y+16, r.W-90, 14, false)
 	if strings.HasPrefix(c.Caption, "[ ") {
 		g.drawIcon(dst, "check", r.X+r.W-26, r.Y+4)
 	}
 	if ch, ok := g.catalog.Chassis(c.Icon); ok {
-		fitText(dst, g.contentName(ch.Weapon, g.catalog.Weapon(ch.Weapon).Name), r.X+80, r.Y+44, r.W-90, 12, false)
-		fitText(dst, g.tr("ui.preset.base", "hp", ch.HP, "armor", ch.Armor), r.X+12, r.Y+90, r.W-24, 11, false)
+		g.fitText(dst, g.contentName(ch.Weapon, g.catalog.Weapon(ch.Weapon).Name), r.X+80, r.Y+44, r.W-90, 12, false)
+		g.fitText(dst, g.tr("ui.preset.base", "hp", ch.HP, "armor", ch.Armor), r.X+12, r.Y+90, r.W-24, 11, false)
 	}
 	if c.Badge != "" {
-		fitText(dst, c.Badge, r.X+80, r.Y+67, r.W-90, 11, false)
+		g.fitText(dst, c.Badge, r.X+80, r.Y+67, r.W-90, 11, false)
 	}
 }

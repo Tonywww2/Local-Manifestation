@@ -8,7 +8,6 @@ import (
 	"hsmultiplayer/pkg/inventory"
 	"hsmultiplayer/pkg/model"
 	"hsmultiplayer/pkg/progression"
-	"hsmultiplayer/pkg/status"
 )
 
 type inventoryStatusCard struct {
@@ -36,35 +35,27 @@ func (g *Game) buildCharacterInventory(f *uiFrame, layout ui.Layout) {
 		g.addCharacterEquipment(f, v, i, bounds)
 	}
 	g.addLabel(f, id, ui.Rect{X: q.Consumables.X, Y: q.Consumables.Y - 28, W: q.Consumables.W, H: 22}, g.tr("ui.consumables"))
-	g.addLabel(f, id, ui.Rect{X: q.Skills.X, Y: q.Skills.Y - 28, W: q.Skills.W, H: 22}, g.tr("ui.inventory.skills"))
 	for i := 0; i < 4; i++ {
 		g.addCharacterEquipment(f, v, 5+i, ui.GridCell(q.Consumables, i, 4, 54))
-		key := fmt.Sprintf("skill%d", i+1)
-		c := uiControl{Owner: id, ID: "configured:" + key, Icon: "empty", Key: g.bindingLabel(g.bound(key)), Bounds: ui.GridCell(q.Skills, i, 4, 54), Title: g.tr("ui.action." + key), Summary: []string{g.tr("ui.slot.empty")}}
-		if d, ok := g.catalog.Skill(p.Skills[i]); ok {
-			c.Icon, c.Title = skillIcon(d.ID), g.contentName(d.ID, d.Name)
-			c.Summary = []string{g.localized("content."+d.ID+".description", d.Description), g.tr("ui.skill.cost", "cost", d.Cost, "seconds", float64(d.CooldownMillis)/1000)}
-			if remaining := float64(p.SkillReady[i]-p.Statuses.Time) / float64(status.UnitsPerSecond); remaining > 0 {
-				c.Badge = fmt.Sprintf("%.1f", remaining)
-			}
-		}
-		f.Controls = append(f.Controls, c)
 	}
+	g.addLabel(f, id, ui.Rect{X: q.WeaponSkill.X, Y: q.WeaponSkill.Y - 28, W: q.Consumables.W, H: 22}, g.tr("ui.weapon_skill"))
+	f.Controls = append(f.Controls, g.weaponSkillControl(*p, id, "configured:weapon_skill", q.WeaponSkill))
 	g.buildCharacterAccessories(f, v, q.Accessories)
 	g.buildCharacterBag(f, v, q.Bag)
 	if it, ok := inventory.Find(v, g.u.selectedItem); ok {
 		d, _ := g.catalog.Item(it.Definition)
 		g.addLabel(f, id, ui.Rect{X: q.Bag.X, Y: r.Y + 476, W: q.Bag.W - 94, H: 40}, g.contentName(d.ID, d.Name))
-		addControl(f, id, "item:equip", "approve", "", "item-equip", it.ID, g.tr("ui.item.equip"), ui.Rect{X: q.Bag.X + q.Bag.W - 86, Y: r.Y + 478, W: 34, H: 30})
+		if d.Kind == "movement" {
+			addControl(f, id, "item:movement", "movement", "", "movement-select", it.ID, g.tr("ui.movement.select"), ui.Rect{X: q.Bag.X + q.Bag.W - 86, Y: r.Y + 478, W: 34, H: 30})
+		} else if d.Kind != "passive" {
+			addControl(f, id, "item:equip", "approve", "", "item-equip", it.ID, g.tr("ui.item.equip"), ui.Rect{X: q.Bag.X + q.Bag.W - 86, Y: r.Y + 478, W: 34, H: 30})
+		}
 		addControl(f, id, "item:sell", "coins", "", "item-sell", it.ID, g.tr("ui.item.sell"), ui.Rect{X: q.Bag.X + q.Bag.W - 44, Y: r.Y + 478, W: 34, H: 30})
 	}
 	// This window has its own ID and lifetime, independent of the backpack.
 	addControl(f, id, "backpack:attributes", "person", "", "window", "self", g.tr("ui.character.attributes"), q.AttributeButton)
 	f.Controls[len(f.Controls)-1].Caption = g.tr("ui.character.attributes")
-	f.Controls[len(f.Controls)-1].Summary = []string{g.tr("ui.points", "count", p.Points), g.tr("ui.character.attributes.help")}
-	if p.Points > 0 {
-		f.Controls[len(f.Controls)-1].Badge = fmt.Sprint(p.Points)
-	}
+	f.Controls[len(f.Controls)-1].Summary = []string{g.tr("ui.character.attributes.help"), g.tr("ui.growth.base")}
 	addControl(f, id, "backpack:loot", "status", "", "window", "loot", g.tr("ui.loot"), q.LootButton)
 	g.addLabel(f, id, q.Help, g.tr("ui.inventory.help.compact"))
 }
@@ -73,6 +64,7 @@ func (g *Game) addCharacterEquipment(f *uiFrame, v model.Inventory, index int, r
 	it, _ := inventory.Find(v, v.Equipment[index])
 	c := g.itemControl("backpack", "equipped:"+strconv.Itoa(index), it, r, "inventory-equipment")
 	c.Value = strconv.Itoa(index)
+	c.Slot = inventory.Slots[index]
 	if index >= 5 {
 		c.Key = g.bindingLabel(g.bound(fmt.Sprintf("item%d", index-4)))
 	}
@@ -132,6 +124,7 @@ func (g *Game) buildCharacterAccessories(f *uiFrame, v model.Inventory, r ui.Rec
 		// Accessories already use a compact equipped list. Every unoccupied
 		// display slot targets its append position, without changing bag slots.
 		c.Value = strconv.Itoa(min(start+i, len(v.Accessories)))
+		c.Slot = "accessory"
 		if it.ID == "" {
 			c.Title = g.tr("ui.slot.accessory")
 			c.Summary = []string{g.tr("ui.slot.empty")}
@@ -145,7 +138,7 @@ func (g *Game) inventoryStatusControl(r ui.Rect, p model.Player) uiControl {
 	next := progression.NextLevelXP(p.Level)
 	c := uiControl{Owner: "equipment", ID: "inventory-status", Icon: "weapon", Action: "window", Value: "backpack", Title: g.tr("ui.backpack_status"), Caption: g.contentName(w.ID, w.Name), Bounds: r,
 		InventoryStatus: &inventoryStatusCard{Coins: fmt.Sprint(p.Coins), Level: g.tr("ui.level.short", "level", p.Level), Experience: fmt.Sprintf("%d / %d", p.XP, next), Fraction: float64(p.XP) / float64(next)},
-		Summary:         []string{g.contentName(w.ID, w.Name), g.tr("ui.shop.balance", "coins", p.Coins), g.tr("ui.level.short", "level", p.Level), g.tr("ui.xp.progress", "xp", p.XP, "next", next), g.tr("ui.points", "count", p.Points)}, Details: g.u.previewLines}
+		Summary:         []string{g.contentName(w.ID, w.Name), g.tr("ui.shop.balance", "coins", p.Coins), g.tr("ui.level.short", "level", p.Level), g.tr("ui.xp.progress", "xp", p.XP, "next", next)}}
 	if it, ok := inventory.Find(p.Inventory, p.Inventory.Equipment[0]); ok {
 		item := g.itemControl("equipment", c.ID, it, r, "window")
 		c.Icon = item.Icon

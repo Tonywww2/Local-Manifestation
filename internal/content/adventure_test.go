@@ -44,9 +44,13 @@ func TestInvalidAdventureAndRegistration(t *testing.T) {
 		{"terrain-room-overlap", "terrain", func(a *model.AdventureDef) {
 			a.Maps[0].Terrain = []model.Terrain{{Q: a.Maps[0].Nodes[0].Q, R: a.Maps[0].Nodes[0].R, Name: "Cliff"}}
 		}},
-		{"paid-passage", "passage", func(a *model.AdventureDef) {
-			a.Nodes[len(a.Nodes)-1].Payment = "personal"
-			a.Nodes[len(a.Nodes)-1].Cost = 1
+		{"combat-passage", "passage", func(a *model.AdventureDef) {
+			for i := range a.Nodes {
+				if a.Nodes[i].Kind == "passage" {
+					a.Nodes[i].Room = a.Rooms[0].ID
+					break
+				}
+			}
 		}},
 		{"waves", "room parameters", func(a *model.AdventureDef) { a.Rooms[0].Waves = nil }},
 		{"overflow", "enemy count", func(a *model.AdventureDef) { a.Rooms[0].Waves[0].Enemies[0].Count.Base = int(^uint(0) >> 1) }},

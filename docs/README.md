@@ -6,6 +6,7 @@
 
 - [玩家说明](player-guide.md)：启动、操作、合作、背包与存档恢复。
 - [开发指南](development.md)：运行参数、构建、打包与开发流程。
+- [Release流程](releases/README.md)：标签发布、版本包、校验及失败重试。
 - [开发规范](../AGENTS.md)：函数式核心、副作用边界与状态所有权。
 - [实装核对与待测](implementation-audit.md)：当前能力、缺口和验证边界。
 - [系统实装说明](approved-systems.md)：已接入模块的运行路径。
@@ -18,6 +19,7 @@
 - [内容配置接口](content.md)：JSON、JS 与内容加载。
 - [模组指南](mods.md)：分发、依赖、校验、重载与原生构建。
 - [第一轮内容设计](content-batch-01.md)：敌人、装备与饰品。
+- [人物与敌人动画](animation-system.md)：四方向部件、骨骼与权威动作边界。
 - [美术来源与提示词](art-assets.json)。
 - [已采用的主菜单设计](ui-designs/2026-10-08-v2/main-menu-v2.png)、[个人大厅设计](ui-designs/2026-10-08-v2/preparation-hall-v2.png)、[战斗界面设计](ui-designs/2026-10-08-v2/combat-hud-v2.png)。
 

@@ -1,46 +1,51 @@
-# 局部显现 / Local Manifestation — 开发版本游玩说明 0.7.0
+# 玩家说明
 
-解压整个目录，运行 `client.exe`。主菜单：开始游戏、设置、退出。开始游戏进入可走动的个人大厅，靠近装置按 G 或点击：单人冒险、房间设置、学习局外加成、创建联机大厅、加入服务器、仓库。
+目标：合作探索五层主流程，击败出口 BOSS。全队倒地或死亡时冒险失败。内容与数值仍在开发。
 
-创建大厅会启动独立服务端。其他电脑选择加入服务器，输入房主的局域网地址和端口（默认 7777）。使用相同版本和玩法组合；管理员在准备窗口开始本层。默认单人也能开始，上限 8 人。关闭房主客户端或返回大厅会结束它启动的服务器。独立服务端可单独运行。
+个人大厅设施可直接用鼠标点击，不限制角色与设施的距离；走近后也可按 F 交互（支持改键）。冒险房间中的装置继续遵守各自的距离与玩法规则。
 
-默认 WASD 移动、左键朝指针攻击、空格闪避，技能 Q/E/R/F，消耗品 1/2/3/4。F2 切换鼠标移动模式，鼠标模式右键按住直接移动、点击寻路，技能 Q/W/E/R。Tab 切换视角，M 打开大地图。设置可调整语言、按键和 HUD 位置，另有完整玩法说明。
+WASD 移动，左键攻击，右键释放当前武器技能，空格闪避，1–4 使用消耗品，F 交互。F2 切换鼠标移动模式：右键按住移动、短点击寻路，中键释放武器技能。武器技能仅部分武器具有，各自有冷却，可能消耗特殊资源；可在设置改键。
 
-个人大厅右上角护甲图标选择初始机体，点击后保存，适用于单人和联机。战士初始持剑，沿用原卫士数值，不限制后续换装。右下背包 / 状态卡片显示当前武器、金钱、等级、经验数值与进度条；悬浮查看未分配点数，Shift 查看武器计算。顶部显示层数与房间/波次，均可在 HUD 设置中调整位置。基础战士贴图为静态单姿态。
+角色在世界中显示当前手持武器。近战攻击播放蓄势、挥动与收势，枪械播放后坐与枪口闪光，法器和武器技能播放施放动作；翻滚播放身体旋转与短暂残影。大厅、战斗外与战斗内共用这些显示，队友动作通过服务端快照同步。动画仅表达既有战斗判定，不增加额外硬直或改变翻滚无敌时间。
 
-地图只查看。走到真实门口跨房：免费通路连续通过；个人付费入口 G 后确认；共享门与下一层出口靠近装置交互投票，留在范围内维持投票，离开撤票。共享行动力为 0 后可以继续用个人行动力探索和救援；要推进需选择强化 BOSS。最后一点共享行动力用于普通 BOSS 不会强化。
+按住 Q/E 旋转，或左右拖动视角按钮。双按 Q/E 沿该方向吸附至最近的 60° 刻度；双击视角按钮沿最近一次旋转方向吸附，无旋转记录时取最近刻度。以默认视角为 0°，例如右转至 73° 后吸附到 120°，左转则到 60°，已在刻度上保持不动。吸附有短暂平滑过渡，手动旋转可打断。滚轮缩放主场景与大小地图；WASD 按屏幕方向移动。M 或小地图打开大地图；左键拖动地图视角，短点击目标确认移动。窗口不会暂停游戏。
 
-战斗外普通房间也能攻击、闪避和释放技能，仍按资源、冷却与控制效果限制。个人大厅可以攻击和闪避；停止操作时闪避次数也会恢复。
+个人移动可沿完整最短通路直接到达目标，每条连接消耗 1 点个人行动力，返回、重复经过也计费。商店和通路等默认不阻挡；未完成战斗与特殊事件默认阻挡，完成后可经过。中途经过不触发节点收益。商店允许个人进入。房间保持独立空间；战斗结束后原地停留，打开地图继续移动。等待、战斗与波次间不能离开，普通战斗开始前和波次间允许他人加入。
 
-普通战斗开战前、波次间可付费加入，战斗时锁门。波次间仍可移动和攻击，中央显示下一波倒计时。全房倒地暂停该房战斗；外部队友进入或支援，清理后才能救援。全队倒地或死亡判负。第四次倒地死亡；死亡复活后计数为 1，之后第三次倒地再次死亡。倒地惩罚和计数分开。
+普通共享同行仅限相邻节点：右键菜单发起投票，通过后统一消耗 1 点共享行动力，选择同行的相邻玩家进入，仅同意的玩家留在原地。共享费用的特殊节点必须投票。BOSS 在地图选择前往即提交集结投票；远处队员可选择个人移动道具入场。达到房间票数，且每名存活队员都相邻或已提交有效移动道具时，统一进入；单人直接确认。普通 BOSS 仍扣 1 共享行动力，个人道具另扣自身费用。右键 BOSS 可取消本人集结。层出口使用实体装置，离开范围撤票。
 
-点击右下卡片打开背包 / 状态：左侧显示角色立绘与武器、四防具；左下显示四消耗品和当前四技能；右上为饰品，右侧其余区域为 27 格背包。左下“属性与加点”打开独立窗口，关闭背包仍保留，可分配点数、滚动查看详细属性，并用 Shift 查看计算。特殊模式扩容后，背包和饰品各自用标题旁箭头翻页；小窗口可滚动内容。
+大小地图的节点只显示类型图标：战斗暗紫、商店绿色、BOSS 红色、通路灰色。视野外仍显示类型，但隐藏真实名称和具体提示；商店与 BOSS 保持公开。进入房间会显示名称字幕，成功移动后关闭大地图，小地图保持显示。第一层没有复苏和强化设施，BOSS 门前固定补给商店。
 
-左键拿起整堆，再点放下/合并/交换；右键拿半堆，手持时右键放一个。消耗品每堆最多 30，装备不堆叠，空格不会自动补位；关闭或断线时手持物品回收背包。可在战斗中换装。靠近地面掉落拾取，在商店附近买卖/强化。点击队友状态打开交易，双方确认同一报价；物品交换没有房间/距离/战斗限制，不能直接交易货币。已装备及手持物品须先放回背包再报价。
+移动道具在背包右键选择，或在大地图内右上角的按钮选择；选“普通移动”恢复道路模式。道具可跳过道路和阻挡，仍只能在战斗外使用并遵守目标锁门时间。普通个人道具每次扣 1 个人行动力，免签坐标券免费；每次成功使用扣 1 耐久。集体坐标券经团队投票扣 1 共享行动力，转移全部脱战队员并保留倒地，跳过战斗中与死亡者。移动道具不可装备到快捷栏。
 
-Hover 跟随鼠标只读，Shift 展开计算，没有按钮，不能拖动。普通窗口可同时打开、拖动、关闭和滚动，不暂停游戏。状态左键不会另开页面。个人/共享行动力在小地图左下；闪避储存以血条右侧圆点表示。
+大小地图按当前移动方式标出可达目标：青色边框可直接前往，金色边框需要团队投票，白色内框表示当前选中。普通移动按完整最短路线和行动力判断，道具按自身范围与费用判断；战斗中不能离开，锁门的目标不会高亮。节点原有类型颜色和未知问号保留。状态随行动力、房间入场时机和道具选择更新，最终入场仍由服务端裁定。
 
-通关装备存入局外仓库，主冒险不能从仓库重复带入装备。局外点数、成就和挑战按同次冒险结算一次。学习树、物品数值和随机内容均是开发配置；标准12饰品槽已接入。首批装备和第一层敌人可玩，开发数值尚待粗调；主流程五层，后续层暂时复用首批模板，无限流程待实装。普通与特殊/玩法模组进度隔离。
+被动消耗品放在背包即生效，同一次事件匹配的所有物品逐件触发。应急熔断片免疫致命命中并提供 10 秒、最大生命 50% 的护盾；其他被动在使用移动道具抵达后提供当层随机饰品或持续至离场的攻速。背包满时奖励落在目标房间内。战斗结束概率掉落一、二档消耗品；三档目前由商店提供，价格和掉落概率仍是开发配置。
 
-管理员可导出最近层间检查点，在房间设置指定恢复文件并开启恢复。留空使用上次文件。独立服务端支持 `server.exe -restore FILE`。恢复需要相同版本/模组摘要，旧成员需在本层开始前回来。不保存战斗中途。
+共享行动力归零后仍可用个人行动力救援或探索，继续推进需选择强化 BOSS。最后一点共享行动力用于普通 BOSS 不会强化。强化 BOSS 诅咒使后续每层个人和共享初始值各少 1，不叠加，直到使用解除道具。
 
-F3 切换中英文，F4 帧率上限，F5 垂直同步，F6 性能计数。逻辑默认 30 TPS，可配置 60，快照频率与渲染独立。实际帧率也取决于机器性能。
+生命归零倒地；清理房间后队友可拉起。普通倒地惩罚每层线性减少 25% 最大生命和最终伤害。第四次倒地死亡；复活后当前计数为 1，之后第三次倒地再次死亡。
 
-同电脑两个客户端用不同 profile，例如：
+每次升级自动获得六维各 +1，再增加机体成长偏好的额外点数。没有手动加点。设置按钮位于小地图下方，武器技能位于右下背包/状态按钮左侧。背包/状态按钮展示武器、货币、等级和经验；背包中的属性详情按钮打开可独立保留的窗口。
 
-```powershell
-.\client.exe -name Alice -profile alice
-.\client.exe -name Bob -profile bob
-```
+靠近地面物品后左键点击，或按交互键 F 拾取最近的一件。背包中的掉落物窗口也能拾取附近物品；距离过远会提示，背包已满时物品留在地上。个人战斗奖励仍只有本人可拾取。空手右键自己的物品可选择“丢到地上”，整组丢弃并保留修饰、强化、耐久与武器技能冷却；正在装备的物品会同时卸下。手动丢弃的物品对全队可见，队友在同房间靠近后也可拾取；进入新层时地面物品清空。
 
-Extract the whole archive and run client.exe. Start Game enters your walkable personal hall. Walk to a device and press G. Solo starts immediately; Host opens a multiplayer lobby; Join uses the host's LAN address and port. Use the same game version and gameplay combination. The administrator starts each floor during preparation.
+设置 → 编辑 UI 布局进入战斗 HUD 编辑模式。小地图、背包/状态按钮、生命与护盾、特殊资源条、闪避计数、状态、消耗品、武器技能、队友状态、冒险进度、旋转视角、设置、交互提示及帧数/延迟可分别定位。拖动组件边框或名称条移动；也可从编辑面板选择组件，用方向键微调 1 像素、Shift+方向键微调 10 像素，或点击 X/Y 输入坐标并按 Enter 确认。编辑面板本身可从标题处移开；重叠组件可通过列表选择后调整。
 
-WASD moves, LMB attacks toward the pointer, Space dodges, Q/E/R/F use skills, and 1–4 use consumables. F2 switches mouse mode (RMB move; Q/W/E/R skills). Tab switches camera; M opens the inspect-only map. Walk between rooms. Personal entrances require payment confirmation; shared entrances and exits use nearby voting devices. Leaving their range withdraws a vote.
+“保存”应用并保存到当前玩家配置；“取消”或 Esc 放弃本次修改；输入坐标时首次 Esc 只取消输入。“重置所选”仅恢复当前组件，“重置战斗布局”仅恢复战斗 HUD，两者仍需保存。普通窗口的位置独立保留。从主菜单或大厅进入时使用本地示例预览，不开启冒险；无队友、状态或交互提示时也显示定位示例。编辑不暂停服务端战斗，期间不发送玩家移动或攻击输入。
 
-Clear rooms, build equipment and defeat the floor BOSS. When shared AP reaches zero, personal AP still permits exploration/rescue; progressing requires an enhanced BOSS. Teammates can occupy separate combat rooms. A completely downed room pauses until help arrives; rescue requires clearing combat. A completely downed/dead team loses.
+背包 27 格，装备另占 9 格，标准 12 饰品槽。左键取放物品，Shift+左键快速穿戴/卸下；空手右键打开“显示详情”菜单，手持时右键放一个；装备不堆叠，消耗品默认每堆 30。背包不自动排序，关闭时收回手持物品。允许战斗中换装；技能冷却随武器实例保留。商店操作与拾取需要靠近。
 
-The bottom-right Inventory / Status card shows the equipped weapon, money, level and XP. Open it for a character portrait and equipment on the left, consumables and configured skills below, accessories at the upper right and 27 fixed bag slots in the remaining right area. Attributes / Points opens a separate window that stays open after inventory closes. Scroll detailed stats and hold Shift for calculations. Expanded bags and accessories have separate page arrows.
+点击队友状态可交易，不限制房间、距离或战斗，但必须双方确认同一报价；不能直接交换货币。悬浮查看摘要，Shift 查看计算；Hover 跟随鼠标，普通窗口可拖动、同时打开和独立关闭。
 
-There are 9 separate weapon/armor/consumable slots and 12 standard accessory slots. Left click picks up or places a stack; right click takes half or places one while holding. Consumables stack up to 30; equipment never stacks. Closing the bag or disconnecting returns held items. Exchange bag items through teammate status, with both players confirming; currencies cannot be directly traded. Hover follows the mouse and Shift expands calculations. Ordinary windows can be dragged and coexist without pausing. Settings include English/Chinese, key bindings, HUD layout and detailed rules.
+通关将持有物品带入局外仓库，获得加成点，在个人大厅学习。仓库装备不能带回主冒险。特殊模式和玩法模组所得进度不能回流普通进度。
 
-Protocol 13 / SDK 6 / content format 3 / checkpoint 6. Update client, server and content together; old default-content checkpoints have a different digest and are unsupported. See README.md, approved-systems.md, mods.md and implementation-audit.md. Public hosting and Steam Workshop are outside this batch. This build uses development content; formal art and balance are pending. The project's distribution license has not been selected.
+界面中的六维名称使用固定颜色：力量为珊瑚红、敏捷为薄荷绿、体质为琥珀色、智力为蓝色、感应为粉紫色、魔力为淡紫色。物品说明、成长偏好、属性详情和计算过程共用此配色；切换中英文保持对应关系。空装备槽显示类别底纹，装备后的格子显示物品图标与小型槽位标记。
+
+武器基础描述直接显示当前属性、装备与状态下的普通命中伤害，精确到两位小数；未装备武器显示换装后的预览，多种伤害分别列出。详情窗口可独立于背包显示，提供普通与暴击的完整单行公式，只展示玩家侧计算，不含目标护甲、抗性、减伤和最低伤害步骤；目标条件加成在实际满足时生效。六维分数与权重使用对应属性颜色，其他伤害部分使用伤害类型颜色。长公式可左右滚动。悬浮数值部分查看组成和来源，左键锁定为独立窗口，点击其中的来源继续展开。锁定窗口保留点击时的计算快照；武器详情本身随当前构筑更新。
+
+大小地图的通路图标为圆点，并且通路始终探明；其他未探明节点为问号，底色仍表示节点类型。节点间留出更宽的间距，连接带填满相连节点两条相对边之间的缝隙，未连接处留白。已完成节点颜色变淡；战斗与单次事件显示勾，通路、商店及功能设施不显示完成勾。新生成的地图混合使用直接连接与通路连接，部分战斗/事件等非通路节点可以直接相邻。
+
+大地图默认占屏幕宽高约 86%，可拖动右下角调整窗口尺寸，松开后自动保存；拖动标题栏移动窗口，拖动地图内容平移地图。操作说明和选中信息为透明叠加文本，不预留底部显示区域，也不拦截对下方节点的点击。缩小游戏窗口时会限制地图窗口的可见范围，放大后恢复保存的尺寸。
+
+冒险中按 F7 打开开发菜单，选择“获取任意道具”。可按名称或 ID 搜索，按武器、防具、饰品、消耗品、移动道具和被动道具分类；滚轮或底部箭头翻页，悬浮图标查看说明。仅服务器管理员可以领取，每次一件，使用普通背包堆叠与容量规则，不自动穿戴或排序。

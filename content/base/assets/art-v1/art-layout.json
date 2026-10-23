@@ -1,0 +1,16 @@
+{
+  "_comment": "Grip points relative to the cropped visible weapon sprite. Coordinates are normalized; X is left-to-right and Y top-to-bottom.",
+  "weapon_grips": {
+    "base:sword": {"x": 0.22, "y": 0.5},
+    "base:wave-sword": {"x": 0.22, "y": 0.5},
+    "base:pry-bar": {"x": 0.22, "y": 0.5},
+    "base:carbine": {"x": 0.42, "y": 0.63},
+    "base:model-700": {"x": 0.36, "y": 0.63},
+    "base:focus": {"x": 0.22, "y": 0.5},
+    "base:dual-focus": {"x": 0.24, "y": 0.6},
+    "base:seeker": {"x": 0.24, "y": 0.65},
+    "base:injector": {"x": 0.22, "y": 0.65},
+    "base:thermal-emitter": {"x": 0.27, "y": 0.7},
+    "base:condensing-projector": {"x": 0.22, "y": 0.6}
+  }
+}

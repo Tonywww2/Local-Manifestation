@@ -9,10 +9,10 @@ import (
 	"time"
 )
 
-// Exercise the real input protocol. Tests cannot teleport with an enter command.
+// Traverse authored connections through the map protocol, paying per movement.
 func travel(t *testing.T, peers []*testPeer, targets map[string]string, enter bool) {
 	t.Helper()
-	pending := map[string]bool{}
+	pending := map[string]string{}
 	deadline := time.Now().Add(60 * time.Second)
 	for time.Now().Before(deadline) {
 		done := true
@@ -62,39 +62,23 @@ func travel(t *testing.T, peers []*testPeer, targets map[string]string, enter bo
 			for previous[next] != pl.Node {
 				next = previous[next]
 			}
-			side, ok := geometry.DoorSide(nodes[pl.Node], nodes[next])
-			if !ok {
-				t.Fatal("invalid door")
-			}
-			w, h := content.DefaultSpaceWidth, content.DefaultSpaceHeight
-			// Development combat rooms keep this envelope except the wide-room fixture.
-			if nodes[pl.Node].Room == "base:wide-room" {
-				w, h = 1200, 300
-			}
-			a := geometry.NewArena(w, h)
-			if !enter && next == target && a.NearDoor(pl.Position, side) {
-				p.send(t, protocol.Request{Kind: "input"})
-				continue
+			if !enter && next == target {
+				continue // Stop in an adjacent room, ready for a map confirmation.
 			}
 			done = false
-			if pending[p.id] {
+			if pending[p.id] == pl.Node {
 				continue
 			}
-			if next == target && enter && a.NearDoor(pl.Position, side) && !nodes[next].Completed && nodes[next].Payment != "none" {
-				p.send(t, protocol.Request{Kind: "input"})
-				p.send(t, protocol.Request{Kind: "enter", Node: next})
-				pending[p.id] = true
-				continue
-			}
-			point := a.DoorPoint(side, -8)
-			p.send(t, protocol.Request{Kind: "input", Input: model.Input{Move: point.Sub(pl.Position).Unit()}})
+			p.send(t, protocol.Request{Kind: "input"})
+			p.send(t, protocol.Request{Kind: "enter", Node: next})
+			pending[p.id] = pl.Node
 		}
 		if done {
 			return
 		}
 		time.Sleep(30 * time.Millisecond)
 	}
-	t.Fatal("physical travel timed out")
+	t.Fatal("map travel timed out")
 }
 
 func walkToDevice(t *testing.T, c *content.Catalog, peers []*testPeer, exit bool) {

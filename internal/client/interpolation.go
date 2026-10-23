@@ -63,6 +63,8 @@ func copyScenePositions(s protocol.Scene) protocol.Scene {
 	s.Players = append([]model.Player(nil), s.Players...)
 	s.Enemies = append([]model.Enemy(nil), s.Enemies...)
 	s.Projectiles = append([]model.Projectile(nil), s.Projectiles...)
+	s.Actions = append([]model.PlayerActionState(nil), s.Actions...)
+	s.EnemyActions = append([]model.EnemyActionState(nil), s.EnemyActions...)
 	return s
 }
 func lerp(a, b model.Vec, alpha float64) model.Vec { return a.Add(b.Sub(a).Scale(alpha)) }

@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 )
 
-const Version = 6
+const Version = 7
 
 type Visit struct {
 	Player string   `json:"player"`

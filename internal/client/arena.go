@@ -40,17 +40,21 @@ func strokeMesh(lines []geometry.Segment, c Camera, width float64, col color.RGB
 // The render host draws the grid in one batch, not one call per hex edge.
 func buildArenaDrawing(width, height float64, c Camera) arenaDrawing {
 	a := geometry.NewArena(width, height)
-	points := a.Vertices()
+	return buildRoomDrawing(a, width, height, c)
+}
+
+func buildRoomDrawing(a geometry.Arena, width, height float64, c Camera) arenaDrawing {
 	floor := arenaMesh{}
-	var edges []geometry.Segment
-	for i, p := range points {
-		floor.Vertices = append(floor.Vertices, meshVertex(c.Project(p), color.RGBA{R: 170, G: 177, B: 169, A: 255}))
-		edges = append(edges, geometry.Segment{A: p, B: points[(i+1)%6]})
+	for _, cell := range a.Cells() {
+		base := uint32(len(floor.Vertices))
+		for _, p := range cell.Vertices() {
+			floor.Vertices = append(floor.Vertices, meshVertex(c.Project(p), color.RGBA{R: 170, G: 177, B: 169, A: 255}))
+		}
+		for i := uint32(1); i < 5; i++ {
+			floor.Indices = append(floor.Indices, base, base+i, base+i+1)
+		}
 	}
-	for i := uint32(1); i < 5; i++ {
-		floor.Indices = append(floor.Indices, 0, i, i+1)
-	}
-	return arenaDrawing{Width: width, Height: height, Camera: c, Floor: floor, Grid: strokeMesh(a.Grid(26), c, 1, color.RGBA{R: 91, G: 100, B: 94, A: 42}), Border: strokeMesh(edges, c, 3, color.RGBA{93, 109, 103, 255})}
+	return arenaDrawing{Width: width, Height: height, Camera: c, Floor: floor, Grid: strokeMesh(a.Grid(26), c, 1, color.RGBA{R: 91, G: 100, B: 94, A: 42}), Border: strokeMesh(a.Boundary(), c, 3, color.RGBA{93, 109, 103, 255})}
 }
 
 // Space views use server-owned player positions, including at the starting node.
@@ -68,13 +72,15 @@ func (g *Game) spaceView() *protocol.Scene {
 		}
 	}
 	w, h := g.catalog.SpaceSize(node)
-	s := protocol.Scene{ID: "space:" + p.Node, Room: node.Room, State: "idle", Width: w, Height: h, Tick: g.state.ServerTick, TickRate: g.state.TickRate, ActualTPS: g.state.ActualTPS}
+	s := protocol.Scene{ID: "space:" + p.Node, Room: node.Room, State: "idle", Width: w, Height: h, Hexes: g.catalog.SpaceHexes(node), Tick: g.state.ServerTick, TickRate: g.state.TickRate, ActualTPS: g.state.ActualTPS}
 	if room, ok := g.catalog.Room(node.Room); ok {
 		s.Obstacles = room.Obstacles
 	}
 	for _, view := range g.state.Scenes {
 		if view.ID == s.ID {
 			s.Projectiles = view.Projectiles
+			s.Actions = view.Actions
+			s.EnemyActions = view.EnemyActions
 			break
 		}
 	}

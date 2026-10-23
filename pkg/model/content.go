@@ -1,7 +1,7 @@
 package model
 
 // ContentFormat is independent of protocol, checkpoint and SDK versions.
-const ContentFormat = 3
+const ContentFormat = 4
 
 type RunDef struct {
 	Floors    []string `json:"floors"`
@@ -15,11 +15,12 @@ type AdventureDef struct {
 	Rooms  []RoomDef        `json:"rooms"`
 }
 type FloorDef struct {
-	ID           string `json:"id"`
-	Map          string `json:"map"`
-	PersonalAP   int    `json:"personal_ap"`
-	SharedAP     int    `json:"shared_ap"`
-	EnhancedRoom string `json:"enhanced_room"`
+	ExcludedRandomKinds []string `json:"excluded_random_kinds,omitempty"`
+	ID                  string   `json:"id"`
+	Map                 string   `json:"map"`
+	PersonalAP          int      `json:"personal_ap"`
+	SharedAP            int      `json:"shared_ap"`
+	EnhancedRoom        string   `json:"enhanced_room"`
 }
 type MapTemplateDef struct {
 	Generator *MapGeneratorDef `json:"generator,omitempty"`
@@ -30,8 +31,10 @@ type MapTemplateDef struct {
 	Terrain   []Terrain        `json:"terrain,omitempty"`
 }
 type MapGeneratorDef struct {
+	BossApproach    string   `json:"boss_approach,omitempty"`
 	Count           CountDef `json:"count"`
 	Pool            []string `json:"pool"`
+	Passage         string   `json:"passage,omitempty"`
 	ExtraEdgeChance float64  `json:"extra_edge_chance"`
 }
 type MapNodeDef struct {
@@ -42,20 +45,23 @@ type MapNodeDef struct {
 	Edges      []string `json:"edges"`
 }
 type NodeDef struct {
-	Shop         []ShopEntry    `json:"shop,omitempty"`
-	Facility     string         `json:"facility,omitempty"`
-	FacilityCost int            `json:"facility_cost,omitempty"`
-	ID           string         `json:"id"`
-	Kind         string         `json:"kind"`
-	Name         string         `json:"name"`
-	NameKey      string         `json:"name_key"`
-	Hint         string         `json:"hint"`
-	HintKey      string         `json:"hint_key"`
-	Payment      string         `json:"payment"`
-	Cost         int            `json:"cost"`
-	Room         string         `json:"room,omitempty"`
-	Handler      string         `json:"handler,omitempty"`
-	Parameters   map[string]any `json:"parameters,omitempty"`
+	WeaponUpgrade bool           `json:"weapon_upgrade,omitempty"`
+	Blocking      *bool          `json:"blocking,omitempty"`
+	Hexes         []HexCell      `json:"hexes,omitempty"`
+	Shop          []ShopEntry    `json:"shop,omitempty"`
+	Facility      string         `json:"facility,omitempty"`
+	FacilityCost  int            `json:"facility_cost,omitempty"`
+	ID            string         `json:"id"`
+	Kind          string         `json:"kind"`
+	Name          string         `json:"name"`
+	NameKey       string         `json:"name_key"`
+	Hint          string         `json:"hint"`
+	HintKey       string         `json:"hint_key"`
+	Payment       string         `json:"payment"`
+	Cost          int            `json:"cost"`
+	Room          string         `json:"room,omitempty"`
+	Handler       string         `json:"handler,omitempty"`
+	Parameters    map[string]any `json:"parameters,omitempty"`
 }
 type CountDef struct {
 	Base      int `json:"base"`
@@ -101,6 +107,7 @@ type ScalingDef struct {
 	HPPerExtraPlayer float64 `json:"hp_per_extra_player"`
 }
 type RoomDef struct {
+	Hexes            []HexCell  `json:"hexes,omitempty"`
 	ObjectiveSeconds float64    `json:"objective_seconds,omitempty"`
 	Obstacles        []Obstacle `json:"obstacles,omitempty"`
 	ID               string     `json:"id"`
@@ -112,6 +119,13 @@ type RoomDef struct {
 	SpawnRadius      Vec        `json:"spawn_radius"`
 	Scaling          ScalingDef `json:"scaling"`
 	Waves            []WaveDef  `json:"waves"`
+}
+
+// HexCell is a room-local axial coordinate, independent of the strategic map.
+// An omitted layout is one hexagon; explicit layouts must include (0, 0).
+type HexCell struct {
+	Q int `json:"q"`
+	R int `json:"r"`
 }
 
 type Obstacle struct {

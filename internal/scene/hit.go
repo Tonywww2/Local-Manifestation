@@ -4,14 +4,17 @@ import (
 	"errors"
 	"fmt"
 	"hsmultiplayer/internal/content"
+	"hsmultiplayer/pkg/animation"
 	"hsmultiplayer/pkg/damage"
 	"hsmultiplayer/pkg/life"
 	"hsmultiplayer/pkg/model"
+	"hsmultiplayer/pkg/perf"
 	"hsmultiplayer/pkg/status"
 	"hsmultiplayer/sdk"
 )
 
 func (w *world) dispatchHit(e model.Event, players map[string]model.Player, target *model.Enemy) ([]sdk.Command, error) {
+	defer w.performance.Since("scene.logic.hit_callbacks", perf.Start())
 	if w.runtime == nil {
 		return nil, nil
 	} // isolated personal-hall host has no hit targets
@@ -35,6 +38,7 @@ func (w *world) dispatchHit(e model.Event, players map[string]model.Player, targ
 // One hit validates callbacks, typed contributions, defense, shields and
 // after-damage effects before committing player/enemy replacements together.
 func (w *world) resolveHit(q damage.Request, e model.Event, enemy *model.Enemy) (damage.Result, error) {
+	defer w.performance.Since("scene.logic.hit_transaction", perf.Start())
 	e.Critical = q.Critical
 	targetEnemy := enemy
 	if enemy != nil {
@@ -116,7 +120,14 @@ func (w *world) resolveHit(q damage.Request, e model.Event, enemy *model.Enemy) 
 	if err != nil {
 		return damage.Result{}, err
 	}
-	r, hp, shields, err = damage.Settle(r, hp, shields)
+	if enemy == nil {
+		var settled model.Player
+		r, settled, err = w.catalog.SettlePlayerDamage(r, players[e.Target])
+		players[e.Target] = settled
+		hp, shields = settled.HP, settled.Statuses
+	} else {
+		r, hp, shields, err = damage.Settle(r, hp, shields)
+	}
 	if err != nil {
 		return damage.Result{}, err
 	}
@@ -179,14 +190,23 @@ func (w *world) resolveHit(q damage.Request, e model.Event, enemy *model.Enemy) 
 	}
 	for id, p := range players {
 		w.players[id].player = p
+		if id == e.Target && enemy == nil && r.HealthLoss+r.Absorbed > 0 {
+			f := w.players[id]
+			f.visual.Hit = model.ActionAnimation{Sequence: f.visual.Hit.Sequence + 1, Direction: f.visual.Facing.Scale(-1), Duration: .16}
+			f.syncVisualLife()
+		}
 		if p.Life != "alive" {
 			w.players[id].input = model.Input{}
 			w.players[id].attack, w.players[id].dodgeTime, w.players[id].invulnerable = nil, 0, 0
+			w.players[id].visual = animation.Cancel(w.players[id].visual)
 		}
 	}
 	if enemy != nil {
 		enemy.HP, enemy.Statuses = hp, shields
 		*targetEnemy = model.CloneEnemy(*enemy)
+		if r.HealthLoss+r.Absorbed > 0 {
+			w.recordEnemyHit(*enemy, model.Vec{}, enemy.HP <= 0)
+		}
 	}
 	return r, nil
 }
